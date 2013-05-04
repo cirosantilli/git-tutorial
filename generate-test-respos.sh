@@ -9,156 +9,180 @@ copy_script="copy.sh"
 F="$(basename "$0")"
 usage()
 {
-  echo "generate and remove git test repos
+    echo "generate and remove git test repos
 
-EXAMPLES
-  
-  create tests:
+# examples
+    
+create tests:
 
     $F
 
-  they are put inside a dir named: $outdir
+they are put inside a dir named: $outdir
 
-  delete tests:
+delete tests:
 
     $F clean
 
-  the output dir is completelly removed.
+the output dir is completelly removed.
+
+see this help:
+
+    $F help
 " 1>&2
 }
 
 if [ $# -gt 0 ]; then
-  if [ $1 = clean ]; then
-    rm -rf "$outdir"
-  else
-    usage
-    exit 1
-  fi
+    if [ $1 = clean ]; then
+        rm -rf $outdir
+        exit 0
+    elif [ $1 = help ]; then
+        usage
+    else
+        usage
+        exit 1
+    fi
 else
 
+    rm -rf $outdir
+    mkdir "$outdir"
+    cp "$copy_script" "$outdir"
+    cd "$outdir"
+    chmod +x "$copy_script"
 
-  mkdir "$outdir"
-  cp "$copy_script" "$outdir"
-  cd "$outdir"
-  chmod +x "$copy_script"
+    #0
+    
+    mkdir 0
+    cd 0
+    git init
+    echo 'a1' > a
+    echo 'b1' > b
+    cd ..
 
-  #0
-  
-  mkdir 0
-  cd 0
-  git init
-  echo 'a1' > a
-  echo 'b1' > b
-  cd ..
+    #0d
 
-  #1
+    cp -r 0 0d
+    cd 0d
+    mkdir d
+    echo da > d/a
+    echo db > d/b
+    cd ..
 
-  cp -r 0 1
-  cd 1
-  git add *
-  git commit -m 1
-  cd ..
+    #1
 
-  #1u
+    cp -r 0 1
+    cd 1
+    git add *
+    git commit -m 1
+    cd ..
 
-  cp -r 1 1u
-  cd 1u
-  echo 'c1' > c
-  cd ..
+    #1d
 
-  #1b
+    cp -r 0d 1d
+    cd 1d
+    git add *
+    git commit -m 1
+    cd ..
 
-  cp -r 1u 1ub
-  cd 1ub
-  git branch b
-  cd ..
+    #1u
 
-  #2
+    cp -r 1 1u
+    cd 1u
+    echo 'c1' > c
+    cd ..
 
-  cp -r 1 2
-  cd 2
-  echo 'a2' >> a
-  echo 'b2' >> b
-  git commit -am 2
-  cd ..
+    #1b
 
-  #2u
+    cp -r 1u 1ub
+    cd 1ub
+    git branch b
+    cd ..
 
-  cp -r 2 2u
-  cd 2u
-  echo -e 'c1' >> c
-  cd ..
+    #2
 
-  #2b
+    cp -r 1 2
+    cd 2
+    echo 'a2' >> a
+    echo 'b2' >> b
+    git commit -am 2
+    cd ..
 
-  cp -r 1u 2b
-  cd 2b
-  git add c
-  git commit -am '2'
+    #2u
 
-  git checkout -b b HEAD~
-  echo a2 >> a
-  echo '' >> b
-  echo d1 > d
-  git add d
-  git commit -am 'b2'
-  git checkout master
-  cd ..
+    cp -r 2 2u
+    cd 2u
+    echo -e 'c1' >> c
+    cd ..
 
-  #3
+    #2b
 
-  cp -r 2 3
-  cd 3
-  echo 'a3' >> a
-  echo 'b3' >> b
-  git commit -am 3
-  cd ..
+    cp -r 1u 2b
+    cd 2b
+    git add c
+    git commit -am '2'
 
-  #0bare
+    git checkout -b b HEAD~
+    echo a2 >> a
+    echo '' >> b
+    echo d1 > d
+    git add d
+    git commit -am 'b2'
+    git checkout master
+    cd ..
 
-  mkdir 0bare
-  cd 0bare
-  git init --bare
-  cd ..
+    #3
 
-  #multi
+    cp -r 2 3
+    cd 3
+    echo 'a3' >> a
+    echo 'b3' >> b
+    git commit -am 3
+    cd ..
 
-  mkdir multi
-  cp -r 2b multi/a
-  cd multi
-  git clone --bare a ao
-  git clone --bare ao bo
-  git clone bo b
+    #0bare
 
-  cd a
-  git remote add origin ../ao
-  cd ..
+    mkdir 0bare
+    cd 0bare
+    git init --bare
+    cd ..
 
-  cd b
-  git remote add upstream ../ao
-  cd ..
+    #multi
 
-  cd ..
+    mkdir multi
+    cp -r 2b multi/a
+    cd multi
+    git clone --bare a ao
+    git clone --bare ao bo
+    git clone bo b
 
-  #multiu
+    cd a
+    git remote add origin ../ao
+    cd ..
 
-  mkdir multiu
-  cp -r multi/* multiu
-  cd multiu
+    cd b
+    git remote add upstream ../ao
+    cd ..
 
-  cd a
-  echo e1 > e
-  git add e
-  git commit -am e
-  cd ..
+    cd ..
 
-  cd b
-  echo f1 > f
-  git add f
-  git commit -am f
-  cd ..
-  
-  cd ..
+    #multiu
+
+    mkdir multiu
+    cp -r multi/* multiu
+    cd multiu
+
+    cd a
+    echo e1 > e
+    git add e
+    git commit -am e
+    cd ..
+
+    cd b
+    echo f1 > f
+    git add f
+    git commit -am f
+    cd ..
+    
+    cd ..
 
 fi
 

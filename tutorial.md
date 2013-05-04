@@ -4,7 +4,7 @@ git tutorial for absolute beginners.
 
 it is use case oriented.
 
-here i'm focusing on linux (ubuntu) + [git](http://git-scm.com/) + [github],
+the current focus on linux (ubuntu) + [git](http://git-scm.com/) + [github],
 you can use any OS (Windows or OSX), and there are many alternatives to [github],
 such as [bitbucket] or [gitorious]
 
@@ -16,7 +16,7 @@ this workflow is basically valid for any [vcs] (git) with a web interface (githu
 
 - lots of examples.
 
-- references applications.
+- reference to applications.
 
 - not sure a complete beginner would easily get around, but I'd like that to be possible.
 
@@ -226,6 +226,90 @@ show tracked files:
     git ls-files
         #a b
 
+# gitignore
+
+`.gitignore` are files that tell git to ignore certain files,
+typically output files so they won't for example clutter your `git status`.
+
+you should *always* put all output files inside a gitignore.
+
+there are two common strategies to to that:
+
+- by file extension: `*.o` to ingore all object files.
+
+    This is has the downside that you may have to add lots of extensions to the gitignore.
+
+- by directory:      `_out/` to ingore all files in `_out/`.
+
+    This is has the downside that some (bad) programs cannot output to or use
+    files from other directories except the current...
+
+## syntax
+
+`.gitignore` uses slightlly modified bash globbing. Reminders:
+
+- bash globbing is strictly less powerful than regexes
+
+- regex equivalence
+
+    glob        regex 
+    --------    --------
+    `*`         `.*`
+    `*.o`       `.*\.o`
+    `[1-3]`     `[1-3]`
+    `[a-c]`     `[a-c]`
+
+    so there is not equivalence for:
+
+    - regex kleene star: `*`
+    - regex alternatives: `(ab|cd)`
+
+## examples
+
+    ./copy 0d
+    git status
+        #untracked: d/
+
+any basename match is ok and  add ignores stuff in the ignore:
+
+    echo a > .gitignore
+    git status
+        #untracked: b d/
+    git add d
+    git status
+        #untracked: b
+        #new file: d/b
+
+to match in current dir only, start with `/`:
+
+    echo '/a' > .gitignore
+    git status
+        #untracked: a d/
+    git add d
+    git status
+        #new file: d/a d/b
+
+trying to add an ingored file is an error:
+
+    git reset
+    git add a
+        #error, a ingored, use -f if you really want to add it
+
+you can ignore entire dirs:
+
+    echo d > .gitignore
+    git status
+        #untracked: a b
+
+`.gitignores` are valid on all subdirs of which it is put only:
+
+    echo a > d/.gitignore
+    git status
+        #untracked: a b d/
+    git add *
+    git status
+        #new file: a b d/b
+
 # add
 
 make git track files for next version
@@ -239,26 +323,44 @@ check that it will be considered for next version with:
 
 ## example: add
 
-requires that you understand [add], [rm] and [reset] to modify the repo.
+start with [1]
 
-start with [0]
-
-    status
-        #untracked: a b
-    git add a
-    status
-        #to be commited: new file: a
-        #untracked: b
-    git add b
-        #to be commited: new file: a b
-    git commit -m '1'
-    status
-        #no changes
     echo a2 >> a
-    status
+
+    git status
         #not staged: modified: a
+
     git add a
+    git status
         #to be committed: modified: a
+
+you must add after making the desired modifications.
+
+if you add and then modify, only the first addition will be taken into account for next version.
+
+    echo a2 >> a
+
+    git status
+        #to be committed: modified: a
+        #not staged:      modified: a
+
+    git add a
+
+    git status
+        #to be committed: modified: a
+
+add is recursive on dirs:
+
+    mkdir d
+    echo a > d/a
+    git status
+        #to be committed: modified: a
+        #untracked: d/
+
+    git add d
+    git status
+        #to be committed: modified: a
+        #to be committed: new: d/a
 
 # rm
 
@@ -357,7 +459,7 @@ so if you mistakenly committed:
 
 - sensitive data like a password
 
-- some large output file like an `.avi`
+- some large output file like an `.ogv`
 
 do this:
 
@@ -410,9 +512,10 @@ with `-k`, if moving would lead to an error (overwrite without -f or file not tr
 
 # reset
 
-changes who is the parent of a commit.
+- make changes to the staged files
+- move branches from one commit to another.
 
-as any history rewritting, you should not do this after a push.
+    as any history rewritting, you should not do this after a push.
 
 ## hard vs soft
 
@@ -475,7 +578,7 @@ with hard:
 
 - untracked files (`c`) are unchanged, but they are unstaged
 
-## change parent of a commit
+## change what a branch points to
 
 this changes history and as any history changing, if you do this after you [push] and someone else [fetche]d, there will be problems!
 
@@ -611,12 +714,31 @@ if you use this all the time, you only add files once.
 
 **danger**: remove all [untracked file]s in repo
 
-start with [1]
+    ./copy.sh 1
 
     echo c > c
-    git clean -f
-    ls
-        #a b
+    echo c > d/c
+
+dry run with -n:
+
+    git clean -n
+        #would remove c
+        #would not remove d/
+
+remove entire dirs with -d:
+
+    git clean -dn
+        #would remove c
+        #would remove d/
+
+not dry run with `-f`:
+
+    git clean -df
+        #would remove c
+        #would remove d/
+
+by default, to make a non dry run, you have to add `-f`
+this depends on your git configurations.
 
 # log
 
@@ -677,6 +799,26 @@ show all commits on all branches (by default only current branch is shown):
 view hash commit messages only:
 
     git log --pretty=oneline
+
+view deleted files only:
+
+    git log --diff-filter=D --summary
+    git log --all --pretty=format: --name-only --diff-filter=D
+
+this is very useful to find when you deleted a file from a repo if you dont know its exact path!
+
+# show
+
+show specific versions of files and other infos.
+
+view file at an specific version:
+
+    git show HEAD^:path/to/file
+    git show $HASH^:path/to/file
+
+application: checkout a file with a diferent name:
+
+    git show HEAD^:path/to/file > new/path/to/file
 
 # reflog
 
@@ -881,6 +1023,13 @@ list with hashes side by side:
 list with commit messages side by side:
 
 not possible without a for loop AFAIK <http://stackoverflow.com/questions/5358336/have-git-list-all-tags-along-with-the-full-message>
+
+you cannot add a tag twice:
+
+    git tag 1.0
+    git tag 1.0 HEAD~
+
+so you msut delete the old tag before.
 
 delete:
 
@@ -1702,6 +1851,12 @@ this may ask for you github username and pass.
 
 go back to github and browse your uploaded files to check that they are there.
 
+## tags
+
+if you tag then you can:
+
+- refer have raw urls for tags
+
 # file permissions
 
 git keeps file permissions (rwx) as metadata inside the ``.git`` dir
@@ -1714,7 +1869,7 @@ to force git to keep a dir, add a file to it.
 
 popular possibilities are:
 
-- `readme`` file explaining why the dir is there after all!
+- `readme` file explaining why the dir is there after all!
 
 - `.gitkeep` file. It has absolutelly no special meaning for git, but is somewhat conventional.
 
@@ -1776,22 +1931,35 @@ Now a dir callled `shared` was created and contains your repo.
 
 Don't ever touch that dir directly. Changes in that dir are not seen by git.
 
-## clone a repo that contains a submodul
+## clone a repo that contains a submodule
 
-to get all the files of submodules you need:
+to get all the files of submodules you need the `--recursive` flag:
 
-    git clone add git://github.com/USERNAME/project2.git
-    git submodule init
-    git submodule update
+    git clone --recursive git://github.com/USERNAME/project2.git
 
----
+if you forgot to use recursive when you cloned, you should:
+
+    git submodule update --init
 
 git commands inside the submodule work just like git commands on a regular git repo!
+
+it seems that adding recursive is neither possible nor a good idea:
+http://stackoverflow.com/questions/4251940/retrospectively-add-recursive-to-a-git-repo
 
 ## update the content of a submodule
 
     cd share
     git pull
+
+now we have:
+
+    git status
+        #modified:   shared (new commits)
+
+for your repo to incorporate this update, you have to add the submodule path (`share/`)
+and commit, or simply do a `commit -a` next time.
+
+From the outside, the submodule looks much like a regular git controlled file.
 
 ## go back to another version of a submodule
 
@@ -1799,7 +1967,7 @@ git commands inside the submodule work just like git commands on a regular git r
     git log
     git checkout VERSION-ID
 
-##remove
+## remove a submodule
 
 TODO test this
 
@@ -1814,6 +1982,15 @@ remove it from `.git/config`:
     rm -Rf .git/modules/$path_to_submodule
     git commit -am 'removed submodule'
     rm -rf $path_to_submodule
+
+of course, this is horrible, and it seems that as of git 1.8.3 there will be a `git deinit` command! TODO remove when true
+
+## change submodule upstream
+
+edit `.gitmodules` to the correct upstream
+
+    git submodule sync
+    git submodule update
 
 # rebase
 
@@ -1843,7 +2020,7 @@ now whenever you commit, you will see: abc on the terminal!
 
 see: <http://git-scm.com/book/en/Customizing-Git-Git-Hooks> for other hook names.
 
-#github api v3 via curl
+# github api v3 via curl
 
 github has an http api, meaning you can do stuff on github programatically such as listing, creating or removing repos.
 
@@ -1863,14 +2040,14 @@ lots of info:
 
 ## create git repo
 
+    USER=
+    REPO=
     curl -u "$USER" https://api.github.com/user/repos -d '{"name":"'$REPO'"}'
-    git remote add github git@github.com:$USER/$REPO.git
-    git push origin master
 
 repo name is the very minimal you must set, but you could also set other params such as:
 
-    '{
-       "name": "'$REPO'",
+    curl -u "$USER" https://api.github.com/user/repos -d '{
+       "name": "'"$REPO"'",
        "description": "This is your first repo",
        "homepage": "https://github.com",
        "private": false,
@@ -1879,7 +2056,7 @@ repo name is the very minimal you must set, but you could also set other params 
        "has_downloads": true
     }'
 
-its just JSON.
+its just JSON (remember, last item cannot end in a comma )
 
 ## delete repo
 
@@ -1910,6 +2087,22 @@ they are described here.
     git status
         #untracked: a b
 
+## 0du
+
+same as [0], but with an untracked subdir d:
+
+    ls
+        #a b d
+    ls d
+        #a b
+    cat d/a
+        #da
+    cat d/b
+        #db
+
+    git status
+        #untracked: a b d/
+
 ## 1
 
 same as [0], but commited
@@ -1926,6 +2119,10 @@ same as [0], but commited
     (1)
      |
      master
+
+## 1d
+
+same as [0d], but with all tracked
 
 ## 1u
 
