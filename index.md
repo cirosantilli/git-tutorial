@@ -1,12 +1,13 @@
 ---
 title: Git version control tutorial
+layout: default
 ---
 
-BSD 3-clause license.
-
-Contributions are very welcome.
-
 The current focus on Linux + [git](http://git-scm.com/) + [github][], you can use any OS (Windows or OSX), and there are many alternatives to [github], such as [bitbucket] or [gitorious].
+
+Contributions are very welcome. BSD 3-clause license.
+
+<ol data-toc></ol>
 
 #souces
 
