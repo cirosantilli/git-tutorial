@@ -28,15 +28,15 @@ The current focus on Linux + [git](http://git-scm.com/) + [github][], you can us
 
 Git + Github allows you to do the following quickly:
 
-- [upload] your work to a server to:
+- upload your work to a server to:
 
     - backup your work
 
     - publish it
 
-- [download] something someone else made and put on a server
+- download something someone else made and put on a server
 
-- [go to another version]
+- go to another version
 
     - in case you make a mistake, you can restore any file you want, even if it was deleted.
 
@@ -56,7 +56,7 @@ Git + Github allows you to do the following quickly:
 
 - create alternate realities
 
-    this is useful when:
+    This is useful when:
 
     - you want to make two different modifications on a file but you think they may interfere with one another.
 
@@ -68,9 +68,9 @@ Git + Github allows you to do the following quickly:
 
 - view differences between versions
 
-    it is easy to [view *differences* between versions](#differences) to find out what was different on a different version
+    It is easy to [view *differences* between versions](#differences) to find out what was different on a different version
 
-    this is useful when:
+    This is useful when:
 
     - why was my program working then, but stopped working?
 
@@ -1908,7 +1908,7 @@ Where remote-name was either given:
 
 Depends on the command.
 
-The best way is explicitly <remote-name>/<branch-name> but some commands do explicit stuff if you enter just <branch-name> and there is no other branch in your repo with that name.
+The best way is explicitly `<remote-name>/<branch-name>` but some commands do explicit stuff if you enter just `<branch-name>` and there is no other branch in your repo with that name.
 
 Ex: `origin/master`, `origin/feature2`, `upstream/feature2`, etc.
 
