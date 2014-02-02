@@ -1819,6 +1819,12 @@ It is possible to push the current branch by using:
 
     git push origin --delete branch
 
+Can only delete a branch if it is not he current one.
+
+It does not seem possible to modify the current remote in pure git unless you can login into the remote machine.
+
+Github for example allows this under `Settings > Default Branch`.
+
 #remote
 
 Manage remote repositories.
@@ -2094,6 +2100,8 @@ To create a bare repo from scratch:
 To create a bare repo that is a clone of another repo:
 
     git clone --bare other
+
+Bare repositories also have a current branch. This is the branch that Github shows by default. This is also important when deleting remotes with `git push remote --delete branch`, since it is not possible to delete the current remote.
 
 #pull
 

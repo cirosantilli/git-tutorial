@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>{{ site.name }}</title>
-    <link rel="stylesheet" href="{{ site.url }}/assets/syntax.css"/>
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/syntax.css"/>
     <!--mathjax-->
       <script
         src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
@@ -16,75 +16,20 @@
             displayIndent: "20px"
         });
       </script>
-    <!--TOC-->
-
-      <!--https://github.com/gfranko/jquery.tocify.js-->
-        <!--<script src="http://code.jquery.com/jquery-1.10.2.min.js" ></script>-->
-        <!--<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js" ></script>-->
-        <!--<link rel="stylesheet" href="code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>-->
-        <!--<script src="{{ site.url }}assets/jquery.tocify.min.js"></script>-->
-        <!--<link rel="stylesheet" href="{{ site.url }}assets/jquery.tocify.css"/>-->
-        <!--<script>-->
-          <!--$(function() {-->
-            <!--$(".toc").tocify({-->
-              <!--showEffect: "none",-->
-              <!--selectors: "h1,h2,h3,h4,h5,h6",-->
-              <!--showAndHide: false,-->
-              <!--showAndHideOnScroll: false,-->
-              <!--highlightOnScroll: false-->
-            <!--});-->
-          <!--});-->
-
-      <!--https://github.com/ndabas/toc-->
-        <script src="http://code.jquery.com/jquery-1.10.2.min.js" ></script>
-        <script src="{{ site.url }}assets/jquery.toc.js"></script>
-        <script>
-          $("#toc").toc({
-            headings: "h1,h2,h3,h4,h5,h6"
-          });
-        </script>
-
-      <!--http://stackoverflow.com/questions/187619/is-there-a-javascript-solution-to-generating-a-table-of-contents-for-a-page-->
-        <!--<script>-->
-          <!--window.onload = function () {-->
-              <!--var toc = "";-->
-              <!--var level = 0;-->
-
-              <!--document.getElementById("contents").innerHTML =-->
-                <!--document.getElementById("contents").innerHTML.replace(-->
-                  <!--/<h([\d])>([^<]+)<\/h([\d])>/gi,-->
-                  <!--function (str, openLevel, titleText, closeLevel) {-->
-                    <!--if (openLevel != closeLevel) {-->
-                      <!--return str;-->
-                    <!--}-->
-
-                    <!--if (openLevel > level) {-->
-                      <!--toc += (new Array(openLevel - level + 1)).join("<ul>");-->
-                    <!--} else if (openLevel < level) {-->
-                      <!--toc += (new Array(level - openLevel + 1)).join("</ul>");-->
-                    <!--}-->
-
-                    <!--level = parseInt(openLevel);-->
-
-                    <!--var anchor = titleText.replace(/ /g, "_");-->
-                    <!--toc += "<li><a href=\"#" + anchor + "\">" + titleText-->
-                      <!--+ "</a></li>";-->
-
-                    <!--return "<h" + openLevel + "><a name=\"" + anchor + "\">"-->
-                      <!--+ titleText + "</a></h" + closeLevel + ">";-->
-                  <!--}-->
-                <!--);-->
-
-              <!--if (level) {-->
-                <!--toc += (new Array(level + 1)).join("</ul>");-->
-              <!--}-->
-
-              <!--document.getElementById("toc").innerHTML += toc;-->
-          <!--};-->
-        <!--</script>-->
+    <!--toc-->
+      <script src="http://code.jquery.com/jquery-1.10.2.min.js" ></script>
+      <script src="{{ site.baseurl }}assets/jquery.toc.js"></script>
+      <script>
+        $("#toc").toc({
+          headings: "h1,h2,h3,h4,h5,h6"
+        });
+      </script>
   </head>
   <body>
-    <h1><a href="{{ site.baseurl }}">{{ site.name }}</a></h1>
+    <div id="nav">
+      <h1 style="display:inline;"><a href="{{ site.baseurl }}">{{ site.name }}</a></h1>
+      <a href="https://github.com/cirosantilli/git-tutorial">Fork me on GitHub!</a>
+    </div>
     {{ content }}
   </body>
 </html>
