@@ -27,57 +27,63 @@ Contributions are very welcome. BSD 3-clause license.
 
 Git + Github allows you to do the following quickly:
 
-- upload your work to a server to:
+- create multiple versions (*commits* in Git jargon) of your work, and travel between them.
 
-    - backup your work
+    This is useful for:
 
-    - publish it
+    - backup. If you delete a file by mistake, and the file was present in some past version, you can recover it.
 
-- download something someone else made and put on a server
+    - if a recent modification made a change that made things worse, you can just go back to a previous correct state and see what happened.
 
-- go to another version
-
-    - in case you make a mistake, you can restore any file you want, even if it was deleted.
-
-    - you can refer to a specific version.
-
-        Why is this useful?
+    - refer to a specific version.
 
         Say you are writting a book, and you made a session called "motivation".
 
         Other people liked it, and said, look at the motivation section!
 
-        But one day, you decide that the motivation section should be moved somewhere else.
+        But one day, you decide that the motivation section should be called "advantages" instead.
 
-        But then this breakes the references of other people!
+        But then this breakes the references of other people...
 
-        Not if the other person said: look at the "motivation" section of *version* XXX!
+        But not if the other person said: look at the "motivation" section of **version** XXX!
 
-- create alternate realities
+    - you are working on a feature, when something more urgent comes up.
 
-    This is useful when:
+        The current state may not be stable, and may interfere with the more urgent state.
 
-    - you want to make two different modifications on a file but you think they may interfere with one another.
+        No problem, make a version of your current work to save it, and switch to the more urgent matter.
 
-        No problem, create one alternate reality version for each based on the current state.
+        When you are done, just switch back.
 
-    - you want to contribute two modifictaions to someoneelse's project.
+    - view differences between versions
 
-        You are not sure which he will accept. So you make two alternate realities and suggest them both.
+        It is easy to [view *differences* between versions](#differences) to find out what was different on a different version
 
-- view differences between versions
+        This is useful when:
 
-    It is easy to [view *differences* between versions](#differences) to find out what was different on a different version
+        - why was my program working then, but stopped working?
 
-    This is useful when:
+        - what changes exactly did someone else made to my files and wants me to accept?
 
-    - why was my program working then, but stopped working?
+    There are many commands that deal with versions, but you should first learn:
 
-    - what changes exactly did someone else made to my files and wants me to accept?
+    - `git add`, `git rm` and `git mv` decide which files to include on the next version
+    - `git commit` creates versions
+    - `git checkout` moves between versions
+    - `git branch` deals with version names
+
+- upload your work to a server to:
+
+    - back it up
+    - publish it
+
+    The main command to do those things is `git push`.
+
+- download something someone else made public. `git clone` is the way to go.
 
 - work in groups
 
-    Because of all its capacitie, git is widely used in group projects. (it was *created* for the linux kernel )
+    Because of all its capacities, git is widely used in group projects. (it was *created* for the linux kernel )
 
     This means that:
 
@@ -105,38 +111,38 @@ To learn it:
 
     use the standard repos generated in [test repos]
 
-- visualize the commit tree whenever you don't know what is going on.
+- visualize *everything* the commit tree whenever you don't know what is going on.
 
-    once you see the tree, and how to modify it, everything falls into place!
+    Once you see the tree, and how to modify it, everything falls into place!
 
 #setup
 
 Before anything else install git.
 
-On on ubuntu:
+On on Ubuntu for example do:
 
-    sudo aptitude insatll git
+    sudo apt-get insatll git
 
 Next configure git:
 
     git config --global user.name "Ciro Duran Santilli"
     git config --global user.email "ciro@mail.com"
 
-You will also want to install a local gui git viewer:
+You will also want to install a local GUI git viewer:
 
-    sudo aptitude insatll gitk
+    sudo apt-get insatll gitk
 
-It makes it easy to see certain things
+It makes it easier to see the version tree.
 
 #repository
 
-Git works inside the dirs you tell it to work.
+Git works inside the directories you tell it to work.
 
-Those dirs are called *repositories*, *repo* for short.
+Those directories are called *repositories*, *repo* for short.
 
 To create a new repo, use [init].
 
-To copy an existin repo, use [clone]. No need to init it after you clone it.
+To copy an existing repo, use [clone]. No need to `git init` it after you clone it.
 
 To transform a repo into a non repo, remove the `.git` dir (and maybe other files like `.gitignore`)
 
@@ -154,7 +160,7 @@ Most of git operations are based on versions, so you'd better know how to create
 
 To create a version you need to:
 
-- decide what files will be included in the version with [add], [rm] or [reset]
+- decide what files will be included in the version with [add], [rm], [mv], and many others.
 - create the version with [commit]
 
 You can see what would be included in the next version with [status]
@@ -185,15 +191,21 @@ And if nothing changes, it says so.
 
 Check out the [add], [rm] and [reset] commands to see how it behaves (it is only cool once you start changing the repo).
 
-#definition: index
+#working tree
 
-Is where git stores what will be kept for next version
+Is all the "regular" files that lie outside the `.git` directory.
+
+#index
+
+Is where git stores what will be kept for next version.
 
 It can modified with may commands such as [add], [rm], [mv], or [reset].
 
-#definition: working tree
+#staged
 
-Is all the "regular" files that lie outside the `.git` dir.
+When a file on the working tree is added to the index, its changes are said to be *staged*.
+
+By analogy, if you modify the working tree and don't add it to the index, the changes are said to be *unstaged*.
 
 #ls-files
 
@@ -752,8 +764,15 @@ Now status only says that `b` is untracked and nothing about `a`.
 
 It is recommended that the commit message be like:
 
-- start with a summary line of max 50 characters
-- black line
+- start with a summary line of max 70 characters
+
+    The initial line should:
+
+    - be in the imperative, e.g., "Make" instead of "Made"
+    - start with a capital letter
+    - end with a period.
+
+- blank line
 - full explanation of the changes unless they are trivial.
 
 In practice, commits usually link commit messages to the issue they fix, or rely on the Merge Request description for the extended information.
@@ -1633,9 +1652,14 @@ Start from [2]
 
 #stash
 
-Saves all modifications which are not on the index and returns the working tree to `HEAD` into a modification stack called *stash*.
+Saves all unstaged modifications of the working tree, and returns the working tree to `HEAD` into a modification stack called *stash*.
 
 The changes can be applied to any branch afterwards.
+
+This is a common operation when:
+
+- you are working on a branch, when a more urgent branch needs fixing, but you don't want to create a commit just to save the current state
+- you want to apply working tree modifications to another branch
 
 Push changes to the top of the stash:
 
@@ -1821,9 +1845,7 @@ It is possible to push the current branch by using:
 
 Can only delete a branch if it is not he current one.
 
-It does not seem possible to modify the current remote in pure git unless you can login into the remote machine.
-
-Github for example allows this under `Settings > Default Branch`.
+Modify current branch on remote: <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
 #remote
 
@@ -2101,7 +2123,22 @@ To create a bare repo that is a clone of another repo:
 
     git clone --bare other
 
-Bare repositories also have a current branch. This is the branch that Github shows by default. This is also important when deleting remotes with `git push remote --delete branch`, since it is not possible to delete the current remote.
+##current branch
+
+The active or current branch of a bare repository is what its `HEAD` points to.
+
+This has the following effects:
+
+- `clone` automatically checks out one of the branches which are on the same ref as the `HEAD`
+- when deleting remotes with `git push remote --delete branch`, it is not possible to delete the current remote.
+- it is the branch that Github shows by default.
+
+It is not possible to use `checkout` on a remote branch since checkout also acts on the working tree. You must use `update-ref` or better `symbolic-ref`:
+
+    git update-ref   HEAD <hash>
+    git symbolic-ref HEAD refs/heads/something
+
+As of 1.8.4, there seems to be no way to conveniently change the current remote branch: <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
 #pull
 
