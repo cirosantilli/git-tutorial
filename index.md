@@ -27,7 +27,7 @@ Contributions are very welcome. BSD 3-clause license.
 
 Git + Github allows you to do the following quickly:
 
-- create multiple versions (*commits* in Git jargon) of your work, and travel between them.
+- create multiple versions (*commits* or *revisions* in Git jargon) of your work, and travel between them.
 
     This is useful for:
 
@@ -209,13 +209,69 @@ By analogy, if you modify the working tree and don't add it to the index, the ch
 
 #ls-files
 
-List files according to several criteria
+List tracked files recursively according to several criteria.
 
-Show tracked files:
+Show all tracked files in current dir:
 
     ./copy.sh 1u
     git ls-files
         #a b
+
+#ls-tree
+
+List tracked files recursively with extra info:
+
+    git ls-tree --full-tree -r HEAD
+
+Sample output:
+
+    100644 blob 867f193a98f573e65a69b336c8205ea392c84c0e    public/404.html
+    100644 blob b6c37ac53866f33aabea2b79ebc365053dbe8e77    public/422.html
+
+Meaning of fields:
+
+1) <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
+2) TODO
+3) <http://stackoverflow.com/questions/18263216/git-ls-tree-head-meaning-of-third-column>
+
+#grep
+
+Do a `grep -r 'a.c' .` only on tracked files of working tree:
+
+    git grep 'a.c
+
+It true, `-n` by default:
+
+    git config --global grep.lineNumber
+
+It true, `-E` by default:
+
+    git config --global grep.extendedRegexp
+
+#blame
+
+See who last modified each line of a given file and when (so you can blame for the bug the line caused...)
+
+Sample output:
+
+    2c37fa38 (Sergey Linnik          2012-11-19 02:36:50 +0400  71)     size = 40 if size.nil? || size <= 0
+    2c37fa38 (Sergey Linnik          2012-11-19 02:36:50 +0400  72)
+    757c7a52 (Riyad Preukschas       2012-12-15 02:19:21 +0100  73)     if !Gitlab.config.gravatar.enabled || user_email.blank?
+    a9d1038f (Jeroen van Baarsen     2013-12-16 21:56:45 +0100  74)       '/assets/no_avatar.png'
+    65bcc41f (Robert Speicher        2012-08-15 21:06:08 -0400  75)     else
+
+It does not seem possible to count how many lines each user changed in a single git command as of 1.8.4, but the manual itself suggests a command to do so:
+
+    f=
+    git blame --line-porcelain "#f" | sed -n 's/^author //p' | sort | uniq -c | sort -rn
+
+For the entire repo: <http://stackoverflow.com/questions/4589731/git-blame-statistics>
+
+See who last modified all files in project: <http://serverfault.com/questions/401437/how-to-retrieve-the-last-modification-date-of-all-files-in-a-git-repository>
+
+Ignore whitespace only changes (e.g. indent) and moved lines `-M`:
+
+    git blame -w -M
 
 #gitignore
 
@@ -898,15 +954,23 @@ This is a great option to view history on a feature branch onto which upstream w
 
 #shortlog
 
+Summarizes log information.
+
+Group by author, count by author:
+
+    Aaron France (1):
+        Fixed JSON description of system hook
+
+    Aaron Stone (2):
+        Tiny fix to the add/edit groups form path field
+        Allow the OmniAuth provider args parameter to pass through as either an Array or a Hash.
+
+    Abe Hassan (1):
+        Fix the sigil for merge request email
+
 See how many commits each author did:
 
     git shortlog -nse
-
-#grep
-
-Do a `grep -Er 'a.c' .` on tracked files of working tree:
-
-    git grep 'a.c
 
 #mailmap
 
@@ -1074,9 +1138,33 @@ Sample output:
 
 #diff
 
-See differences between two versions with:
+View unstaged modifications, that is, the diff between working tree and index (changes will disappear after `git add`):
+
+    git diff
+
+View staged differences (git added) and `HEAD`:
+
+    git diff --cached
+
+View differences between two revisions:
 
     git diff eebb22 06637b
+
+For a single file:
+
+    f=
+    git diff -- "$f"
+
+Ignore whitespace only changes (e.g. indent changes):
+
+    git diff -w
+
+Ignore changes when a file is moved to another name:
+
+    git diff -M
+
+This can be autodetected even before staging with `git mv` when files are exactly the same.
+It is also possible to consider moves up to a percentage of similarity via `-M90`.
 
 Sample output:
 
@@ -1087,29 +1175,17 @@ Sample output:
 
 Meaning:
 
-- before, line 3 was "before", line for "after".
+- before, line 3 was `before`, line for `after`.
 
-    there were 2 lines total in what we see
+    There were 2 lines total in what we see.
 
-- after, "error" was added after "before", becoming line 4
+- after, `error` was added after `before`, becoming line 4
 
-    there will be 3 lines total in what we see
+    There will be 3 lines total in what we see.
 
-    '+' indicates that a line was added.
+    `+` indicates that a line was added.
 
-    not surprisingly, if we remove something, a '-' will show instead
-
-On a single file:
-
-    git diff $C1 $C2 $F
-
-View staged differences (git added) and `HEAD`:
-
-    git diff --cached
-
-View unstaged modifications, that is, the diff between working tree and index (changes will disappear after `git add`):
-
-    git diff
+    Not surprisingly, if we remove something, a `-` will show instead
 
 After a `git merge`, `git diff` shows a special mode that shows diffs to both parents:
 
@@ -1933,6 +2009,12 @@ Where remote-name was either given:
 
 ##how to refer to one
 
+Documentation at:
+
+    git rev-parse
+
+`SPECIFYING REVISIONS` section.
+
 Depends on the command.
 
 The best way is explicitly `<remote-name>/<branch-name>` but some commands do explicit stuff if you enter just `<branch-name>` and there is no other branch in your repo with that name.
@@ -2353,21 +2435,26 @@ Print full paths of each submodule:
 
 ##remove a submodule
 
-TODO test this
+As of git 1.8.3:
 
-Remove it from the `.gitmodules` file:
+    git submodule deinit path
+
+Files are kept and the `.submodule` path is not edited.
+
+Before 1.8.3: first remove it from the `.gitmodules` file:
 
     vim .submodules
 
-Remove it from `.git/config`:
+Then Remove it from `.git/config`:
 
     vim .git/config
+
+Then:
+
     rm --cached $path_to_submodule #(no trailing slash).
     rm -Rf .git/modules/$path_to_submodule
     git commit -am 'removed submodule'
     rm -rf $path_to_submodule
-
-Of course, this is horrible, and it seems that as of git 1.8.3 there will be a `git deinit` command! TODO remove when true
 
 ##change submodule upstream
 
@@ -2483,7 +2570,7 @@ Now `git log --pretty=oneline -n3` gives:
 
 `squash` can be used if you want to remove all trace of a commit.
 
-`squash` is useful when you are developping a feature locally and you want to save progress at several points in case you want to go back.
+`squash` is useful when you are developing a feature locally and you want to save progress at several points in case you want to go back.
 
 When you are done, you can expose a single commit for the feature, which will be much more concise and useful to others (or at least people will konw that you can use `squash`).
 
@@ -2492,10 +2579,10 @@ You will also look much smarter, since it will seem that you did not make lots o
 If we want to remove only the `HEAD~` from history we edit as:
 
     pick fc95d59 last - 2 commit message
-    squash 81961e9 last - 1 commit message
+    s 81961e9 last - 1 commit message
     pick d13a071 last commit message
 
-This will open up another vim buffer like:
+This will open up another Vim buffer like:
 
     # This is a combination of 2 commits.
     # The first commit's message is:
@@ -2600,15 +2687,15 @@ Path to `.git` dir:
 
 #config
 
-Allows to get and set config data.
+Allows to get and set configuration data.
 
-Main config files:
+Main configuration files:
 
-- `~/.gitconfig`: for all repos on current computer. `--global` option
+- `~/.gitconfig`: for all repos on current computer. `--global` option.
 
-- `.git/config`: cur repo only.
+- `.git/config`: cur repo only. Takes precedence over global options.
 
-It is a cfg file of type:
+It is a `.cfg` file of type:
 
     [group]
         a = b
@@ -2621,38 +2708,59 @@ Corresponding command lines of type:
 
 ##commands
 
-List all non default configs set in those files:
+List the currently used value of all non default configs:
 
     git config -l
 
+Read only from the global file:
+
+    git config --global -l
+
 Get single value:
 
-    git config --global --get user.name
+    git config user.name
 
-Get multiple values:
+Set value locally:
 
-    git config --global --get-all user.name user.email
+    git config user.name "User Name"
 
-##most important fields
+Set value globally:
 
-Usename and email on commits:
+    git config --global user.name "User Name"
 
-    git config --global user.name "Ciro Duran Santilli"
+Get multiple values: TODO
+
+    git config --get-all user.name
+
+Set boolean
+
+##most important configs with bad defaults
+
+Non default ones that you should always set:
+
+    # Username and email on commits:
+    git config --global user.name "Ciro Santilli"
     git config --global user.email "ciro@mail.com"
 
-Remember HTTP/HTTPS passwords for 15 minutes:
-
+    # Remember HTTP/HTTPS passwords for 15 minutes:
     git config --global credential.helper cache
 
-Remember HTTP/HTTPS passwords for given time:
-
+    # Remember HTTP/HTTPS passwords for given time:
     git config --global credential.helper "cache --timeout=3600"
 
-Let git color terminal output by default (but not if it goes to pipes, or the color escape chars might break programs): 
-
+    #Let git color terminal output by default (but not if it goes to pipes,
+    # or the color escape chars might break programs):
     git config --global color.ui auto
 
+    # See grep
+    git config --global grep.lineNumber true
+    git config --global grep.extendedRegexp true
+
+##most important settings with good defaults
+
 Pager to use: `core.pager`. `less` by default.
+
+    git config --global color.ui auto
 
 Editor to use for commit and tag messages: `core.editor`
 
