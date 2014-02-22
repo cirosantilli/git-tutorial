@@ -109,7 +109,7 @@ To learn it:
 
 - make a bunch of standard test repos, copy them out, and *test away*.
 
-    use the standard repos generated in [test repos]
+    Use the standard repos generated in [test repos]
 
 - visualize *everything* the commit tree whenever you don't know what is going on.
 
@@ -119,13 +119,13 @@ To learn it:
 
 Before anything else install git.
 
-On on Ubuntu for example do:
+On on Ubuntu 13.10 do:
 
     sudo apt-get insatll git
 
 Next configure git:
 
-    git config --global user.name "Ciro Duran Santilli"
+    git config --global user.name "Ciro Santilli"
     git config --global user.email "ciro@mail.com"
 
 You will also want to install a local GUI git viewer:
@@ -140,19 +140,39 @@ Git works inside the directories you tell it to work.
 
 Those directories are called *repositories*, *repo* for short.
 
+The only thing that makes a directory in to a repository is the presence of a `.git` folder with the correct files in it, which contains most of the `.git` data (some more may be contained in config files outside `.git` like `.gititnore`).
+
 To create a new repo, use [init].
 
 To copy an existing repo, use [clone]. No need to `git init` it after you clone it.
 
-To transform a repo into a non repo, remove the `.git` dir (and maybe other files like `.gitignore`)
+To transform a repo into a non repo, simply remove the `.git` dir (and maybe other files like `.gitignore`).
 
 #init
 
-Go into some dir you have code you want to add to git and then do:
+Create an empty git repository inside the current directory:
 
     git init
 
 This creates a `.git` dir that contains all the git information.
+
+#three trees
+
+This is a confusing point for beginners, but it is a good design choice by Git, so understand it now and save lots of trouble later.
+
+- working tree: regular files outside `.git`. Those files may not be tracked by Git.
+- staging area: things that have been selected to be added to the next revision
+- HEAD: the last version
+
+Transitions:
+
+    +--------------+  +--------------+  +---------------+
+    | working tree |  | staging area |  | next revision |
+    |--------------+  |--------------+  |---------------+
+    |                 |                 |
+    |                 |                 |
+    |- add ---------> |- commit ------> |
+
 
 #create version
 
@@ -167,11 +187,15 @@ You can see what would be included in the next version with [status]
 
 #status
 
-Allows you to see what would be included in the next version
+See all differences between staged files and the tree and `HEAD`:
 
     git status
 
-You can change what would be added with commmands like [add], [rm] or [reset]
+Only in a given directory:
+
+    git status .
+
+You can change what would be added with commands like [add], [rm] or [reset]
 
 There are 3 possible sections:
 
@@ -211,15 +235,16 @@ By analogy, if you modify the working tree and don't add it to the index, the ch
 
 List tracked files recursively according to several criteria.
 
-Show all tracked files in current dir:
+List all tracked files under current dir newline separated:
 
     ./copy.sh 1u
     git ls-files
-        #a b
+        #a
+        #b
 
 #ls-tree
 
-List tracked files recursively with extra info:
+List tracked files recursively starting from the root:
 
     git ls-tree --full-tree -r HEAD
 
@@ -236,6 +261,15 @@ Meaning of fields:
 
 #grep
 
+Searches for lines in tracked files.
+
+If you only want to search the entire current tree, `ack -a` is probably better as it has better formatted output.
+
+There are however cases where `git grep` shines:
+
+- it is crucial to ignore ignored files
+- search in other revisions
+
 Do a `grep -r 'a.c' .` only on tracked files of working tree:
 
     git grep 'a.c
@@ -247,6 +281,18 @@ It true, `-n` by default:
 It true, `-E` by default:
 
     git config --global grep.extendedRegexp
+
+Search in revision:
+
+    git grep a.c 1.0
+
+Search in revision only under directory:
+
+    git grep a.c 1.0 -- dir
+
+`-l`: list files without any other data:
+
+    git grep -f a.c | xargs perl -lane 's/a/b/p'
 
 #blame
 
@@ -866,13 +912,13 @@ Start with [2]. List versions in chronological order:
 Sample output:
 
     commit 1ba8fcebbff0eb6140740c8e1cdb4f9ab5fb73b6
-    Author: Ciro Duran Santillli <ciro@mail.com>
+    Author: Ciro Santillli <ciro@mail.com>
     Date:   Fri Apr 12 10:22:30 2013 +0200
 
         2
 
     commit 494b713f2bf320ffe034adc5515331803e22a8ae
-    Author: Ciro Duran Santillli <ciro@mail.com>
+    Author: Ciro Santillli <ciro@mail.com>
     Date:   Thu Apr 11 15:50:38 2013 +0200
 
         1
@@ -881,7 +927,7 @@ In this example, there are 2 versions, one with commit message `1` and another w
 
 On version `1` we see that:
 
-- author name: `Ciro Duran Santilli` (specified in `git config`)
+- author name: `Ciro Santilli` (specified in `git config`)
 
 - author email: ciro@mail.com (specified in `git config`)
 
@@ -1015,11 +1061,11 @@ Shows stuff like:
 
 #gitk
 
-Gitk is a gui for git.
+Gitk is a GUI for git.
 
-It helps visualise commits and branches.
+Most of what it does can be done better on the command line, except for one thing: visualizing the commit tree, since this requires lines too fine for a terminal.
 
-Show commits on all branches:
+What you almost always want is to use with `--all` to see all branches marked:
 
     gitk --all
 
@@ -1138,7 +1184,7 @@ Sample output:
 
 #diff
 
-View unstaged modifications, that is, the diff between working tree and index (changes will disappear after `git add`):
+View diff between working tree and index (changes will disappear after `git add`):
 
     git diff
 
@@ -1163,8 +1209,32 @@ Ignore changes when a file is moved to another name:
 
     git diff -M
 
-This can be autodetected even before staging with `git mv` when files are exactly the same.
+This can be auto detected even before staging with `git mv` when files are exactly the same.
 It is also possible to consider moves up to a percentage of similarity via `-M90`.
+
+Show only how many lines were added / removed from each file, and the order of addition/removal:
+
+    git diff --stat
+
+Sample output:
+
+    app/assets/javascripts/extensions/array.js                  |  2 +-
+    app/assets/javascripts/groups.js.coffee                     |  2 +-
+    app/assets/javascripts/markup_preview.js.coffee             | 39 +++++++++++++++++++++++++++++++++++++++
+    app/assets/javascripts/notes.js.coffee                      | 74 +++++---------------------------------------------------------------------
+    app/assets/javascripts/profile.js.coffee                    |  2 +-
+    app/assets/stylesheets/g
+    spec/seed_project.tar.gz                                    | Bin 9833961 -> 9789938 bytes
+
+Show only how many file changed, and how many additions deletions were there:
+
+    git diff --shortstat
+
+Sample output:
+
+    40 files changed, 244 insertions(+), 203 deletions(-)
+
+##format
 
 Sample output:
 
@@ -1194,6 +1264,29 @@ After a `git merge`, `git diff` shows a special mode that shows diffs to both pa
      -    Removed in ours
     ++    Added in both
      +    Added in ours
+
+##newline at the end of file
+
+If the file does not end in a newline, you will see things like:-
+
+Add `a` without newline at end of file:
+
+    +a
+    \ No newline at end of file
+
+Add `\n` at end of file that had no ending newline:
+
+    -a
+    \ No newline at end of file
+    +a
+
+This way, every line that starts with `+` is assumed to have a newline at the end, unless stated otherwise.
+
+Beware of editors that do magic things with ending newlines: someday it may bite you.
+
+For example, Vim 7.3 hides trailing newlines by default.
+
+`tail file | hd` and `truncate -s -1` will never lie to you.
 
 #tag
 
@@ -2819,7 +2912,82 @@ and use a `.gitattributes` as:
 
     file_to_ignore merge=ours
 
-#github api v3 via curl
+#contrib
+
+Under the git source tree there is a directory called contrib which includes features that are not yet part of the main distribution, but are being considered.
+
+Any information contained on this section is more volatile than the others.
+
+##diff-highlight
+
+A diff format similar to what is used by most web interfaces today.
+
+It does a regular linewise diff, but highlights the words changed between two lines.
+
+It is simply a Perl script, and you can install it with:
+
+    cd ~/bin && curl -O https://raw.github.com/git/git/master/contrib/diff-highlight/diff-highlight && chmod +x diff-highlight
+    git config --global pager.log 'diff-highlight | less'
+    git config --global pager.show 'diff-highlight | less'
+    git config --global pager.diff 'diff-highlight | less'
+
+Now when using `git diff --color`, this will work automatically.
+
+#third party tools
+
+##fame
+
+Get stats on file / line and commit percents per author.
+
+Home: <https://github.com/oleander/git-fame-rb>
+
+Install:
+
+    gem install git_fame
+
+Usage:
+
+    git fame
+
+Sample output:
+
+    +------------------------+--------+---------+-------+--------------------+
+    | name                   | loc    | commits | files | distribution       |
+    +------------------------+--------+---------+-------+--------------------+
+    | Johan Sørensen         | 22,272 | 1,814   | 414   | 35.3 / 41.9 / 20.2 |
+    | Marius Mathiesen       | 10,387 | 502     | 229   | 16.5 / 11.6 / 11.2 |
+    | Jesper Josefsson       | 9,689  | 519     | 191   | 15.3 / 12.0 / 9.3  |
+    | Ole Martin Kristiansen | 6,632  | 24      | 60    | 10.5 / 0.6 / 2.9   |
+    | Linus Oleander         | 5,769  | 705     | 277   | 9.1 / 16.3 / 13.5  |
+    | Fabio Akita            | 2,122  | 24      | 60    | 3.4 / 0.6 / 2.9    |
+    | August Lilleaas        | 1,572  | 123     | 63    | 2.5 / 2.8 / 3.1    |
+    | David A. Cuadrado      | 731    | 111     | 35    | 1.2 / 2.6 / 1.7    |
+    | Jonas Ängeslevä        | 705    | 148     | 51    | 1.1 / 3.4 / 2.5    |
+    | Diego Algorta          | 650    | 6       | 5     | 1.0 / 0.1 / 0.2    |
+    | Arash Rouhani          | 629    | 95      | 31    | 1.0 / 2.2 / 1.5    |
+    | Sofia Larsson          | 595    | 70      | 77    | 0.9 / 1.6 / 3.8    |
+    | Tor Arne Vestbø        | 527    | 51      | 97    | 0.8 / 1.2 / 4.7    |
+    | spontus                | 339    | 18      | 42    | 0.5 / 0.4 / 2.0    |
+    | Pontus                 | 225    | 49      | 34    | 0.4 / 1.1 / 1.7    |
+    +------------------------+--------+---------+-------+--------------------+
+
+##browse remote
+
+Open current remote on browser.
+
+Smart: considers current branch / revision.
+
+Home: <https://github.com/motemen/git-browse-remote>
+
+Usage:
+
+    git browse-remote
+
+More intelligent than `hub` for this.
+
+#github specific
+
+##api v3 via curl
 
 Github has an HTTP api, meaning you can do stuff on Github programatically such as listing, creating or removing repos.
 
@@ -2864,6 +3032,17 @@ Its just JSON (remember, last item cannot end in a comma).
 Careful, it works!
 
 TODO
+
+##hub
+
+Powerful CLI interface: <https://github.com/github/hub>
+
+    gem install hub
+
+Open URL of current branch / commit in browser:
+
+    hub browse
+
 
 #test repos
 
