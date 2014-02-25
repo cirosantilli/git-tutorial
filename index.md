@@ -1063,7 +1063,10 @@ Shows stuff like:
 
 Gitk is a GUI for git.
 
-Most of what it does can be done better on the command line, except for one thing: visualizing the commit tree, since this requires lines too fine for a terminal.
+Most of what it does can be done better on the command line, except for:
+
+- visualizing the commit tree, since this requires lines too fine for a terminal.
+- look at the log for interesting changes, then click on a potentially interesting change to see its diff.
 
 What you almost always want is to use with `--all` to see all branches marked:
 
@@ -2975,15 +2978,17 @@ Sample output:
 
 Open current remote on browser.
 
-Smart: considers current branch / revision.
+Smart: considers current branch / revision. More intelligent than `hub browse`.
 
 Home: <https://github.com/motemen/git-browse-remote>
+
+Install:
+
+    gem install git-browse-remote
 
 Usage:
 
     git browse-remote
-
-More intelligent than `hub` for this.
 
 #github specific
 
@@ -3043,6 +3048,13 @@ Open URL of current branch / commit in browser:
 
     hub browse
 
+Create repository with same name as current dir:
+
+    hub create
+
+Give a name and a description:
+
+    hub create name -d 'Description'
 
 #test repos
 

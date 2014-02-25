@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title>{{ site.name }}</title>
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/syntax.css"/>
     <!--mathjax-->
       <script
         src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
@@ -18,7 +17,13 @@
       </script>
     <!--toc-->
       <script src="http://code.jquery.com/jquery-1.10.2.min.js" ></script>
-      <script src="{{ site.baseurl }}assets/jquery.toc.js"></script>
+      <!--assets-->
+        <!--shared at github.io root: -->
+          <link rel="stylesheet" href="/assets/syntax.css"/>
+          <script src="/assets/jquery.toc.js"></script>
+        <!--per site: -->
+          <!--<link rel="stylesheet" href="{{ site.baseurl }}/assets/syntax.css"/>-->
+          <!--<script src="{{ site.baseurl }}assets/jquery.toc.js"></script>-->
       <script>
         $("#toc").toc({
           headings: "h1,h2,h3,h4,h5,h6"

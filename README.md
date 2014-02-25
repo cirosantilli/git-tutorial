@@ -1,6 +1,6 @@
 Git version control tutorial: <http://cirosantilli.github.io/git-tutorial/>
 
-At Github Pages for the Js TOC. Source on on brach `gh-pages`.
+At GitHub Pages for the Js TOC.
 
 To test the page compilation locally:
 
