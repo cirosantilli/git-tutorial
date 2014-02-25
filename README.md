@@ -1,4 +1,4 @@
-Git version control tutorial: <http://cirosantilli.github.io/git-tutorial/>
+Git version control tutorial: <http://cirosantilli.github.io/git-tutorial>
 
 At GitHub Pages for the Js TOC.
 
