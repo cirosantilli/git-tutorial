@@ -237,12 +237,27 @@ List tracked files recursively according to several criteria.
 
 List all tracked files under current dir newline separated:
 
-    ./copy.sh 1u
     git ls-files
-        #a
-        #b
+
+Sample output:
+
+    .hidden
+    file
+    dir/file
+
+Untracked files only:
+
+    git ls-files --other
+
+TODO only files in current dir?
 
 #ls-tree
+
+List tracked files and directories under current directory:
+
+    git ls-tree
+
+Files are marked as `blob`, while directories as `tree`.
 
 List tracked files recursively starting from the root:
 
@@ -315,9 +330,13 @@ For the entire repo: <http://stackoverflow.com/questions/4589731/git-blame-stati
 
 See who last modified all files in project: <http://serverfault.com/questions/401437/how-to-retrieve-the-last-modification-date-of-all-files-in-a-git-repository>
 
-Ignore whitespace only changes (e.g. indent) and moved lines `-M`:
+Ignore whitespace only changes (e.g. indent):
 
-    git blame -w -M
+    git blame -w
+
+Attribute moved lines to the original author, not the mover (TODO understand `C` and `M` precisely):
+
+    git blame -CM
 
 #gitignore
 
@@ -376,7 +395,7 @@ If a pattern does not contain a slash `/`, it matches any entire basename in any
 
 If the pattern contains a slash `/`, only files under the given directory can match. E.g.: `d/*.c` matches `d/a.c` but not `d/e/a.c`.
 
-If you want to ignore by basename under a given dir only, put a `.gitignore` into that dir.
+If you want to ignore by basename under a given directory only, put a `.gitignore` into that directory.
 
 If the pattern starts in `/`, only files under the same directory as the gitignore file can match. E.g.: `/*.c` matches `/a.c` but not `/d/a.c`.
 
@@ -386,13 +405,13 @@ Trying to add an ignored file gives an error:
     git add a
         #error, a ignored, use -f if you really want to add it
 
-You can ignore entire dirs:
+You can ignore entire directories:
 
     echo d > .gitignore
     git status
         #untracked: a b
 
-`.gitignores` are valid on all subdirs of which it is put only:
+`.gitignores` are valid on all subdirectories of which it is put only:
 
     echo a > d/.gitignore
     git status
@@ -400,6 +419,12 @@ You can ignore entire dirs:
     git add *
     git status
         #new file: a b d/b
+
+If a pattern starts with a `!`, it unignores files. Ignore all files except one:
+
+    *
+    !.gitignore
+    !.gitkeep
 
 ##local gitignore
 
@@ -422,7 +447,7 @@ Check that it will be considered for next version with:
 
 ##example: add
 
-Start with [1]
+Start with [1]:
 
     echo a2 >> a
 
@@ -481,11 +506,11 @@ which fails if there are gitignored files.
 
 ##combos
 
-Add all nonhidden files in current dir:
+Add all non-hidden files in current directory:
 
     git add *
 
-Add all files in current dir, including hidden:
+Add all files in current directory, including hidden:
 
     git add `ls -A`
 
@@ -981,7 +1006,7 @@ View up to a certain number of log messages (most recent):
 `-n 1` is specially useful if you want to get information on the current commit,
 specially when used with `pretty=format`.
 
-Show diff evolution of a single file:
+Show every commit and diff of a single file:
 
     git log -p file
 
@@ -1061,12 +1086,16 @@ Shows stuff like:
 
 #gitk
 
-Gitk is a GUI for git.
+Gitk is a GUI for git. Part of the Git source tree.
 
-Most of what it does can be done better on the command line, except for:
+Consider tig for a very good curses version of gitk
+
+Most of what it does can be done better from the git the command line interface, except for:
 
 - visualizing the commit tree, since this requires lines too fine for a terminal.
 - look at the log for interesting changes, then click on a potentially interesting change to see its diff.
+
+All of the above are also possible via curses based tig.
 
 What you almost always want is to use with `--all` to see all branches marked:
 
@@ -1451,24 +1480,15 @@ Will show you who is the descendant of whom!
 
 ##create a branch
 
-Create a branch called b:
+The most common way to create a branch is via:
 
-    git branch b
+    git checkout -b branchname
 
-Check it was created:
+which already sets that branch as the current.
 
-    git branch
+Create a branch without setting it to current:
 
-But the asterisk shows we are still in branch `master`.
-
-This does not move to the branch just created! to do so you must use:
-
-    git checkout b
-
-##create a and move to it
-
-    git checkout -b b
-    git branch
+    git branch branchname
 
 ##what happens when you create a branch
 
@@ -1570,7 +1590,7 @@ To correct it you can create a branch:
 
 And since you were on no branch, git automatically changes to `b`.
 
-####what if I commit and checkout??
+####what if I commit and checkout
 
 Worse things.
 
@@ -1580,7 +1600,7 @@ Git warns you: this might be a good time to give it a branch, and you should as:
 
     git branch b hash
 
-##start point
+##set branch commit
 
 You can also create a branch at any commit other than the current one:
 
@@ -1609,7 +1629,7 @@ Therefore you can't both:
 
 since `a` would have to be both a directory and a file at the same time for that to work.
 
-##rename a branch
+##rename branch
 
 Rename a given branch:
 
@@ -1618,6 +1638,38 @@ Rename a given branch:
 Rename the current branch:
 
     git branch -m newname
+
+##branch without parent
+
+If two repositories are strictly linked, it is possible to use a single repository with unrelated branches for both.
+
+To achieve this, you must create a branch without a parent, which can be done with:
+
+    git branch --orphan branchname
+
+This command takes the tree:
+
+    ( )-----( )
+             |
+             master *
+
+and generates:
+
+
+    ( )-----( )
+             |
+             master *
+
+    ( )
+     |
+     branchname
+
+This is notably the case of GitHub Pages which requires an orphan branch called `gh-pages`.
+
+Before you do this however, take into account its downsides:
+
+- you cannot view file from both branches simultaneously (unless you copy the repository)
+- its more confusing for new users
 
 #checkout
 
@@ -2937,6 +2989,16 @@ It is simply a Perl script, and you can install it with:
 Now when using `git diff --color`, this will work automatically.
 
 #third party tools
+
+##tig
+
+Overpowered curses Gitk written in C:
+
+    https://github.com/git/git
+
+Install:
+
+    sudo apt-get install tig
 
 ##fame
 
