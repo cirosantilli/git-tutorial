@@ -892,18 +892,27 @@ Now status only says that `b` is untracked and nothing about `a`.
 
 It is recommended that the commit message be like:
 
-- start with a summary line of max 70 characters
+- start with a summary line of max 50 characters
+
+    To achieve the character limit, **don't** use `-m`, and edit the message in Vim.
 
     The initial line should:
 
-    - be in the imperative, e.g., "Make" instead of "Made"
-    - start with a capital letter
+    - be in the imperative, e.g., `Make` instead of `Made`.
+    - start with a capital letter.
     - end with a period.
 
 - blank line
-- full explanation of the changes unless they are trivial.
+- detailed explanation of the non-trivial changes.
 
-In practice, commits usually link commit messages to the issue they fix, or rely on the Merge Request description for the extended information.
+    In practice, commits rely on the pull request or fixed issue description for the extended information.
+
+E.g. of good commit message:
+
+    Add new super feature.
+
+    The feature behaves that way on case X because without that behavior,
+    case Y would fail miserably.
 
 ##correct last commit
 
@@ -954,17 +963,8 @@ In this example, there are 2 versions, one with commit message `1` and another w
 On version `1` we see that:
 
 - author name: `Ciro Santilli` (specified in `git config`)
-
-- author email: ciro@mail.com (specified in `git config`)
-
+- author email: `ciro@mail.com` (specified in `git config`)
 - commit hash: `494b713f2bf320ffe034adc5515331803e22a8ae`.
-
-    If you don't know what a hash is, it is time to learn now!
-
-    Put simply, a hash is an angorithm that takes lots of input bytes (the repo)
-    and outputs a short string (aka "the hash"), and so that it is very hard
-    to find two inputs that have the same hash (altough they obviously exist,
-    because the ouput string is much smaller! )
 
 Show only if grepping commit messages match:
 
@@ -974,10 +974,16 @@ Show all commits:
 
     git log --all
 
-This includes:
+this includes:
 
 - on other branches besides the current (by default only current branch is shown):
 - future commits when navigating history
+
+To show only history of the current branch ignoring merges do:
+
+    git log --first-parent
+
+This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
 
 View hash and commit messages only, one per line:
 
@@ -985,29 +991,28 @@ View hash and commit messages only, one per line:
 
 Use a custom format string:
 
-    git log --pretty=format:"The author of %h was %an, %ar%nThe title was >>%s<<%n"
+    git log --pretty=format:'%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s' --date=short
 
 See `man git log` and grep for `format:` for a list of all formats.
 
-Most useful ones:
+There seems to be no built-in way to do fixed column widths, but that can be worked around with `column`:
 
-- `%H`: full hash
+    git log --pretty=format:'%C(yellow)%h|%Cred%ad|%Cblue%an|%Cgreen%d %Creset%s' --date=short | column -ts'|' | less -r
 
 View deleted files only:
 
     git log --diff-filter=D --summary
     git log --all --pretty=format: --name-only --diff-filter=D
 
-This is very useful to find when you deleted a file from a repo if you dont know its exact path!
+This is very useful to find when you deleted a file from a repo if you don't know its exact path!
 
 View up to a certain number of log messages (most recent):
 
     git log -n 1
 
-`-n 1` is specially useful if you want to get information on the current commit,
-specially when used with `pretty=format`.
+`-n 1` is specially useful if you want to get information on the current commit, specially when used with `pretty=format`.
 
-Show every commit and diff of a single file:
+Show every commit and diff (Patch) of a single file:
 
     git log -p file
 
@@ -1015,14 +1020,43 @@ Also cross `git mv`:
 
     git log --follow -p file
 
-If a merge occurs, both branches appear on `git log` and get mixed up
-chronologically and it is impossible to set them appart.
+If a merge occurs, both branches appear on `git log` and get mixed up chronologically and it is impossible to set them appart.
 
-To show only history of the current branch ignoring merges do:
+Show text commit tree:
 
-    git log --first-parent
+    git log --pretty=oneline --graph
 
-This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
+Sample output:
+
+    *   0f055197776275cdf55538469a07cf8d5e13ad24 Merge pull request #6610 from Datacom/feature/parallel_diff_scrollbars_pr2
+    |\  
+    | * 83f811fff5f6b2188c82f187f747122d2f7cd936 Refactor Parallel Diff feature and add scrollbars
+    * |   cf7aab9b441f61a0db11f1f20887db1862c8c791 Merge branch 'master' of gitlab.com:gitlab-org/gitlab-ce
+    |\ \  
+    | * \   24e9c5e83e1b5b304aa0109e95bbd69a554f5e3f  Merge branch 'bugfix/fix_unicorn-sidekiq_confusion_in_gitlab_init_script' into 'master'
+    | |\ \  
+    | | * | 058aae5940762c18b3f099a6c3cb734041641390 Fixed Unicorn-Sidekiq confusion in GitLab init script.
+    * | | |   aabd90a828eeb1b1c2fd82afd674d965aaa2dde3 Merge branch 'master' of github.com:gitlabhq/gitlabhq
+
+The asterisks `*` show which branch the message on the right corresponds to.
+
+See a range with:
+
+    git log rev1..rev2
+
+If any of them is omitted, it defaults to `HEAD`. Major application: see differences between a branch and its remote.
+
+Outdated remote origin:
+
+    git fetch origin
+    git log origin/master..
+
+Updated upstream:
+
+    git fetch upstream
+    git log ..upstream/master
+
+To simply count the number of different versions, consider `git branch -vv`
 
 #shortlog
 
@@ -1102,11 +1136,17 @@ What you almost always want is to use with `--all` to see all branches marked:
 
     gitk --all
 
-#rev names
+#How to name revisions
+
+#Revisions
 
 To actually go to another version, you have to be able to tell git which one is it, so that git can go back to it.
 
 There are a few ways to do that.
+
+For the manual see:
+
+    man gitrevisions
 
 ##hash
 
@@ -1453,7 +1493,7 @@ Too overkill/too lazy to show for here see: <http://learn.github.com/p/tagging.h
 
 A branch is a name for a commit.
 
-The commit a branch referst to may change.
+The commit a branch refers to may change.
 
 Using branches you may split up the commit tree
 
@@ -1461,7 +1501,7 @@ This creates alternate realities so you  can test changes without one affecting 
 
 The first commit of a repo is made on a branch called `master`
 
-##view existing branches
+##List branches
 
     git branch
 
@@ -1479,7 +1519,7 @@ One very important way is to do is graphically:
 
 Will show you who is the descendant of whom!
 
-##create a branch
+##Create a branch
 
 The most common way to create a branch is via:
 
@@ -1491,7 +1531,7 @@ Create a branch without setting it to current:
 
     git branch branchname
 
-##what happens when you create a branch
+##What happens when you create a branch
 
 To the files, nothing.
 
@@ -1508,7 +1548,7 @@ It becomes:
      master *
      b
 
-##what happens to a branch when you commit
+##What happens to a branch when you commit
 
 The *current* branch moves forward and continues being current.
 
@@ -1551,7 +1591,7 @@ And now we have:
 
 Which makes it obvious why a branch is called a branch.
 
-##detached head
+##Detached head
 
 Is when you checkout to a commit that has no branch associated.
 
@@ -1567,7 +1607,7 @@ Shows current branch as:
 
     (no branch) *
 
-###what should I do if I want to branch from the detached head
+###What should I do if I want to branch from the detached head
 
 If you are on it, you should first create a branch:
 
@@ -1579,9 +1619,9 @@ You can also create a branch before going to it with:
 
     git branch <hash>
 
-###what happens if I commit on a detached head
+###What happens if I commit on a detached head
 
-Bad things! never do this!
+Bad things! Never do this!
 
 Git does commit, but stays on a undefined state.
 
@@ -1591,7 +1631,7 @@ To correct it you can create a branch:
 
 And since you were on no branch, git automatically changes to `b`.
 
-####what if I commit and checkout
+####What if I commit and checkout
 
 Worse things.
 
@@ -1601,7 +1641,7 @@ Git warns you: this might be a good time to give it a branch, and you should as:
 
     git branch b hash
 
-##set branch commit
+##Set branch commit
 
 You can also create a branch at any commit other than the current one:
 
@@ -1617,7 +1657,7 @@ To create switch to it directly:
 
     git checkout -b b HEAD~
 
-##slash in branch name
+##Slash in branch name
 
 Inside the `.git`, branches are placed under `refs`.
 
@@ -2038,7 +2078,9 @@ where `remote` is anything that identifies the remote such as its URL or name gi
 
 If the remote branch does not exist it is created.
 
-###-u
+##u
+
+##upstream
 
 Each local branch can have a remote branch which it tracks, which is known as the upstream or tracked branch.
 
@@ -2050,13 +2092,17 @@ Set the upstream without push:
 
     git branch --set-upstream remote branch
 
-There seems to be no clean way to get the corresponding upstreams of all branches: <http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
-
-The best options are:
+There seems to be no clean way to get the corresponding upstreams of all branches computationally without grepping: <http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
 
 Interactive for a single branch:
 
     git branch -vv
+
+Sample output:
+
+    * master 7840566 [origin/master: ahead 2] Install aliases.
+
+Also shows the very useful ahead behind statistic on the tracked remote.
 
 Interactive for all branches:
 
@@ -2070,7 +2116,7 @@ Push current branch to its default upstream (remote/branch) pair
 
     git push -u git@github.com:userid/reponame.git master
 
-What happens when you do:
+What happens when you do just:
 
     git push
 
@@ -2082,7 +2128,9 @@ Push all local branches which track a remote at `remote`:
 
     git push remote
 
-##push -f
+##f
+
+##force
 
 Push to remote branch even if the remote branch is not a descendant of the local branch.
 
@@ -2119,7 +2167,9 @@ It is possible to push the current branch by using:
 
     git config push.default current
 
-##delete remote branch
+##delete
+
+Delete remote branch:
 
     git push origin --delete branch
 
@@ -2131,7 +2181,7 @@ Modify current branch on remote: <http://stackoverflow.com/questions/1485578/how
 
 Manage remote repositories.
 
-When you clone something, it alreay has a remote called `origin`.
+When you clone something, it already has a remote called `origin`.
 
 ##view remote
 
@@ -2568,26 +2618,26 @@ There is no reliable way to:
 
 So you have to keep a copy of the shared repo for each using repo anyways.
 
-##creation
+##Create
 
 You have a LaTeX `a.sty` file which you want to use.
 
-- on version `1.1` for a latex project 2 in `project2` repo
-- on version `1.0` for a latex project 3 in `project3` repo
+- on version `1.1` for a LaTeX project 2 in `project2` repo
+- on version `1.0` for a LaTeX project 3 in `project3` repo
 
 Make a repo and put `a.sty` in the repo. Call it `latex`.
 
 On project 2:
 
-    git submodule add git://github.com/USERNAME/latex.git shared
+    git submodule add https://github.com/USERNAME/latex.git shared
     ln -s shared/a.sty a.sty
     git add .gitmodules
 
-Now a dir called `shared` was created and contains your repo.
+Now the dir called `shared` was created and contains your repo.
 
 Don't ever touch that dir directly. Changes in that dir are not seen by git.
 
-##clone a repo that contains a submodule
+##Clone a repo that contains a submodule
 
 To get all the files of submodules you need the `--recursive` flag:
 
@@ -2599,7 +2649,7 @@ If you forgot to use recursive when you cloned, you should:
 
 It seems that making clone recursive by default is neither possible nor a good idea: <http://stackoverflow.com/questions/4251940/retrospectively-add-recursive-to-a-git-repo>
 
-##update the content of a submodule
+##Update the content of a submodule
 
     cd share
     git pull
@@ -3103,9 +3153,16 @@ Overpowered curses gitk written in C:
 
     https://github.com/git/git
 
-Install:
+Install Ubuntu 12.04:
 
-    sudo apt-get install tig
+    sudo aptitude install tig
+
+Manpages:
+
+    man tig
+    man tigrc
+
+`H`: see a list of branches. Enter click on it to go to the branch list.
 
 ##fame
 
