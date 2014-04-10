@@ -2147,15 +2147,19 @@ Example:
     ./clone.sh multi
     cd a
     git reset --hard HEAD~
+    # Does not work.
     git push
-        #does not work
+    # Works.
     git push -f
-        #works
     git cd ../ao
+    # We're on 1.
     git log --pretty=oneline
-        #we're on 1
+    # One dangling commit.
     git fsck --lost-found
-        #one dangling commit
+
+After you `push -f`, collaborators have to rebase. The fastest way to do that is with:
+
+    git pull --rebase
 
 ---
 
@@ -2478,11 +2482,13 @@ As of 1.8.4, there seems to be no way to conveniently change the current remote 
 
 #pull
 
-Pull is exactly the same as [fetch] + [merge] on given branch and merges with current branch.
+`pull` is exactly the same as [fetch] + [merge] on given branch and merges with current branch.
+
+`pull --rebase` does `reabase` instead of `merge`. You need that after someone did a `push -f`.
 
 Does not update remote heads like [fetch] does.
 
-##example: pull
+##Basic usage
 
 State of the remote:
 
@@ -2531,36 +2537,6 @@ Local repo after a `merge`:
                           feature               origin/feature
 
 So you current branch `master` has been merged into the branch `master` from repo `origin`.
-
-#push to GitHub
-
-To upload you must have an account on some server and you must have created.
-
-Here we show how to upload to [GitHub].
-
-##GitHub setup
-
-Create an account. Your userid is: `userid`
-
-Create a repository. Call it `reponame`
-
-Don't initialized it with a README.
-
-The git URL is then `git@github.com:userid/reponame.git`
-
-##do the upload
-
-Upload the latest version to the server with:
-
-    git push git@github.com:userid/reponame.git master
-
-This may ask for you GitHub username and pass.
-
-Go back to GitHub and browse your uploaded files to check that they are there.
-
-##GitHub and tags
-
-If you tag then you can refer have raw URLs for tags.
 
 #File permissions
 
@@ -3217,6 +3193,8 @@ Usage:
     git browse-remote
 
 #GitHub specific
+
+The git URL is then `git@github.com:userid/reponame.git`
 
 ##GitHub API v3 via curl
 
