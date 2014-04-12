@@ -3028,6 +3028,10 @@ Allowing you to do any command at top-level:
 
     git exec make
 
+#gc
+
+Clean repository TODO what does that do exactly? Possible use case: <http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
+
 #gitattributes
 
 Configs that apply only to specific paths, not the entire repo.
@@ -3108,7 +3112,9 @@ You also probably want to reuse part of the `.gitignore` and other top-level git
 
 ##diff-highlight
 
-A diff format similar to what is used by most web interfaces today.
+Highlight which parts of a line were modified, similar to by most web interfaces today.
+
+![diff-highlight](diff-highlight.png)
 
 It does a regular line-wise diff, but highlights the words changed between two lines.
 
