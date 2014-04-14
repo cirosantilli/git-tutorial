@@ -602,7 +602,7 @@ Remove all files descendants of a dir recursivelly.
 
 By default, `git rm` won't remove dirs.
 
-#remove file from repo history
+#Remove file from repo history
 
 [rm] does not remove files from repo history, only from future versions.
 
@@ -2181,6 +2181,10 @@ Can only delete a branch if it is not he current one.
 
 Modify current branch on remote: <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
+After you delete remote branches, you can remove the local tracking branches with:
+
+    git remote prune origin
+
 #remote
 
 Manage remote repositories.
@@ -2231,6 +2235,14 @@ Remove the remote branch called GitHub:
 Change the address of a remote:
 
     git remote set-url git://github.com/username/projectname.git
+
+##prune
+
+Remove all local branches under `remotes/remote-name/branch-name` such that the remote it tracks has been deleted:
+
+    git remote prune origin
+
+Useful after `push --delete` or when the remote was deleted via the web interface, e.g. after the pull request was merged.
 
 #remote head
 
