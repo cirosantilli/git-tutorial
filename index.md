@@ -702,9 +702,9 @@ Move the current branch and possibly index and working directory to one of its a
 
 Changes history.
 
-Greate explanation: <http://git-scm.com/blog>
+Create explanation: <http://git-scm.com/blog>
 
-Withtout paths `git reset [option]`:
+Without paths `git reset [option]`:
 
 - `--soft` moves the current branch to given ancestor commit.
 
@@ -716,8 +716,7 @@ Withtout paths `git reset [option]`:
 
     `git status` will show unstaged changes.
 
-- neither `--hard` will move the current branch, the index *and* the working directory
-    to the given commit.
+- neither `--hard` will move the current branch, the index *and* the working directory to the given commit.
 
     `git status` does not show any changes.
 
@@ -1029,12 +1028,12 @@ Show text commit tree:
 Sample output:
 
     *   0f055197776275cdf55538469a07cf8d5e13ad24 Merge pull request #6610 from Datacom/feature/parallel_diff_scrollbars_pr2
-    |\  
+    |\
     | * 83f811fff5f6b2188c82f187f747122d2f7cd936 Refactor Parallel Diff feature and add scrollbars
     * |   cf7aab9b441f61a0db11f1f20887db1862c8c791 Merge branch 'master' of gitlab.com:gitlab-org/gitlab-ce
-    |\ \  
+    |\ \
     | * \   24e9c5e83e1b5b304aa0109e95bbd69a554f5e3f  Merge branch 'bugfix/fix_unicorn-sidekiq_confusion_in_gitlab_init_script' into 'master'
-    | |\ \  
+    | |\ \
     | | * | 058aae5940762c18b3f099a6c3cb734041641390 Fixed Unicorn-Sidekiq confusion in GitLab init script.
     * | | |   aabd90a828eeb1b1c2fd82afd674d965aaa2dde3 Merge branch 'master' of github.com:gitlabhq/gitlabhq
 
@@ -2059,6 +2058,21 @@ We get: TODO
                            |
                            feature
 
+#mergetool
+
+Start running a conflict resolution tool, typically a 3-way merge tool to solve all merge conflicts.
+
+    git mergetool -t vimdiff
+
+Git already knows about certain tools, and you must choose amongst them.
+
+Git checks out all necessary versions in current directory with basename prefixes, and calls the merge tool on them.
+
+If the tool is not given, git uses:
+
+- `merge.tool` configuration option tool
+- a suitable tool found in the path
+
 #push
 
 Makes changes on a [bare] remote repo.
@@ -2243,6 +2257,10 @@ Remove all local branches under `remotes/remote-name/branch-name` such that the 
     git remote prune origin
 
 Useful after `push --delete` or when the remote was deleted via the web interface, e.g. after the pull request was merged.
+
+Also possible with:
+
+    git fetch -p
 
 #remote head
 
