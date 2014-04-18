@@ -3,8 +3,6 @@ title: Git version control tutorial
 layout: default
 ---
 
-Contributions are very welcome. BSD 3-clause license.
-
 <ol data-toc></ol>
 
 #Sources
