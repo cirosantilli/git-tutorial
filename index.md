@@ -3225,9 +3225,7 @@ Now when using `git diff --color`, this will work automatically.
 
 ##tig
 
-Overpowered curses gitk written in C:
-
-    https://github.com/git/git
+Powerful curses gitk written in C: <https://github.com/jonas/tig>.
 
 Install Ubuntu 12.04:
 
@@ -3238,10 +3236,49 @@ Manpages:
     man tig
     man tigrc
 
+And help inside tig:
+
+    h
+
+###Views
+
+Tig has many views:
+
+- log (initial view)
+- branches
+- tree (directory)
+- blob (file)
+
+The bindings you can use depend on which view you are currently on.
+
+For instance, it only makes sense to view a blame `B` if you are either on a tree or blob view.
+
+There is currently no `remotes` view: <https://github.com/jonas/tig/issues/199>
+
+###Generic
+
+General mappings:
+
+- `Space`: one screen down
+- `b`: one screen up
 - `H`: see a list of branches.
 
-    - `C`: checkout to the commit.
-    - `<enter>`: open a list of the commits inline.
+###Refs
+
+These bindings are available on views that shows revisions such as the log view or the branches view.
+
+- `C`: checkout to the commit.
+- `<enter>`: open a list of the commits inline.
+
+###Blob
+
+- `e`: open file in editor. Default: `vim`.
+- `B`: blame view of file
+    - `Enter`: open `log -p` of current line's commit inline.
+
+##fugitive
+
+Vim plug-in with large overlap with tig functionality: <https://github.com/tpope/vim-fugitive>
 
 ##fame
 
