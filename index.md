@@ -981,7 +981,7 @@ Show all commits:
 
     git log --all
 
-this includes:
+Includes:
 
 - on other branches besides the current (by default only current branch is shown):
 - future commits when navigating history
@@ -1011,7 +1011,7 @@ View deleted files only:
     git log --diff-filter=D --summary
     git log --all --pretty=format: --name-only --diff-filter=D
 
-This is very useful to find when you deleted a file from a repo if you don't know its exact path!
+Very useful to find when you deleted a file from a repo if you don't know its exact path!
 
 View up to a certain number of log messages (most recent):
 
@@ -1089,7 +1089,7 @@ See how many commits each author did:
 
 Config file named `.mailmap` file at the repo root.
 
-Allows authors to change emails/usernames while keeping a single identity.
+Allows authors to change emails / usernames while keeping a single identity.
 
 Put lines like this in that file:
 
@@ -1110,7 +1110,7 @@ View file at an specific version:
     git show HEAD^:path/to/file
     git show $HASH^:path/to/file
 
-Application: checkout a file with a diferent name:
+Application: checkout a file with a different name:
 
     git show HEAD^:path/to/file > new/path/to/file
 
@@ -1143,19 +1143,37 @@ What you almost always want is to use with `--all` to see all branches marked:
 
     gitk --all
 
-#How to name revisions
+#Revision
 
-#Revisions
+A revision is the git name for a version. It is also known informally as a commit.
+
+##How to name revisions
 
 To actually go to another version, you have to be able to tell git which one is it, so that git can go back to it.
-
-There are a few ways to do that.
 
 For the manual see:
 
     man gitrevisions
 
-##hash
+There are a two ways to do that:
+
+- hash
+- reference
+
+###SHA
+
+###Hash
+
+This is the SHA hash of the entire repo.
+
+If you don't know what a SHA hash is learn it now. <http://en.wikipedia.org/wiki/SHA-1>. The key properties of a SHA functions are that:
+
+- it is very unlikely that two inputs give the same output.
+- small changes in the input make large unpredictable changes on the output.
+
+In this way, even if SHAs contain much less information than the entire repository itself (only a few bytes), it is very unlikely that two different repositories will have the same SHA.
+
+The SHA input includes things like file contents, commit timestamps, authors and tags. Therefore, even if the files are the same, SHAs will probably be different.
 
 The most complete is giving the entire hash, so:
 
@@ -1163,19 +1181,26 @@ The most complete is giving the entire hash, so:
 
 Would be version 2.
 
-This is the [SHA] hash of the entire repo.
+If this is the only version that starts with `1ba8fc` or `1ba8`, you could use those as well. 6 digits is common for manual use.
 
-For those that do not know what a SHA hash is, keep in mind that it is very unlikelly that another version will have the same hash as this one.
-
-The SHA input includes things like file contents, Commit times and authors, and tags. Therefore, even if the files are the same, SHAs willl probably be different.
-
-If this is the only version that starts with `1ba8fc` or `1ba8`, (and it is) you could use those as well!
-
-Get the hash of the lastest commit:
+Get the hash of the latest commit:
 
     git log -n1 --pretty=format:%H
 
-##HEAD
+###Reference
+
+###Refs
+
+Refs are names for revisions.
+
+They point to hashes.
+
+There are many types of references. References discussed in other sections are:
+
+- branches
+- tags
+
+#####HEAD
 
 The `HEAD` is the current commit we are on.
 
@@ -1183,9 +1208,9 @@ It is possible to determine the current `HEAD` by doing `git branch`: the head w
 
 Internally, the head is determined by the content of the file `$GIT/HEAD`, which is the hash of the current head commit.
 
-###example: HEAD
+#####Example: HEAD
 
-Start with [1]. we have:
+Start with [1]. We have:
 
     (1)
      |
@@ -1203,11 +1228,20 @@ After another commit:
                      |
                      HEAD
 
-##by tag
+###show-ref
 
-See [tag]
+List all references and their hashes:
 
-##relative to another version
+    git show-refs
+
+Sample output:
+
+    9b7dd8b4c04c427de22543fec7f52be26decdb22 refs/heads/up
+    861fa5553de736af945a78b4bf951f6f5d2618e9 refs/remotes/mine/zz/public-user
+    9b7dd8b4c04c427de22543fec7f52be26decdb22 refs/remotes/origin/master
+    52d771167707552d8e2a50f602c669e2ad135722 refs/tags/v1.0.1
+
+###Relative to another revision
 
 One commit before:
 
@@ -1231,16 +1265,7 @@ Also work:
 - remote head: `origin/master~3`
 - the previous position of branch `master`: `master@{1}`
 
-Moving forward is not unique since branch can split and have multiple children,
-so it is more complicated.
-
-##by branch
-
-To understand branches, see [branch].
-
-##by remote head name
-
-See [remote head]
+Moving forward is not unique since branch can split and have multiple children, so it is more complicated.
 
 ##name-rev
 
@@ -1378,9 +1403,9 @@ Typical usage: give version numbers: `1.0`, `1.1`, `2.0`
 
     ./copy 2
 
-There are two types of tags, annoted and lightweight (unannoted).
+There are two types of tags, annotated and lightweight (unannoted).
 
-Annoted tags have an associated message, author and creation date.
+Annotated tags have an associated message, author and creation date.
 
 You cannot give a tag twice:
 
@@ -1391,17 +1416,17 @@ So you must delete the old tag before.
 
 A single commit can however have multiple tags.
 
-##give tags
+##Give tags
 
 Give lightweight tag to `HEAD`:
 
     git tag 2.0
 
-Give annoted tag to `HEAD`:
+Give annotated tag to `HEAD`:
 
     git tag -a 2.0 -m 'message'
 
-View associated information of annoted tag:
+View associated information of annotated tag:
 
     git show 2.0
 
@@ -1413,21 +1438,27 @@ Give another tag to that commit:
 
     git tag 1.1 HEAD~
 
-##tag info
+##Get tag info
 
 List all tags:
 
     git tag
-        #1.0
-        #1.0a
-        #1.1
+
+Sample output:
+
+    1.0
+    1.0a
+    1.1
 
 List tags and corresponding hashes side by side:
 
     git show-ref --tags
 
-List with tags with corresponding commit messages side by side:
-not possible without a for loop <http://stackoverflow.com/questions/5358336/have-git-list-all-tags-along-with-the-full-message>
+List with tags with corresponding commit messages side by side: not possible without a for loop: <http://stackoverflow.com/questions/5358336/have-git-list-all-tags-along-with-the-full-message>
+
+List tags with date side by side and on commit tree:
+
+    git log --date-order --graph --tags --simplify-by-decoration --pretty=format:'%ai %h %d'
 
 ###describe
 
@@ -1447,7 +1478,7 @@ Get the latest tag:
 
     git describe --abbrev=0 --tags
 
-If you want to use this programatically you could:
+If you want to use this programmatically you could:
 
     git describe --abbrev=0 --tags 2>/dev/null
 
@@ -1464,13 +1495,13 @@ Sample output:
     tag1
     tag2
 
-##delete tags
+##Delete tags
 
 Delete a tag:
 
     git tag -d 1.0
 
-##push tags to remote
+##Push tags to remote
 
 Is not done be default.
 
@@ -1478,7 +1509,7 @@ Must do it with:
 
     git push --tags
 
-##annotated tag
+##Annotated tag
 
     git tag -a ta -m 'annotated tag message!'
 
@@ -1488,13 +1519,11 @@ And now:
 
 Will show who created the tag and the tag message before the rest of the infos.
 
-A tag that is not annotated is called a `lightweight` tag.
+A tag that is not annotated is called a *lightweight* tag.
 
-##signed
+##Signed
 
-Gpg signed tags!!
-
-Too overkill/too lazy to show for here see: <http://learn.github.com/p/tagging.html>.
+GPG signed tags. TODO
 
 #branch
 
@@ -1733,11 +1762,11 @@ Use the `checkout` command with some version name as explained in [how to refer 
     git checkout HEAD~
     git checkout master~
 
-The command is called `checkout`, because we are goint to "check out" what another version was like.
+The command is called `checkout`, because we are going to "check out" what another version was like.
 
 If you checkout the entire repo, `HEAD` moves!
 
-If you ommit the version, defaults to `HEAD` so:
+If you omit the version, defaults to `HEAD` so:
 
     git checkout
     git checkout HEAD
