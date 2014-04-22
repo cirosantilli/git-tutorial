@@ -2728,22 +2728,38 @@ A submodule is a git repository included inside another at a version fixed by th
 
 Submodules are used to factor out directories which are used in multiple repositories.
 
-Git commands inside the submodule work just like git commands on a regular git repo!
+This approach is useful when there is no way to:
 
-##Application
+- share a file between programs (like `PATH` does for executable)
+- maintain different versions of a program (like `virtualenv` does for Python)
 
-You have 3 repos.
+for a given technology.
 
-You want to use files from a certain versions of repo 1 in repos 2 and 3.
+If a better system does exist for you repository however (e.g. Python / Ruby modules + virtualenv / RVM), use that method instead.
 
-There is no reliable way to:
-
-- share a file between programs ( like `PATH` does for executable )
-- maintain different versions of a program ( like `virtualenv` does for python )
-
-So you have to keep a copy of the shared repo for each using repo anyways.
+A submodule is a completely separate repo: the super repository only keeps note of its path, URL and current commit.
 
 ##Create
+
+Create on directory `.latex`:
+
+    git submodule add https://github.com/USERNAME/latex.git
+    git add .gitmodules
+    git commit -m 'Added submodule latex.
+
+Modifies / creates `.gitmodules`, which you should then `git commit`.
+
+If the directory exists and contains the required git repository already, nothing is done.
+
+Else, the repository is cloned.
+
+Add to another directory:
+
+    git submodule add https://github.com/USERNAME/latex.git another_name
+
+##Symlink technique
+
+If you technology requires files to be in the current directory, you can use symlinks into the submodule to achieve that effect.
 
 You have a LaTeX `a.sty` file which you want to use.
 
@@ -2758,8 +2774,6 @@ On project 2:
     ln -s shared/a.sty a.sty
 
 Now the dir called `shared` was created and contains your repo.
-
-Don't ever touch that dir directly. Changes in that dir are not seen by git.
 
 ##Clone a repo that contains a submodule
 
@@ -2805,11 +2819,7 @@ Print full paths of each submodule:
 
     git submodule foreach pwd
 
-##Go back to another version of a submodule
-
-    cd share
-    git log
-    git checkout VERSION-ID
+##Delete a submodule
 
 ##deinit
 
@@ -2834,9 +2844,9 @@ Then:
     git commit -am 'removed submodule'
     rm -rf $path_to_submodule
 
-##change submodule upstream
+##Change submodule upstream
 
-Edit `.gitmodules` to the correct upstream
+Edit `.gitmodules` and then:
 
     git submodule sync
     git submodule update
