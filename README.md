@@ -1,8 +1,3 @@
-Git version control tutorial: <http://www.cirosantilli.com/git-tutorial>
+Submodule for: <https://github.com/cirosantilli/cirosantilli.github.io>
 
-At GitHub Pages for the Js TOC.
-
-To test the page compilation locally:
-
-    bundle install
-    bundle exec jekyll serve --watch
+Live at: <http://www.cirosantilli.com/git-tutorial>

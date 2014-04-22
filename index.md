@@ -1,5 +1,5 @@
 ---
-title: Git version control tutorial
+title: Git Version Control Tutorial
 layout: default
 ---
 
