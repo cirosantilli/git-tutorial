@@ -945,7 +945,9 @@ If you use this all the time, you only add files once.
 
 #log
 
-List existing versions.
+List revisions. Highly customizable output format.
+
+##Basic usage
 
 Start with [2]. List versions in chronological order:
 
@@ -973,9 +975,7 @@ On version `1` we see that:
 - author email: `ciro@mail.com` (specified in `git config`)
 - commit hash: `494b713f2bf320ffe034adc5515331803e22a8ae`.
 
-Show only if grepping commit messages match:
-
-    git log --grep 1
+##all
 
 Show all commits:
 
@@ -986,11 +986,27 @@ Includes:
 - on other branches besides the current (by default only current branch is shown):
 - future commits when navigating history
 
-To show only history of the current branch ignoring merges do:
+##patch
 
-    git log --first-parent
+Show every commit and diff (Patch) of a single file:
 
-This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
+    git log -p file
+
+#grep
+
+Show only if grepping commit messages match:
+
+    git log --grep 1
+
+#n
+
+View up to a certain number of log messages (most recent):
+
+    git log -n 1
+
+`-n 1` is specially useful if you want to get information on the current commit, specially when used with `pretty=format`.
+
+##format
 
 View hash and commit messages only, one per line:
 
@@ -1005,29 +1021,6 @@ See `man git log` and grep for `format:` for a list of all formats.
 There seems to be no built-in way to do fixed column widths, but that can be worked around with `column`:
 
     git log --pretty=format:'%C(yellow)%h|%Cred%ad|%Cblue%an|%Cgreen%d %Creset%s' --date=short | column -ts'|' | less -r
-
-View deleted files only:
-
-    git log --diff-filter=D --summary
-    git log --all --pretty=format: --name-only --diff-filter=D
-
-Very useful to find when you deleted a file from a repo if you don't know its exact path!
-
-View up to a certain number of log messages (most recent):
-
-    git log -n 1
-
-`-n 1` is specially useful if you want to get information on the current commit, specially when used with `pretty=format`.
-
-Show every commit and diff (Patch) of a single file:
-
-    git log -p file
-
-Also cross `git mv`:
-
-    git log --follow -p file
-
-If a merge occurs, both branches appear on `git log` and get mixed up chronologically and it is impossible to set them appart.
 
 ##graph
 
@@ -1049,16 +1042,30 @@ Sample output:
 
 The asterisks `*` show which branch the message on the right corresponds to.
 
+##decorate
+
+Also show refs for each commit:
+
+    git log --decorate --pretty=oneline
+
+Sample output:
+
+    abc2f322034989737e0c7654ecbeaa1009011bb6 (HEAD, normalize) Improve output normalization with custom parser.
+    9b397b1d09f126aeba985aed8c41bf86ba0b0e58 Add -l option.
+    9dc5a1a74d65fdb3e1d6aa23365089a0d8d7a6ed Add -n option.
+    d99ce39e4c37c869ba2b98f593f31d00842c8c99 Add -s option.
+    2fba1c4ba0574027fe8845aa5ce63edea677824f (up/master, origin/master, origin/HEAD, only-ext, master) Merging and resolving conflict
+
 ##simplify-by-decoration
 
 Only show commits that:
 
 - have a ref
-- are required to understand history of commits with a ref. Mostly merge events.
+- are required to understand history of commits with a ref. Basically merge events.
 
-Especially meaningful with `--graph` and `--pretty=oneline`, where it becomes clear why the extra commits are added:
+Especially meaningful with `--graph`, where it becomes clear why the extra commits are added:
 
-    git log --graph --pretty=oneline --simplify-by-decoration
+    git log --decorate --graph --pretty=oneline --simplify-by-decoration
 
 Sample output:
 
@@ -1094,6 +1101,31 @@ Updated upstream:
     git log ..upstream/master
 
 To simply count the number of different versions, consider `git branch -vv`
+
+##diff-filter
+
+View deleted files only:
+
+    git log --diff-filter=D --summary
+    git log --all --pretty=format: --name-only --diff-filter=D
+
+Useful to find when you deleted a file from a repo if you don't know its exact path!
+
+##follow
+
+Also cross `git mv`:
+
+    git log --follow -p file
+
+If a merge occurs, both branches appear on `git log` and get mixed up chronologically and it is impossible to set them appart.
+
+##first-parent
+
+To show only history of the current branch ignoring merges do:
+
+    git log --first-parent
+
+This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
 
 #shortlog
 
