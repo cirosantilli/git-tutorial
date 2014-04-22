@@ -1029,6 +1029,8 @@ Also cross `git mv`:
 
 If a merge occurs, both branches appear on `git log` and get mixed up chronologically and it is impossible to set them appart.
 
+##graph
+
 Show text commit tree:
 
     git log --pretty=oneline --graph
@@ -1047,7 +1049,35 @@ Sample output:
 
 The asterisks `*` show which branch the message on the right corresponds to.
 
-See a range with:
+##simplify-by-decoration
+
+Only show commits that:
+
+- have a ref
+- are required to understand history of commits with a ref. Mostly merge events.
+
+Especially meaningful with `--graph` and `--pretty=oneline`, where it becomes clear why the extra commits are added:
+
+    git log --graph --pretty=oneline --simplify-by-decoration
+
+Sample output:
+
+    * b60e1176d0f1be90902e117e6bb45b712024ade0 (HEAD, origin/one-test, one-test) Add -a option.
+    *   2fba1c4ba0574027fe8845aa5ce63edea677824f (up/master, origin/master, origin/HEAD, only-ext, master) Merging and resolving conflict
+    |\
+    | * 7033e24a572fdd1f88d5b0eb67bf08599ca655d9 (origin/document-config-local) Document config_local.py on README.
+    * |   7ab3a61a7a5b95bffb4704e3b2824613099f140e Merge pull request #24 from cirosantilli/factor-out-engines
+    |\ \
+    | * | 4ae853d571046c18705f49520e501c9affbe2812 (origin/factor-out-engines) Factor out engines that are commands on PATH.
+    * | |   e69627cbf9a576ded85fadd7a1e1325499f462cf Merge pull request #25 from cirosantilli/sample-output-readme
+    |\ \ \
+    | * | | 3e4684cd291e54c79028c58c8241254771d9ceca (origin/sample-output-readme) Add sample run-tests.py output to README.
+    | |/ /
+    * | | 1f7b2547d1965f2887146929e55eecc881eabb9f (origin/check-no-engines) Check if are no engines enabled to avoid exception.
+    |/ /
+    * |   710e9adf53d7cdd1f3888a3dbeacb38d07deaf49 Merge pull request #20 from cirosantilli/multimarkdown
+
+##Range
 
     git log rev1..rev2
 
@@ -2662,9 +2692,13 @@ Start with [multi].
 
 #submodule
 
+A submodule is a git repository included inside another at a version fixed by the parent.
+
+Submodules are used to factor out directories which are used in multiple repositories.
+
 Git commands inside the submodule work just like git commands on a regular git repo!
 
-##application
+##Application
 
 You have 3 repos.
 
@@ -2690,7 +2724,6 @@ On project 2:
 
     git submodule add https://github.com/USERNAME/latex.git shared
     ln -s shared/a.sty a.sty
-    git add .gitmodules
 
 Now the dir called `shared` was created and contains your repo.
 
