@@ -1008,9 +1008,19 @@ View up to a certain number of log messages (most recent):
 
 ##format
 
+The `--pretty` option allows for any output format. There are also options which are aliases to useful formats that can be achieved with `--pretty`.
+
+Same as `--abbrev-commit` and `--pretty=oneline`:
+
+    git log --oneline
+
 View hash and commit messages only, one per line:
 
     git log --pretty=oneline
+
+Show short hashes:
+
+    git log --abbrev-commit
 
 Use a custom format string:
 
@@ -1026,7 +1036,7 @@ There seems to be no built-in way to do fixed column widths, but that can be wor
 
 Show text commit tree:
 
-    git log --pretty=oneline --graph
+    git log --oneline --graph
 
 Sample output:
 
@@ -2320,7 +2330,7 @@ Manage remote repositories.
 
 When you clone something, it already has a remote called `origin`.
 
-##view remote
+##View remote
 
 Shows remote repo aliases without their real addresses:
 
@@ -2355,7 +2365,7 @@ Which gives:
     origin  git@github.com:cirosantilli/reponame.git (fetch)
     origin  git@github.com:cirosantilli/reponame.git (push)
 
-##modify remote
+##Modify remotes
 
 Remove the remote branch called GitHub:
 
@@ -2367,7 +2377,7 @@ Change the address of a remote:
 
 ##prune
 
-Remove all local branches under `remotes/remote-name/branch-name` such that the remote it tracks has been deleted:
+Remove all remote refs under under `remotes/origin` such that the remote it tracks has been deleted:
 
     git remote prune origin
 
@@ -2377,17 +2387,13 @@ Also possible with:
 
     git fetch -p
 
-#remote head
+##remote head
 
 Is a head that has a name.
 
 It is not a branch however!
 
 If you checkout to them, you are in a detached head state.
-
-##how to get one
-
-See [clone] and [fetch].
 
 ##view remote branches
 
@@ -2455,15 +2461,13 @@ Would simply go to it.
 
 #URLs
 
-See protocols.
-
-#protocols
+#Protocols
 
 If you can connect via SSH to a computer as:
 
     ssh username@host
 
-then you can do git operations as:
+Then you can do git operations as:
 
     git username@host:/path/to/repo
 
@@ -2479,7 +2483,7 @@ Other methods of connection include:
 
 Make a "copy" of another repo.
 
-Fetchs all the remote branches.
+Fetches all the remote branches.
 
 Creates only a single branch: the branch were the `HEAD` of the remote was.
 
@@ -3062,7 +3066,7 @@ Merge only the last commit from the `other-branch` branch:
 
 #rerere
 
-TODO
+Reuse merge strategies from previous merges.
 
 #hooks
 
@@ -3080,7 +3084,7 @@ Example:
     echo abc' > post-commit
     chmod +x post-commit
 
-Now whenever you commit, you will see: abc on the terminal!
+Now whenever you commit, you will see `abc` on the terminal!
 
 See: <http://git-scm.com/book/en/Customizing-Git-Git-Hooks> for other hook names.
 
@@ -3243,11 +3247,11 @@ Examples:
 
 Always ignore remote version of certain files on merge run:
 
-    `git config merge.ours.driver true`
+    git config merge.ours.driver true
 
-and use a `.gitattributes` as:
+and then use `.gitattributes` lines like:
 
-    file_to_ignore merge=ours
+    path/to/file merge=ours
 
 #contrib
 
