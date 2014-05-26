@@ -7,33 +7,33 @@ layout: default
 
 #Sources
 
-- official book: <http://git-scm.com/book>.
+-   Official book: <http://git-scm.com/book>.
 
     Good info and graphs.
 
     Leaves out many practical things.
 
-- good tut: <http://cworth.org/hgbook-git/tour/>
+-   Good tut: <http://cworth.org/hgbook-git/tour/>
 
-- good tut, straight to the point, ASCII diagrams: <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
+-   Good tut, straight to the point, ASCII diagrams: <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
 
-- good tut by GitHub: <http://learn.github.com/p/>
+-   Good tut by GitHub: <http://learn.github.com/p/>
 
-- description of a production / dev / hotfix branch model: <http://nvie.com/posts/a-successful-git-branching-model/>
+-   Description of a production / dev / hotfix branch model: <http://nvie.com/posts/a-successful-git-branching-model/>
 
 #Motivation
 
 Git + GitHub allows you to do the following quickly:
 
-- create multiple versions (*commits* or *revisions* in Git jargon) of your work, and travel between them.
+-   create multiple versions (*commits* or *revisions* in Git jargon) of your work, and travel between them.
 
     This is useful for:
 
-    - backup. If you delete a file by mistake, and the file was present in some past version, you can recover it.
+    -   backup. If you delete a file by mistake, and the file was present in some past version, you can recover it.
 
-    - if a recent modification made a change that made things worse, you can just go back to a previous correct state and see what happened.
+    -   if a recent modification made a change that made things worse, you can just go back to a previous correct state and see what happened.
 
-    - refer to a specific version.
+    -   refer to a specific version.
 
         Say you are writting a book, and you made a session called "motivation".
 
@@ -45,7 +45,7 @@ Git + GitHub allows you to do the following quickly:
 
         But not if the other person said: look at the "motivation" section of **version** XXX!
 
-    - you are working on a feature, when something more urgent comes up.
+    -   you are working on a feature, when something more urgent comes up.
 
         The current state may not be stable, and may interfere with the more urgent state.
 
@@ -53,7 +53,7 @@ Git + GitHub allows you to do the following quickly:
 
         When you are done, just switch back.
 
-    - view differences between versions
+    -   View differences between versions.
 
         It is easy to [view *differences* between versions](#differences) to find out what was different on a different version
 
@@ -70,16 +70,16 @@ Git + GitHub allows you to do the following quickly:
     - `git checkout` moves between versions
     - `git branch` deals with version names
 
-- upload your work to a server to:
+-   Upload your work to a server to:
 
     - back it up
     - publish it
 
     The main command to do those things is `git push`.
 
-- download something someone else made public. `git clone` is the way to go.
+-   Download something someone else made public. `git clone` is the way to go.
 
-- work in groups
+-   Work in groups.
 
     Because of all its capacities, git is widely used in group projects. (it was *created* for the linux kernel )
 
@@ -105,11 +105,11 @@ Git is hard to learn at first because
 
 To learn it:
 
-- make a bunch of standard test repos, copy them out, and *test away*.
+-   make a bunch of standard test repos, copy them out, and *test away*.
 
     Use the standard repos generated in [test repos]
 
-- visualize *everything* the commit tree whenever you don't know what is going on.
+-   visualize *everything* the commit tree whenever you don't know what is going on.
 
     Once you see the tree, and how to modify it, everything falls into place!
 
@@ -433,9 +433,25 @@ Does not get pushed to remote.
 
 Same syntax as `.gitignore`.
 
+#git file
+
+The `.git` file, not directory. TODO
+
+#mailmap
+
+Config file named `.mailmap` file at the repo root.
+
+Allows authors to change emails / usernames while keeping a single identity.
+
+Put lines like this in that file:
+
+    Old Name <old_email@mail.com> New Name <new_email@mail.com>
+
+Things will work well with this, for example [shortlog].
+
 #add
 
-Make git track files for next version
+Make Git track files for next version
 
     add a
     add a b
@@ -444,7 +460,7 @@ Check that it will be considered for next version with:
 
     git status
 
-##example: add
+##Example: add
 
 Start with [1]:
 
@@ -704,17 +720,17 @@ Create explanation: <http://git-scm.com/blog>
 
 Without paths `git reset [option]`:
 
-- `--soft` moves the current branch to given ancestor commit.
+-   `--soft` moves the current branch to given ancestor commit.
 
     It does not touch the index nor the working directory.
 
     `git status` will show staged changes.
 
-- neither `--soft` nor `--hard` does what `--soft` does *and* changes the index to that commit. The working directory is unchanged.
+-   neither `--soft` nor `--hard` does what `--soft` does *and* changes the index to that commit. The working directory is unchanged.
 
     `git status` will show unstaged changes.
 
-- neither `--hard` will move the current branch, the index *and* the working directory to the given commit.
+-   neither `--hard` will move the current branch, the index *and* the working directory to the given commit.
 
     `git status` does not show any changes.
 
@@ -864,6 +880,61 @@ But *don't rely on this!*: dangling commits are removed from time to time depend
     git gc --prune=now
 
 But be sure this is what you want! There is no turning back.
+
+#revert
+
+Create new commit(s) that undo what previous commits have done.
+
+May generate merge conflicts.
+
+Old commit tree for all examples:
+
+    (1)-----(2)-----(3)
+                     |
+                     master *
+
+Revert a single commit:
+
+    git revert 3
+
+Never generates merge conflicts.
+
+New commit tree:
+
+    (1)-----(2)-----(3)-----(4)
+                             |
+                             master *
+
+And the tree is exactly as it was on `(2)`.
+
+You can also revert a commit other than the last one, but it may generate merge conflicts:
+
+    git revert 1
+
+Revert multiple commits with multiple commits:
+
+    git revert 1..3
+
+New commit tree:
+
+    (1)-----(2)-----(3)-----(4)-----(5)
+                                     |
+                                     master *
+
+And the working tree is exactly as it was on `(1)`. One new commit is generated for each reverted commit.
+
+`-n`: revert multiple commits with a single new commit:
+
+    git revert -n 1..3
+    git commit -m 4
+
+New commit tree:
+
+    (1)-----(2)-----(3)-----(4)
+                             |
+                             master *
+
+And the working tree is exactly as it was on `(1)`.
 
 #commit
 
@@ -1156,18 +1227,6 @@ Group by author, count by author:
 See how many commits each author did:
 
     git shortlog -nse
-
-#mailmap
-
-Config file named `.mailmap` file at the repo root.
-
-Allows authors to change emails / usernames while keeping a single identity.
-
-Put lines like this in that file:
-
-    Old Name <old_email@mail.com> New Name <new_email@mail.com>
-
-Things will work well with this, for example [shortlog].
 
 #describe
 
@@ -2087,7 +2146,7 @@ If all merges can be done automatically, then you are prompted for a commit mess
 
 However there changes that cannot be merged automatically such as modification of a single line on both versions.
 
-If that happens, and the file is not a binray file, the file on the tree be modified to contain:
+If that happens, and the file is not a binary file, the file on the tree be modified to contain:
 
     <<<<<<< HEAD
         config.password_length = 1..128
@@ -2216,6 +2275,10 @@ Push current branch to `remote` bare repo over branch `branch`:
 where `remote` is anything that identifies the remote such as its URL or name given by `add`.
 
 If the remote branch does not exist it is created.
+
+Push a branch other than the current one to a remote:
+
+    git push remote local-name:remote-name
 
 ##u
 
@@ -2689,7 +2752,13 @@ So you current branch `master` has been merged into the branch `master` from rep
 
 #File permissions
 
-Git keeps file permissions (rwx) as metadata inside the `.git` dir.
+Git only keeps the `x` and symlink bits of file permissions as metadata inside the `.git` dir.
+
+Other permissions are lost.
+
+How to get around it: <http://stackoverflow.com/questions/3207728/retaining-file-permissions-with-git>.
+
+The best solution seems to be the `git-cache-meta` third party tool.
 
 #Empty dirs
 
@@ -3438,6 +3507,28 @@ Usage:
 
     git browse-remote
 
+##git-cache-meta
+
+Save and apply all UNIX permissions. Git only keeps `x` and symlink bits.
+
+Save all permissions to file `.git_cache_meta`:
+
+    git-cache-meta --store
+
+Apply permissions after clone:
+
+    git-cache-meta --apply
+
+Not sure who wrote it originally, but there are some Gists containing the script:
+
+    cd ~/bin
+    wget https://gist.githubusercontent.com/andris9/1978266/raw/git-cache-meta.sh
+    chmod +x git-cache-meta.sh
+
+One downside is that this script always stores file owner, but when publishing a file to other users, we are only interested in storing read write permissions.
+
+The situation is complicated because sometimes we do want the owner to be kept: e.g. when a file must be owned by `root`.
+
 #GitHub specific
 
 The git URL is then `git@github.com:userid/reponame.git`
@@ -3446,8 +3537,9 @@ The git URL is then `git@github.com:userid/reponame.git`
 
 GitHub has an HTTP REST API, which allows you to:
 
-- programmatically access and modify GitHub data
-- overcome certain web interface limitations.
+-   programmatically access and modify GitHub data
+
+-   overcome certain web interface limitations.
 
     For example, on the web interface, you can only see up to 30 results for the starred repos of other people.
 
