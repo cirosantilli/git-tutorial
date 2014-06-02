@@ -349,37 +349,36 @@ You should *always* put all output files inside a gitignore.
 
 There are two common strategies to to that:
 
-- by file extension
+-   by file extension
 
     `*.o` to ignore all object files.
 
     This is has the downside that you may have to add lots of extensions to the gitignore.
 
-- by directory
+-   by directory
 
     `_out/` to ignore all files in `_out/`.
 
-    This is has the downside that some (bad) programs cannot output to or use
-    files from other directories except the current...
+    This is has the downside that some (bad) programs cannot output to or use files from other directories except the current...
 
 ##syntax
 
 `.gitignore` uses slightly modified bash globbing. Reminders:
 
-- bash globbing is strictly less powerful than regexes
+-   bash globbing is strictly less powerful than regexes
 
-- regex equivalence
+-   regex equivalence
 
-    glob        regex
-    --------    --------
-    `*`         `.*`
-    `*.o`       `.*\.o`
-    `[1-3]`     `[1-3]`
-    `[a-c]`     `[a-c]`
+        glob        regex
+        --------    --------
+        `*`         `.*`
+        `*.o`       `.*\.o`
+        `[1-3]`     `[1-3]`
+        `[a-c]`     `[a-c]`
 
     so there is not equivalence for:
 
-    - regex kleene star: `*`
+    - regex Kleene star: `*`
     - regex alternatives: `(ab|cd)`
 
 If a pattern does not contain a slash `/`, it matches any entire basename in any subdir:
@@ -419,11 +418,10 @@ You can ignore entire directories:
     git status
         #new file: a b d/b
 
-If a pattern starts with a `!`, it unignores files. Ignore all files except one:
+If a pattern starts with a `!`, it unignores files. Ignore all files except the gitignore itself:
 
     *
     !.gitignore
-    !.gitkeep
 
 ##local gitignore
 
@@ -2550,7 +2548,7 @@ Fetches all the remote branches.
 
 Creates only a single branch: the branch were the `HEAD` of the remote was.
 
-##example: clone and branches
+##Example: clone and branches
 
 Start with [multi].
 
@@ -2582,7 +2580,7 @@ But if you do:
 
 Then you have a `b` branch, because that is where the head was when you cloned.
 
-##from GitHub
+##Clone from GitHub
 
 It can also clone from a server such as GitHub:
 
@@ -3532,6 +3530,14 @@ The situation is complicated because sometimes we do want the owner to be kept: 
 #GitHub specific
 
 The git URL is then `git@github.com:userid/reponame.git`
+
+##Pull request refs
+
+GitHub stores refs to pull requests on the original repository under `pull/<number>`.
+
+Therefore, if you want to get a pull request locally to try it out you can do:
+
+    git fetch origin 
 
 ##GitHub API v3 via curl
 
