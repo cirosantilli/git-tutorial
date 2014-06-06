@@ -1269,7 +1269,21 @@ See how many commits each author did:
 
 #describe
 
-TODO
+Show the most recent tag reachable from current branch.
+
+Any tag:
+
+    git describe --tags
+
+Only annotated tags:
+
+    git describe
+
+TODO understand `--abbrev`.
+
+Very useful to check out to the most recent stable version before building:
+
+    git checkout "$(git describe --tags --abbrev=0)"
 
 #show
 
