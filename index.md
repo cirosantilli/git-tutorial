@@ -285,13 +285,13 @@ Sample output:
 
 Meaning of fields:
 
-1) <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
-2) TODO
-3) <http://stackoverflow.com/questions/18263216/git-ls-tree-head-meaning-of-third-column>
+1. <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
+2. TODO
+3. <http://stackoverflow.com/questions/18263216/git-ls-tree-head-meaning-of-third-column>
 
 #grep
 
-Searches for lines in tracked files.
+Search for lines in tracked files.
 
 If you only want to search the entire current tree,
 `ack -a` is probably better as it has better formatted output.
@@ -324,6 +324,37 @@ Search in revision only under directory:
 `-l`: list files without any other data:
 
     git grep -f a.c | xargs perl -lane 's/a/b/p'
+
+#Binary files
+
+Git has an heuristic for determining if files are binary or text.
+
+This has effects such as not showing diffs in such files, which would be meaningless line-wise.
+
+In 2014, the heuristic is: look up to 8000 bytes at the beginning of the file.
+Binary iff there is a `NUL` (`\0`).
+
+<http://stackoverflow.com/questions/7110750/how-do-popular-source-control-systems-differentiate-binary-files-from-text-files>
+
+##List all text files
+
+<http://stackoverflow.com/questions/18973057/list-all-text-non-binary-files-in-repo>
+
+    git grep -Ile ''
+
+##Determine if a file is binary
+
+<http://stackoverflow.com/questions/6119956/how-to-determine-if-git-handles-a-file-as-binary-or-as-text>
+
+    if [ -n "$(git grep -Ile "" -- "$file")" ]; then echo "Text"; fi
+
+##Force file to be treated as binary
+
+<http://stackoverflow.com/questions/11162267/how-do-i-make-git-treat-a-file-as-binary>
+
+##Force file to be treated as text
+
+<http://stackoverflow.com/questions/777949/can-i-make-git-recognize-a-utf-16-file-as-text>
 
 #blame
 
