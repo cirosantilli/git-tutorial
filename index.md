@@ -5,7 +5,7 @@ layout: default
 
 <ol data-toc></ol>
 
-#Sources
+# Sources
 
 -   Short help: `git help`
 
@@ -32,7 +32,7 @@ layout: default
 
 -   Description of a production / dev / hotfix branch model: <http://nvie.com/posts/a-successful-git-branching-model/>
 
-#Motivation
+# Motivation
 
 Git + GitHub allows you to do the following quickly:
 
@@ -107,7 +107,7 @@ Git + GitHub allows you to do the following quickly:
 
     - you can make modifications that you need to the program you use.
 
-#How to learn Git
+# How to learn Git
 
 Git is hard to learn at first because
 
@@ -125,9 +125,9 @@ To learn it:
 
     Once you see the tree, and how to modify it, everything falls into place!
 
-#Base concepts
+# Base concepts
 
-##Repository
+## Repository
 
 Git works inside the directories you tell it to work.
 
@@ -143,7 +143,7 @@ To copy an existing repo, use [clone]. No need to `git init` it after you clone 
 
 To transform a repo into a non repo, simply remove the `.git` dir (and maybe other files like `.gitignore`).
 
-##Three trees
+## Three trees
 
 This is a confusing point for beginners, but it is a good design choice by Git,
 so understand it now and save lots of trouble later.
@@ -161,7 +161,7 @@ Transitions:
     |                 |                 |
     |- add ---------> |- commit ------> |
 
-#Setup
+# Setup
 
 Before anything else install Git.
 
@@ -180,7 +180,7 @@ You will also want to install a local GUI git viewer:
 
 It makes it easier to see the version tree.
 
-#init
+# init
 
 Create an empty git repository inside the current directory:
 
@@ -188,7 +188,7 @@ Create an empty git repository inside the current directory:
 
 This creates a `.git` dir that contains all the git information.
 
-#create version
+# create version
 
 Most of git operations are based on versions, so you'd better know how to create them!
 
@@ -199,7 +199,7 @@ To create a version you need to:
 
 You can see what would be included in the next version with `status`
 
-#status
+# status
 
 See all differences between staged files and the tree and `HEAD`:
 
@@ -213,40 +213,32 @@ You can change what would be added with commands like `add`, `rm` or `reset`
 
 There are 3 possible sections:
 
-`Untracked files`
-
-:   files which have never been added in any version.
-
-`Changes not staged for commit`
-
-:   files which have changed but will not be considered.
-
-`Changes to be committed`
-
-:   files which which have changed and will be considered
+- `Untracked files`: files which have never been added in any version.
+- `Changes not staged for commit`: files which have changed but will not be considered.
+- `Changes to be committed`: files which which have changed and will be considered
 
 And if nothing changes, it says so.
 
 Check out the `add`, `rm` and `reset` commands to see how it behaves.
 
-#working tree
+# working tree
 
 Is all the "regular" files that lie outside the `.git` directory.
 
-#index
+# index
 
 Is where git stores what will be kept for next version.
 
 It can modified with may commands such as `add`, `rm`, `mv`, or `reset`.
 
-#staged
+# staged
 
 When a file on the working tree is added to the index, its changes are said to be *staged*.
 
 By analogy, if you modify the working tree and don't add it to the index,
 the changes are said to be *unstaged*.
 
-#ls-files
+# ls-files
 
 List tracked files recursively according to several criteria.
 
@@ -266,7 +258,7 @@ Untracked files only:
 
 TODO only files in current dir?
 
-#ls-tree
+# ls-tree
 
 List tracked files and directories under current directory:
 
@@ -289,7 +281,7 @@ Meaning of fields:
 2. TODO
 3. <http://stackoverflow.com/questions/18263216/git-ls-tree-head-meaning-of-third-column>
 
-#grep
+# grep
 
 Search for lines in tracked files.
 
@@ -325,7 +317,7 @@ Search in revision only under directory:
 
     git grep -f a.c | xargs perl -lane 's/a/b/p'
 
-#Binary files
+# Binary files
 
 Git has an heuristic for determining if files are binary or text.
 
@@ -336,27 +328,31 @@ Binary iff there is a `NUL` (`\0`).
 
 <http://stackoverflow.com/questions/7110750/how-do-popular-source-control-systems-differentiate-binary-files-from-text-files>
 
-##List all text files
+## List all text files
 
 <http://stackoverflow.com/questions/18973057/list-all-text-non-binary-files-in-repo>
 
     git grep -Ile ''
 
-##Determine if a file is binary
+Add trailing newlines to all text files that don't have them:
+
+    git grep -Ile '' | xargs perl -lapi -e 's/.*/$&/'
+
+## Determine if a file is binary
 
 <http://stackoverflow.com/questions/6119956/how-to-determine-if-git-handles-a-file-as-binary-or-as-text>
 
     if [ -n "$(git grep -Ile "" -- "$file")" ]; then echo "Text"; fi
 
-##Force file to be treated as binary
+## Force file to be treated as binary
 
 <http://stackoverflow.com/questions/11162267/how-do-i-make-git-treat-a-file-as-binary>
 
-##Force file to be treated as text
+## Force file to be treated as text
 
 <http://stackoverflow.com/questions/777949/can-i-make-git-recognize-a-utf-16-file-as-text>
 
-#blame
+# blame
 
 See who last modified each line of a given file and when (so you can blame for the bug the line caused...)
 
@@ -387,7 +383,7 @@ Attribute moved lines to the original author, not the mover (TODO understand `C`
 
     git blame -CM
 
-#gitignore
+# gitignore
 
 See `man gitignore`
 
@@ -412,7 +408,7 @@ There are two common strategies to to that:
 
     This is has the downside that some (bad) programs cannot output to or use files from other directories except the current...
 
-##syntax
+## syntax
 
 `.gitignore` uses slightly modified bash globbing. Reminders:
 
@@ -482,7 +478,7 @@ Ignore all files except the gitignore itself and another file:
     !.gitignore
     !README.md
 
-##local gitignore
+## local gitignore
 
 `.git/info/exclude`
 
@@ -490,11 +486,11 @@ Does not get pushed to remote.
 
 Same syntax as `.gitignore`.
 
-#git file
+# git file
 
 The `.git` file, not directory. TODO
 
-#mailmap
+# mailmap
 
 Config file named `.mailmap` file at the repo root.
 
@@ -506,7 +502,7 @@ Put lines like this in that file:
 
 Things will work well with this, for example [shortlog].
 
-#add
+# add
 
 Make Git track files for next version
 
@@ -517,7 +513,7 @@ Check that it will be considered for next version with:
 
     git status
 
-##Example: add
+## Example: add
 
 Start with [1]:
 
@@ -558,7 +554,7 @@ Add is recursive on dirs:
         #to be committed: modified: a
         #to be committed: new: d/a
 
-##add and gitignore
+## add and gitignore
 
 If you add a file that is in `.gitignore` directly, the add fail.
 
@@ -577,7 +573,7 @@ which fails if there are gitignored files.
 
 `git add .` also has the advantage of including hidden dot files `.`.
 
-##combos
+## combos
 
 Add all non-hidden files in current directory:
 
@@ -587,7 +583,7 @@ Add all files in current directory, including hidden:
 
     git add `ls -A`
 
-#rm
+# rm
 
 If you want to remove a file that is tracked from future versions then use:
 
@@ -603,7 +599,7 @@ If you committed sensitive data like passwords like this by mistake, you need to
 
 To do that see [remove file from repo history].
 
-##example: rm
+## example: rm
 
 Start with [1]
 
@@ -641,7 +637,7 @@ Or
 
 And a will be removed.
 
-##rm --cached
+## rm --cached
 
 Don't remove the file from working tree, but stop tracking it for next commit.
 
@@ -654,7 +650,7 @@ Don't remove the file from working tree, but stop tracking it for next commit.
     git status
         #nothing to be committed
 
-##rm -f
+## rm -f
 
 Remove even if it has local changes.
 
@@ -668,13 +664,13 @@ By default this is not permitted.
     ls
         #b
 
-##rm -r
+## rm -r
 
 Remove all files descendants of a dir recursively.
 
 By default, `git rm` won't remove dirs.
 
-#Remove file from repo history
+# Remove file from repo history
 
 [rm] does not remove files from repo history, only from future versions.
 
@@ -706,9 +702,9 @@ Remove from repo:
 
 **Mail all colaborators** and tell them to git rebase
 
-#clean
+# clean
 
-**danger**: remove all [untracked file]s in repo that are not in [gitignore]:
+**danger**: remove all untracked files in repo that are not in gitignore:
 
     ./copy.sh 1
 
@@ -743,7 +739,7 @@ Also remove untracked files listed in `.gitignore` with `-x`:
 
     git clean -dfx
 
-#mv
+# mv
 
 Similar to [rm].
 
@@ -770,7 +766,7 @@ With `-k`, if moving would lead to an error (overwrite without -f or file not tr
 
     git mv -k "$OLD_PATH" "$NEW_PATH"
 
-#reset
+# reset
 
 Move the current branch and possibly index and working directory to one of its ancestor commits.
 
@@ -797,7 +793,7 @@ Without paths `git reset [option]`:
 
     Changes were lost forever.
 
-##hard vs soft
+## hard vs soft
 
 Hard also modifies the actual files and the index!
 
@@ -858,7 +854,7 @@ With hard:
 
 - untracked files (`c`) are unchanged, but they are unstaged.
 
-##change what a branch points to
+## change what a branch points to
 
 This changes history and as any history changing, if you do this after you [push]
 and someone else [fetche]d, there will be problems!
@@ -882,13 +878,13 @@ The tree:
              master *
              b
 
-###dangling commit
+### dangling commit
 
 `(2)` in this example is called a *dangling commit*.
 
 It is a commit with no descendant branch.
 
-###delete last commit from history
+### delete last commit from history
 
 Start with [2]:
 
@@ -923,7 +919,7 @@ The tree:
 
 And `(2)` is called a dangling commit.
 
-##undo a reset hard
+## undo a reset hard
 
 You *can* undo a reset hard if your are fast enough.
 
@@ -937,14 +933,14 @@ Now merge away with the have you just found.
 
 But *don't rely on this!*: dangling commits are removed from time to time depending on your configs.
 
-##remove all dangling commits forever
+## remove all dangling commits forever
 
     git reflog expire --expire=now --all
     git gc --prune=now
 
 But be sure this is what you want! There is no turning back.
 
-#revert
+# revert
 
 Create new commit(s) that undo what previous commits have done.
 
@@ -999,7 +995,7 @@ New commit tree:
 
 And the working tree is exactly as it was on `(1)`.
 
-#commit
+# commit
 
 Creates a new version.
 
@@ -1019,7 +1015,7 @@ To give it a message 'added a'.
 
 Now status only says that `b` is untracked and nothing about `a`.
 
-##commit message
+## commit message
 
 It is recommended that the commit message be like:
 
@@ -1045,7 +1041,7 @@ E.g. of good commit message:
     The feature behaves that way on case X because without that behavior,
     case Y would fail miserably.
 
-##amend
+## amend
 
 Instead of creating a new commit, add modifications to the last existing commit:
 
@@ -1068,7 +1064,7 @@ Change author:
 To correct the name of an author on an entire repository, see:
 <http://stackoverflow.com/questions/750172/how-do-i-change-the-author-of-a-commit-in-git>
 
-##Commit all tracked files
+## Commit all tracked files
 
     git add -am 'message'
 
@@ -1078,11 +1074,11 @@ It is a very common default commit command.
 
 If you use this all the time, you only add files once.
 
-#log
+# log
 
 List revisions. Highly customizable output format.
 
-##Basic usage
+## Basic usage
 
 Start with [2]. List versions in chronological order:
 
@@ -1110,7 +1106,7 @@ On version `1` we see that:
 - author email: `ciro@mail.com` (specified in `git config`)
 - commit hash: `494b713f2bf320ffe034adc5515331803e22a8ae`.
 
-##all
+## all
 
 Show all commits:
 
@@ -1121,19 +1117,19 @@ Includes:
 - on other branches besides the current (by default only current branch is shown):
 - future commits when navigating history
 
-##patch
+## patch
 
 Show every commit and diff (Patch) of a single file:
 
     git log -p file
 
-#grep
+# grep
 
 Show only if grepping commit messages match:
 
     git log --grep 1
 
-#n
+# n
 
 View up to a certain number of log messages (most recent):
 
@@ -1142,7 +1138,7 @@ View up to a certain number of log messages (most recent):
 `-n 1` is specially useful if you want to get information on the current commit,
 specially when used with `pretty=format`.
 
-##format
+## format
 
 The `--pretty` option allows for any output format.
 There are also options which are aliases to useful formats that can be achieved with `--pretty`.
@@ -1169,7 +1165,7 @@ There seems to be no built-in way to do fixed column widths, but that can be wor
 
     git log --pretty=format:'%C(yellow)%h|%Cred%ad|%Cblue%an|%Cgreen%d %Creset%s' --date=short | column -ts'|' | less -r
 
-##graph
+## graph
 
 Show text commit tree:
 
@@ -1189,7 +1185,7 @@ Sample output:
 
 The asterisks `*` show which branch the message on the right corresponds to.
 
-##decorate
+## decorate
 
 Also show refs for each commit:
 
@@ -1203,7 +1199,7 @@ Sample output:
     d99ce39e4c37c869ba2b98f593f31d00842c8c99 Add -s option.
     2fba1c4ba0574027fe8845aa5ce63edea677824f (up/master, origin/master, origin/HEAD, only-ext, master) Merging and resolving conflict
 
-##simplify-by-decoration
+## simplify-by-decoration
 
 Only show commits that:
 
@@ -1231,7 +1227,7 @@ Sample output:
     |/ /
     * |   710e9adf53d7cdd1f3888a3dbeacb38d07deaf49 Merge pull request #20 from cirosantilli/multimarkdown
 
-##Range
+## Range
 
     git log rev1..rev2
 
@@ -1250,7 +1246,7 @@ Updated upstream:
 
 To simply count the number of different versions, consider `git branch -vv`
 
-##diff-filter
+## diff-filter
 
 View deleted files only:
 
@@ -1259,7 +1255,7 @@ View deleted files only:
 
 Useful to find when you deleted a file from a repo if you don't know its exact path!
 
-##follow
+## follow
 
 Also cross `git mv`:
 
@@ -1268,7 +1264,7 @@ Also cross `git mv`:
 If a merge occurs, both branches appear on `git log` and get mixed up chronologically
 and it is impossible to set them apart.
 
-##first-parent
+## first-parent
 
 To show only history of the current branch ignoring merges do:
 
@@ -1278,7 +1274,7 @@ This is a great option to view history on a feature branch onto which upstream w
 Rebase is a better option than merge in this case if you work locally,
 but may not be an option if a group is working on the feature branch.
 
-#shortlog
+# shortlog
 
 Summarizes log information.
 
@@ -1298,7 +1294,7 @@ See how many commits each author did:
 
     git shortlog -nse
 
-#describe
+# describe
 
 Show the most recent tag reachable from current branch.
 
@@ -1316,7 +1312,7 @@ Very useful to check out to the most recent stable version before building:
 
     git checkout "$(git describe --tags --abbrev=0)"
 
-#show
+# show
 
 Show specific versions of files and other infos.
 
@@ -1329,7 +1325,7 @@ Application: checkout a file with a different name:
 
     git show HEAD^:path/to/file > new/path/to/file
 
-#reflog
+# reflog
 
 See all that was done on repo linearly in time:
 
@@ -1343,7 +1339,7 @@ Shows stuff like:
 
 Information is stored under `.git/logs`.
 
-#gitk
+# gitk
 
 Gitk is a GUI for git. Part of the Git source tree.
 
@@ -1360,11 +1356,11 @@ What you almost always want is to use with `--all` to see all branches marked:
 
     gitk --all
 
-#Revision
+# Revision
 
 A revision is the git name for a version. It is also known informally as a commit.
 
-##How to name revisions
+## How to name revisions
 
 To actually go to another version, you have to be able to tell git which one is it,
 so that git can go back to it.
@@ -1378,9 +1374,9 @@ There are a two ways to do that:
 - SHA-1 hash
 - refs: names that points to SHA-1 hashes
 
-###SHA-1
+### SHA-1
 
-###Hash
+### Hash
 
 This is the SHA hash of the entire repo.
 
@@ -1409,9 +1405,9 @@ Get the hash of the latest commit:
 
     git log -n1 --pretty=format:%H
 
-###Reference
+### Reference
 
-###Refs
+### Refs
 
 Refs are names that point to SHA-1 hashes, and therefor to revisions.
 
@@ -1438,7 +1434,7 @@ Git uses the following search order, documented at `man gitrevisions`:
 - `refs/remotes/<name>`
 - `refs/remotes/<name>/HEAD`
 
-####HEAD
+#### HEAD
 
 The `HEAD` is the current commit we are on.
 
@@ -1450,7 +1446,7 @@ the head will be the branch with an asterisk in front of it.
 Internally, the head is determined by the content of the file `$GIT/HEAD`,
 which is the hash of the current head commit.
 
-#####Example: HEAD
+##### Example: HEAD
 
 Start with [1]. We have:
 
@@ -1470,7 +1466,7 @@ After another commit:
                      |
                      HEAD
 
-###show-ref
+### show-ref
 
 List all references and their hashes:
 
@@ -1483,7 +1479,7 @@ Sample output:
     9b7dd8b4c04c427de22543fec7f52be26decdb22 refs/remotes/origin/master
     52d771167707552d8e2a50f602c669e2ad135722 refs/tags/v1.0.1
 
-###Relative to another revision
+### Relative to another revision
 
 One commit before:
 
@@ -1510,7 +1506,7 @@ Also work:
 Moving forward is not unique since branch can split and have multiple children,
 so it is more complicated.
 
-##name-rev
+## name-rev
 
 If you have the hash of a commit and you want a symbolic name for it,
 `name-rev` does that for you, probably looking for the closest named reference ahead of the commit.
@@ -1531,11 +1527,11 @@ Sample output:
 
     012345 some-branch
 
-##symbolic-ref
+## symbolic-ref
 
     git symbolic-ref 'master2' 'refs/heads/master'
 
-#diff
+# diff
 
 View diff between working tree and index (changes will disappear after `git add`):
 
@@ -1587,7 +1583,39 @@ Sample output:
 
     40 files changed, 244 insertions(+), 203 deletions(-)
 
-##format
+View only changed words:
+
+    git diff -M
+
+## color-words
+
+## word-diff
+
+    git diff --word-diff
+
+Sample output:
+
+    The [-gud-]{+good+} word.
+
+colored if you have `--color`.
+
+Show only color, very neat:
+
+    git diff --word-diff=color
+
+Same as:
+
+    git diff --color-words
+
+Sample output:
+
+    The gudgood word.
+
+where `gud` is red and `good` is green.
+
+`diff-highlight` is a related contrib script.
+
+## format
 
 Sample output:
 
@@ -1618,7 +1646,7 @@ After a `git merge`, `git diff` shows a special mode that shows diffs to both pa
     ++    Added in both
      +    Added in ours
 
-##newline at the end of file
+## Newline at the end of file
 
 If the file does not end in a newline, you will see things like:-
 
@@ -1641,7 +1669,7 @@ For example, Vim 7.3 hides trailing newlines by default.
 
 `tail file | hd` and `truncate -s -1` will never lie to you.
 
-#tag
+# tag
 
 Tags are a type of ref: names for commits commits.
 
@@ -1668,7 +1696,7 @@ So you must delete the old tag before.
 
 A single commit can however have multiple tags.
 
-##Give tags
+## Give tags
 
 Give lightweight tag to `HEAD`:
 
@@ -1690,7 +1718,7 @@ Give another tag to that commit:
 
     git tag 1.1 HEAD~
 
-##Get tag info
+## Get tag info
 
 List all tags:
 
@@ -1713,7 +1741,7 @@ List tags with date side by side and on commit tree:
 
     git log --date-order --graph --tags --simplify-by-decoration --pretty=format:'%ai %h %d'
 
-###describe
+### describe
 
 Find out how many commits we are ahead of the latest tag:
 
@@ -1749,13 +1777,13 @@ Sample output:
     tag1
     tag2
 
-##Delete tags
+## Delete tags
 
 Delete a tag:
 
     git tag -d 1.0
 
-##Push tags to remote
+## Push tags to remote
 
 Is not done be default.
 
@@ -1763,7 +1791,7 @@ Must do it with:
 
     git push --tags
 
-##Annotated tag
+## Annotated tag
 
     git tag -a ta -m 'annotated tag message!'
 
@@ -1775,11 +1803,11 @@ Will show who created the tag and the tag message before the rest of the infos.
 
 A tag that is not annotated is called a *lightweight* tag.
 
-##Signed
+## Signed
 
 GPG signed tags. TODO
 
-#branch
+# branch
 
 Branches are a type of ref: a name for a commit.
 
@@ -1791,7 +1819,7 @@ Therefore, you cannot refer to a single revision forever with a branch.
 Branches are used to creates alternate realities
 so you can test changes without one affecting the other.
 
-##master
+## master
 
 `master` is the name of the branch created by default on new repositories.
 
@@ -1804,7 +1832,7 @@ so it is where you will develop the software.
 There are also some work flows that only leave stable versions at `master`,
 and develop on the `dev` branch.
 
-##List branches
+## List branches
 
     git branch
 
@@ -1822,7 +1850,7 @@ One very important way is to do is graphically:
 
 Will show you who is the descendant of whom!
 
-##Create a branch
+## Create a branch
 
 The most common way to create a branch is via:
 
@@ -1834,7 +1862,7 @@ Create a branch without setting it to current:
 
     git branch branchname
 
-##What happens when you create a branch
+## What happens when you create a branch
 
 To the files, nothing.
 
@@ -1851,7 +1879,7 @@ It becomes:
      master *
      b
 
-##What happens to a branch when you commit
+## What happens to a branch when you commit
 
 The *current* branch moves forward and continues being current.
 
@@ -1894,7 +1922,7 @@ And now we have:
 
 Which makes it obvious why a branch is called a branch.
 
-##Detached head
+## Detached head
 
 Is when you checkout to a commit that has no branch associated.
 
@@ -1910,7 +1938,7 @@ Shows current branch as:
 
     (no branch) *
 
-###What should I do if I want to branch from the detached head
+### What should I do if I want to branch from the detached head
 
 If you are on it, you should first create a branch:
 
@@ -1922,7 +1950,7 @@ You can also create a branch before going to it with:
 
     git branch <hash>
 
-###What happens if I commit on a detached head
+### What happens if I commit on a detached head
 
 Bad things! Never do this!
 
@@ -1934,7 +1962,7 @@ To correct it you can create a branch:
 
 And since you were on no branch, git automatically changes to `b`.
 
-####What if I commit and checkout
+#### What if I commit and checkout
 
 Worse things.
 
@@ -1944,7 +1972,7 @@ Git warns you: this might be a good time to give it a branch, and you should as:
 
     git branch b hash
 
-##Set branch commit
+## Set branch commit
 
 You can also create a branch at any commit other than the current one:
 
@@ -1960,7 +1988,7 @@ To create switch to it directly:
 
     git checkout -b b HEAD~
 
-##Slash in branch name
+## Slash in branch name
 
 Inside the `.git`, branches are placed under `refs`.
 
@@ -1973,7 +2001,7 @@ Therefore you can't both:
 
 since `a` would have to be both a directory and a file at the same time for that to work.
 
-##rename branch
+## rename branch
 
 Rename a given branch:
 
@@ -1983,14 +2011,14 @@ Rename the current branch:
 
     git branch -m newname
 
-##branch without parent
+## Branch without parent
 
 If two repositories are strictly linked,
 it is possible to use a single repository with unrelated branches for both.
 
 To achieve this, you must create a branch without a parent, which can be done with:
 
-    git branch --orphan branchname
+    git checkout --orphan branchname
 
 This command takes the tree:
 
@@ -2016,13 +2044,13 @@ Before you do this however, take into account its downsides:
 - you cannot view file from both branches simultaneously (unless you copy the repository)
 - its more confusing for new users
 
-#checkout
+# checkout
 
 Goes to another version
 
 Before you go to another version, you must see which versions you can go back with [log] or [gitk].
 
-##Entire repo
+## Entire repo
 
 Use the `checkout` command with some version name as explained in [how to refer to a version] for example:
 
@@ -2041,7 +2069,7 @@ If you omit the version, defaults to `HEAD` so:
 
 Are the same.
 
-###Example: checkout entire repo
+### Example: checkout entire repo
 
 Start with [3].
 
@@ -2091,7 +2119,7 @@ And `a` and `b` contain three lines again. This is how things look:
 
 Files that are not tracked stay the same.
 
-###Untracked files
+### Untracked files
 
 Start with [2]
 
@@ -2115,11 +2143,11 @@ But the untracked `c` stays the same:
         #c1
         #c2
 
-###Uncommitted changes
+### Uncommitted changes
 
 If you have not yet committed changes, git warns you and does not checkout.
 
-####Checkout uncommitted modification
+#### Checkout uncommitted modification
 
 Start with [2].
 
@@ -2131,7 +2159,7 @@ Then try:
 
 Git says that there is a change, and does nothing.
 
-####Checkout file overwrite
+#### Checkout file overwrite
 
 Start with [2]
 
@@ -2146,7 +2174,7 @@ Then try:
 
 This fails again, because file a would be overwritten, even if its contents did not change.
 
-##Single file or dir
+## Single file or dir
 
 Just like checking out the dir, but you also specify the files:
 
@@ -2156,7 +2184,7 @@ The head does not move now! this is different from the behaviour of checkout [en
 
 New files that appear are just like untracked ones.
 
-###Checkout single file
+### Checkout single file
 
 Start from [2]
 
@@ -2170,7 +2198,7 @@ But we are still at master:
     git branch
         #* master
 
-###Checkout single removed file
+### Checkout single removed file
 
 Start from [2]
 
@@ -2189,7 +2217,7 @@ Now restore it:
 
 The file must exist in the version you want to checkout to.
 
-###Checkout after remove
+### Checkout after remove
 
     start with [1]
 
@@ -2206,21 +2234,21 @@ Which is the same as:
 
 And it fails, because in `HEAD` a was removed from the repo.
 
-###Uncommitted changes
+### Uncommitted changes
 
 Unlike when checking out the entire repo, Git does not prompt you
 in case of non-committed modifications when checking out individual files!
 
 This is a great way to achieve data loss.
 
-###example: checkout single file with modifications
+### Example: checkout single file with modifications
 
 Start from [2]
 
     echo a3 >> a
     git checkout
 
-#bisect
+# bisect
 
 Checkout interactively to binary search between two commits for an error.
 
@@ -2244,12 +2272,11 @@ And if it works:
 
 And the binary search continues!
 
-If you have an automated test script that has return status 0 on success
-and otherwise on failure, you can automate everything with:
+# bisect run
 
-    git bisect run my_script arguments
+<http://stackoverflow.com/questions/4713088/how-to-use-git-bisect/22592593#22592593>
 
-#stash
+# stash
 
 Saves all unstaged modifications of the working tree,
 and returns the working tree to `HEAD` into a modification stack called *stash*.
@@ -2274,7 +2301,7 @@ Apply change at the top of the stash:
 
     git stash apply
 
-#merge
+# merge
 
 Is when you take two branches and make a new one that is child of both.
 
@@ -2315,7 +2342,7 @@ To go back to the merge conflict version with `<<<<<< HEAD` you can do:
 
 This is what you do when you like the modifications of two branches!
 
-##Strategies
+## Strategies
 
 Git attempts to merge automatically using one of different merge strategies.
 
@@ -2332,7 +2359,7 @@ Some important strategies are:
 
         git merge -X theirs ref
 
-##ignore certain files on merge
+## ignore certain files on merge
 
 Run:
 
@@ -2342,7 +2369,7 @@ and use a `.gitattributes` as:
 
     file_to_ignore merge=ours
 
-##squash
+## squash
 
 Given:
 
@@ -2369,7 +2396,7 @@ We get: TODO
                            |
                            feature
 
-#mergetool
+# mergetool
 
 Start running a conflict resolution tool, typically a 3-way merge tool to solve all merge conflicts.
 
@@ -2390,24 +2417,24 @@ If the tool is not given, git uses:
 - `merge.tool` configuration option tool
 - a suitable tool found in the path
 
-#email patches
+# email patches
 
 Tools only used in projects that exchange patches via email,
 not in those that use web interfaces like GitHub.
 
-##format-patch
+## format-patch
 
 Generate a patch.
 
-##am
+## am
 
 TODO0
 
-##apply
+## apply
 
 TODO0
 
-#push
+# push
 
 Makes changes on a bare remote repo.
 
@@ -2434,7 +2461,7 @@ Push even if not fast forward:
 
     git push remote +local-name:remote-name
 
-##refspec
+## refspec
 
 The name of a origin destination branch pair,
 including options on how push / pull may happen such as `+` to allow non-fast forwards.
@@ -2445,9 +2472,9 @@ Example:
 
 They are used by commands such as `push` and `fetch`.
 
-##u
+## u
 
-##upstream
+## upstream
 
 Each local branch can have a remote branch which it tracks, which is known as the upstream or tracked branch.
 
@@ -2496,9 +2523,9 @@ Push all local branches which track a remote at `remote`:
 
     git push remote
 
-##f
+## f
 
-##force
+## force
 
 Push to remote branch even if the remote branch is not a descendant of the local branch.
 
@@ -2539,7 +2566,7 @@ It is possible to push the current branch by using:
 
     git config push.default current
 
-##delete
+## delete
 
 Delete remote branch:
 
@@ -2557,13 +2584,13 @@ After you delete remote branches, you can remove the local tracking branches wit
 
     git remote prune origin
 
-#remote
+# remote
 
 Manage remote repositories.
 
 When you clone something, it already has a remote called `origin`.
 
-##View remote
+## View remote
 
 Shows remote repo aliases without their real addresses:
 
@@ -2577,7 +2604,7 @@ View detail of branch:
 
     git remote show $B
 
-##remote add
+## remote add
 
 One way to avoid typing the repo URL is giving it an alias with `remote add`:
 
@@ -2598,7 +2625,7 @@ Which gives:
     origin  git@github.com:cirosantilli/reponame.git (fetch)
     origin  git@github.com:cirosantilli/reponame.git (push)
 
-##Modify remotes
+## Modify remotes
 
 Remove the remote branch called GitHub:
 
@@ -2608,10 +2635,10 @@ Change the address of a remote:
 
     git remote set-url git://github.com/username/projectname.git
 
-##prune
+## prune
 
 Remove all remote refs under under `remotes/origin`
-such that the remote it tracks has been deleted:
+such that their remote it tracks has been deleted:
 
     git remote prune origin
 
@@ -2622,7 +2649,12 @@ Also possible with:
 
     git fetch -p
 
-##remote head
+The actual branches will still be there. Delete merged branches,
+i.e. any ancestor of the current branch, with:
+
+    git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+
+## remote head
 
 Is a head that has a name.
 
@@ -2630,7 +2662,7 @@ It is not a branch however!
 
 If you checkout to them, you are in a detached head state.
 
-##view remote branches
+## view remote branches
 
 First fetch the branches with:
 
@@ -2651,7 +2683,7 @@ Where remote-name was either given:
 - explicitly by `remote add`
 - `origin` by default by `clone`
 
-##how to refer to one
+## how to refer to one
 
 Documentation at:
 
@@ -2667,11 +2699,11 @@ and there is no other branch in your repo with that name.
 
 Ex: `origin/master`, `origin/feature2`, `upstream/feature2`, etc.
 
-###branch
+### branch
 
 Branch only sees remotes if you give the `remote-name` explicitly.
 
-###checkout
+### checkout
 
 If you have a remote `origin/b` and no branch named `b`,
 
@@ -2696,7 +2728,7 @@ If you had a branch named `b`:
 
 Would simply go to it.
 
-#ls-remote
+# ls-remote
 
 List remote references:
 
@@ -2718,9 +2750,9 @@ The `^{}` is explained in `man gitrevisions`. Above:
 - `52d771167707552d8e2a50f602c669e2ad135722` is the SHA-1 for the actual commit,
     which is most likely to interest you.
 
-#URLs
+# URLs
 
-#Protocols
+# Protocols
 
 If you can connect via SSH to a computer as:
 
@@ -2739,7 +2771,7 @@ Other methods of connection include:
 - a git specific protocol with id `git://`. More efficient than HTTP since git specific,
     but also requires a more specialized server.
 
-#clone
+# clone
 
 Make a "copy" of another repo.
 
@@ -2747,7 +2779,7 @@ Fetches all the remote branches.
 
 Creates only a single branch: the branch were the `HEAD` of the remote was.
 
-##Example: clone and branches
+## Example: clone and branches
 
 Start with `multi`.
 
@@ -2779,7 +2811,7 @@ But if you do:
 
 Then you have a `b` branch, because that is where the head was when you cloned.
 
-##Clone from GitHub
+## Clone from GitHub
 
 It can also clone from a server such as GitHub:
 
@@ -2787,7 +2819,7 @@ It can also clone from a server such as GitHub:
 
 This is how you download a project which interests you.
 
-#fetch
+# fetch
 
 Looks for all modifications made on all branches of a remote
 and download everything necessary to recreate those branches locally.
@@ -2838,7 +2870,7 @@ To use `fetch`, the remote must have a name, either given automatically at `clon
 as `origin` or through explicit `remote add`,
 since the name determines how the local references will be named.
 
-#bare
+# bare
 
 A repo that only contains the files that are inside `.git`.
 
@@ -2861,7 +2893,7 @@ To create a bare repo that is a clone of another repo:
 
     git clone --bare other
 
-##current branch
+## current branch
 
 The active or current branch of a bare repository is what its `HEAD` points to.
 
@@ -2881,7 +2913,7 @@ also acts on the working tree. You must use `update-ref` or better `symbolic-ref
 As of 1.8.4, there seems to be no way to conveniently change the current remote branch:
 <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
-#pull
+# pull
 
 `pull` is exactly the same as [fetch] + [merge] on given branch and merges with current branch.
 
@@ -2889,7 +2921,7 @@ As of 1.8.4, there seems to be no way to conveniently change the current remote 
 
 Does not update remote heads like [fetch] does.
 
-##Basic usage
+## Basic usage
 
 State of the remote:
 
@@ -2939,7 +2971,7 @@ Local repo after a `merge`:
 
 So you current branch `master` has been merged into the branch `master` from repo `origin`.
 
-#File permissions
+# File permissions
 
 Git only keeps the `x` and symlink bits of file permissions as metadata inside the `.git` dir.
 
@@ -2949,7 +2981,7 @@ How to get around it: <http://stackoverflow.com/questions/3207728/retaining-file
 
 The best solution seems to be the `git-cache-meta` third party tool.
 
-#Empty dirs
+# Empty dirs
 
 Git ignores empty dirs.
 
@@ -2961,14 +2993,14 @@ Popular possibilities are:
 
 - `.gitkeep` file. It has absolutely no special meaning for git, but is somewhat conventional.
 
-#Symlinks
+# Symlinks
 
-##On push
+## On push
 
 Git stores symlinks as files containing the link location + some metadata inside `.git`
 that indicates that it is a symlink.
 
-##On pull
+## On pull
 
 Git recreates the symlinks on local system.
 
@@ -2985,7 +3017,7 @@ Start with [multi].
     cd c
     [ -s c ] && echo ok
 
-#submodule
+# submodule
 
 A submodule is a git repository included inside another at a version fixed by the parent.
 
@@ -3004,7 +3036,7 @@ e.g. Python / Ruby modules + virtualenv / RVM, use that method instead.
 A submodule is a completely separate repo: the super repository
 only keeps note of its path, URL and current commit.
 
-##Create
+## Create
 
 Create on directory `.latex`:
 
@@ -3022,7 +3054,7 @@ Add to another directory:
 
     git submodule add https://github.com/USERNAME/latex.git another_name
 
-##Symlink technique
+## Symlink technique
 
 If you technology requires files to be in the current directory,
 you can use symlinks into the submodule to achieve that effect.
@@ -3041,7 +3073,7 @@ On project 2:
 
 Now the dir called `shared` was created and contains your repo.
 
-##Clone a repo that contains a submodule
+## Clone a repo that contains a submodule
 
 To get all the files of submodules you need the `--recursive` flag:
 
@@ -3054,7 +3086,7 @@ If you forgot to use recursive when you cloned, you should:
 It seems that making clone recursive by default is neither possible nor a good idea:
 <http://stackoverflow.com/questions/4251940/retrospectively-add-recursive-to-a-git-repo>
 
-##Update the content of a submodule
+## Update the content of a submodule
 
     cd share
     git pull
@@ -3076,7 +3108,7 @@ Update the contents of all submodules:
 
 This does not work if the modules are only listed under `.gitmodule` but have not been added to index with `add`.
 
-##foreach
+## foreach
 
 Do an arbitrary command from each submodule directory.
 
@@ -3088,9 +3120,9 @@ Print full paths of each submodule:
 
     git submodule foreach pwd
 
-##Delete a submodule
+## Delete a submodule
 
-##deinit
+## deinit
 
 As of git 1.8.3:
 
@@ -3113,24 +3145,24 @@ Then:
     git commit -am 'removed submodule'
     rm -rf $path_to_submodule
 
-##Change submodule upstream
+## Change submodule upstream
 
 Edit `.gitmodules` and then:
 
     git submodule sync
     git submodule update
 
-##Change submodule location
+## Change submodule location
 
 <http://stackoverflow.com/questions/4604486/how-do-i-move-an-existing-git-submodule-within-a-git-repository>
 
-#rebase
+# rebase
 
 Change local history making it appear linear thus clearer.
 
 As any history change, should only be done before pushing to a remote.
 
-##Non-interactive rebase
+## Non-interactive rebase
 
 Given:
 
@@ -3159,7 +3191,7 @@ making it look linear and therefore easier to understand.
 This is how you should incorporate upstreams changes on your feature branch
 before you make a pull request, followed often by a squash interactive rebase.
 
-##Interactive rebase
+## Interactive rebase
 
     git rebase -i HEAD~3
 
@@ -3190,7 +3222,7 @@ The buffer should contain something like this:
     #
     # Note that empty commits are commented out
 
-###Edit
+### Edit
 
 `edit` can be used for example if we want to change
 the commit message for `HEAD~` we edit that to:
@@ -3227,7 +3259,7 @@ Now `git log --pretty=oneline -n3` gives:
     81961e9[...] new last - 1 commit message
     d13a071[...] last commit message
 
-###squash
+### squash
 
 `squash` can be used if you want to remove all trace of a commit.
 
@@ -3285,13 +3317,13 @@ To do that, it would be necessary to do a `git rabase -i HEAD~4`, and `pick` `HE
     pick 81961e9 last - 1 commit message
     pick d13a071 last commit message
 
-###reorder and delete
+### reorder and delete
 
 It is also possible to reorder and erase any commit on the commit list.
 
 All you need to do is to change the line order or remove lines.
 
-#filter-branch
+# filter-branch
 
 Mass history rewrite using arbitrary Bash function.
 
@@ -3317,7 +3349,7 @@ Correct the name of one of the authors:
             git commit-tree "$@";
         fi' HEAD
 
-##Commiter vs author
+## Commiter vs author
 
 The author is who actually wrote the commit.
 
@@ -3336,7 +3368,7 @@ and apply patches with `git merge`, this is not necessary:
 the commit appears directly on history, in addition to the merge commit.
 This is the case for most modern projects.
 
-#cherry-pick
+# cherry-pick
 
 Merge only certain commits from another branch.
 
@@ -3344,11 +3376,11 @@ Merge only the last commit from the `other-branch` branch:
 
     git cherry-pick other-branch
 
-#rerere
+# rerere
 
 Reuse merge strategies from previous merges.
 
-#hooks
+# hooks
 
 Take an action whenever something happens (a commit for example).
 
@@ -3371,7 +3403,7 @@ See: <http://git-scm.com/book/en/Customizing-Git-Git-Hooks> for other hook names
 
 When hooks are executed on the remote they echo on the local shell as: `remote: <stdout>`.
 
-#rev-parse
+# rev-parse
 
 Some useful commands to automate Git.
 
@@ -3396,7 +3428,7 @@ Path to `.git` dir:
 
     git rev-parse --git-dir
 
-#Config
+# Config
 
 Allows to get and set configuration data.
 
@@ -3417,7 +3449,7 @@ Corresponding command lines of type:
     group.a b
     group.c d
 
-##Commands
+## Commands
 
 List the currently used value of all non default configs:
 
@@ -3445,7 +3477,7 @@ Get multiple values: TODO
 
 Set boolean
 
-##Most important configs with bad defaults
+## Most important configs with bad defaults
 
 Non default ones that you should always set:
 
@@ -3467,21 +3499,17 @@ Non default ones that you should always set:
     git config --global grep.lineNumber true
     git config --global grep.extendedRegexp true
 
-##Most important settings with good defaults
+## Most important settings with good defaults
 
-Pager to use: `core.pager`. `less` by default.
+-   `core.pager`: pager to use. `less` by default.
+-   `color.ui`: when to add color ANSI escapes. `auto` is the best option,
+    which only adds the escapes if not piped.
+-   `core.editor`: editor to use for commit and tag messages.
+-   `core.autocrlf`: deal well with windows loved CR LF newlines.
+-   `core.excludesfile`: path of a global `.gititnore` file for all projects.
+-   `commit.template`: commit message template file path
 
-    git config --global color.ui auto
-
-Editor to use for commit and tag messages: `core.editor`
-
-Deal well with windows loved CR LF newlines: `core.autocrlf`
-
-Path of a global `.gititnore` file for all projects: `core.excludesfile`.
-
-Commit message template file path: `commit.template`
-
-###alias
+### alias
 
 Alias:
 
@@ -3509,13 +3537,29 @@ Allowing you to do any command at top-level:
 
     git exec make
 
-#gc
+## UTF8 filenames
+
+<http://stackoverflow.com/questions/5854967/git-msysgit-accents-utf-8-the-definitive-answers>
+
+### quotepath
+
+If `true`, file paths that contain characters non printable bytes are printed
+as quoted C strings literals in commands, in particular UTF-8 characters
+are encoded.
+
+If `false` and the encoding is compatible with your terminal,
+you will see nice characters.
+
+So should be `false` for UTF-8 usage.
+
+# gc
 
 Clean repository.
 
-TODO what does that do exactly? Possible use case: <http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
+TODO what does that do exactly? Possible use case:
+<http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
 
-#gitattributes
+# gitattributes
 
 Configs that apply only to specific paths, not the entire repo.
 
@@ -3536,7 +3580,7 @@ and then use `.gitattributes` lines like:
 
     path/to/file merge=ours
 
-#contrib
+# contrib
 
 Under the git source tree there is a directory called contrib
 which includes features that are not yet part of the main distribution,
@@ -3557,7 +3601,7 @@ for example as:
 
 Other commands may simply need to be in the PATH.
 
-##subtree
+## subtree
 
 Split a directory of a repository into another repository.
 
@@ -3598,7 +3642,11 @@ And don't forget to clean up the big directory:
 You also probably want to reuse part of the `.gitignore`
 and other top-level git config files from the larger directory.
 
-##diff-highlight
+## diff-highlight
+
+`git diff --word-diff=color` is probably better than this when you are sure that you want
+a word diff for a file: the advantage of this solution is that it works well for both
+prose and programming languages.
 
 Highlight which parts of a line were modified, similar to by most web interfaces today.
 
@@ -3615,19 +3663,19 @@ It is simply a Perl script, and you can install it with:
 
 Now when using `git diff --color`, this will work automatically.
 
-#Internals
+# Internals
 
 Learn them as early as possible: they unify many topics.
 
 Git offers lots of commands to manipulate low level internals stuff.
 
-##.git directory
+## .git directory
 
 Holds all the Git information.
 
 - `logs`: information for `reflog`.
 
-##objects
+## objects
 
 <http://git-scm.com/book/en/Git-Internals-Git-Objects>
 
@@ -3642,21 +3690,21 @@ The major objects git store are:
     - one commit message
 - tags: TODO check. I read some where they are also objects.
 
-##hash-object
+## hash-object
 
-##cat-file
+## cat-file
 
-##update-index
+## update-index
 
-##write-tree
+## write-tree
 
-##commit-tree
+## commit-tree
 
 TODO
 
-#Third party tools
+# Third party tools
 
-##tig
+## tig
 
 Powerful curses gitk written in C: <https://github.com/jonas/tig>.
 
@@ -3673,7 +3721,7 @@ And help inside tig:
 
     h
 
-###Views
+### Views
 
 Tig has many views:
 
@@ -3688,7 +3736,7 @@ For instance, it only makes sense to view a blame `B` if you are either on a tre
 
 There is currently no `remotes` view: <https://github.com/jonas/tig/issues/199>
 
-###Generic
+### Generic
 
 General mappings:
 
@@ -3696,24 +3744,24 @@ General mappings:
 - `b`: one screen up
 - `H`: see a list of branches.
 
-###Refs
+### Refs
 
 These bindings are available on views that shows revisions such as the log view or the branches view.
 
 - `C`: checkout to the commit.
 - `<enter>`: open a list of the commits inline.
 
-###Blob
+### Blob
 
 - `e`: open file in editor. Default: `vim`.
 - `B`: blame view of file
     - `Enter`: open `log -p` of current line's commit inline.
 
-##fugitive
+## fugitive
 
 Vim plug-in with large overlap with tig functionality: <https://github.com/tpope/vim-fugitive>
 
-##fame
+## fame
 
 Get stats on file / line and commit percents per author.
 
@@ -3749,7 +3797,7 @@ Sample output:
     | Pontus                 | 225    | 49      | 34    | 0.4 / 1.1 / 1.7    |
     +------------------------+--------+---------+-------+--------------------+
 
-##browse remote
+## browse remote
 
 Open current remote on browser.
 
@@ -3765,7 +3813,7 @@ Usage:
 
     git browse-remote
 
-##git-cache-meta
+## git-cache-meta
 
 Save and apply all UNIX permissions. Git only keeps `x` and symlink bits.
 
@@ -3789,11 +3837,11 @@ but when publishing a file to other users, we are only interested in storing rea
 The situation is complicated because sometimes we do want the owner to be kept:
 e.g. when a file must be owned by `root`.
 
-#GitHub specific
+# GitHub specific
 
 The git URL is then `git@github.com:userid/reponame.git`
 
-##Pull request refs
+## Pull request refs
 
 GitHub stores refs to pull requests on the original repository under `refs/pull/<number>/head`.
 
@@ -3801,7 +3849,7 @@ Therefore, if you want to get a pull request locally to try it out on a local br
 
     git fetch origin pull/<pr-number>/head:<local-branch-name>
 
-##GitHub API v3 via curl
+## GitHub API v3 via cURL
 
 GitHub has an HTTP REST API, which allows you to:
 
@@ -3834,7 +3882,7 @@ Make a POST request with `curl`:
       "context": "github/gollum"
     }' | curl --data @- https://api.github.com/markdown
 
-###Authentication
+### Authentication
 
 Many methods that take a user can use the authenticated user instead if present.
 
@@ -3846,35 +3894,60 @@ Or:
 
     curl -u "cirosantilli-puppet:password" https://api.github.com/user/orgs
 
-OAuth: generate a large number random which you can only get once.
-Allows you to limit what can be done with it.
+### OAuth
 
-To create one go: `Profile Settings > Applications`.
+OAuth: generate a large random number called the *access token*.
+Which you can only get once.
 
-Once you get it:
+There are two ways to get the token:
 
-    curl https://api.github.com/user/orgs?access_token=TOKEN
+-   personal tokens, generated by a logged in user from: <https://github.com/settings/tokens/new>
 
-###Rate limiting
+    Useful if you need to generate only a few tokens for personal use.
+
+-   application obtained token.
+
+    A way for applications to interact with GitHub and obtain a token.
+
+    User is first redirected to GitHub, inputs his password only there,
+    and the token is sent back to the application.
+
+    Useful if you are building an application that must interact with GitHub,
+    and don't want to store the user's password.
+
+    Each user gets a single token per application in case multiple token requests are made.
+
+Tokens are safer than storing the password directly because:
+
+- it is possible to restrict what can be done with each token,
+    thus increasing confidence users have on your application.
+
+- users can revoke tokens at any time, without changing their passwords.
+
+Once you get the token, make an authenticated request with:
+
+    curl https://api.github.com/user?access_token=TOKEN
+
+### Rate limiting
 
 - authenticated: 60 requests per hour
 - unauthenticated requests: 5000 requests per hour
 
 <http://developer.github.com/v3/#rate-limiting>
 
-###per_page
+### per_page
 
 Get given number of results. Default is 30. Allows you to beat web API limitations. List all starred repos of a user:
 
     curl https://api.github.com/users/$USER/starred?per_page=9999909 | grep -B1 "description" | less
 
-###Get repo info
+### Get repo info
 
 Lots of info:
 
     curl -i https://api.github.com/users/$USER/repos
 
-###Create repo
+### Create repo
 
     USER=
     REPO=
@@ -3894,13 +3967,13 @@ Repo name is the very minimal you must set, but you could also set other params 
 
 Its just JSON (remember, last item cannot end in a comma).
 
-###Delete repo
+### Delete repo
 
     curl -u "$USER" -X DELETE https://api.github.com/repos/$USER/$REPO
 
 Careful, it works!
 
-##hub
+## hub
 
 Powerful CLI interface: <https://github.com/github/hub>
 
@@ -3918,7 +3991,7 @@ Give a name and a description:
 
     hub create name -d 'Description'
 
-#Test repos
+# Test repos
 
 Use those to test stuff.
 
@@ -3926,7 +3999,7 @@ They can be generated with the `generate-test-repos.sh` script
 
 They are described here.
 
-##0
+## 0
 
 2 files uncommitted
 
@@ -3939,7 +4012,7 @@ They are described here.
     git status
         #untracked: a b
 
-##0du
+## 0du
 
 Same as [0], but with an untracked subdir d:
 
@@ -3955,7 +4028,7 @@ Same as [0], but with an untracked subdir d:
     git status
         #untracked: a b d/
 
-##1
+## 1
 
 Same as [0], but committed.
 
@@ -3972,11 +4045,11 @@ Same as [0], but committed.
      |
      master
 
-##1d
+## 1d
 
 Same as [0d], but with all tracked.
 
-##1u
+## 1u
 
 Same as [1], but one untracked file `c` added.
 
@@ -3997,7 +4070,7 @@ Same as [1], but one untracked file `c` added.
      master
      HEAD
 
-##1ub
+## 1ub
 
 Same as 1ub + one branch.
 
@@ -4020,7 +4093,7 @@ Current branch is `master`.
      master *
      b
 
-##2
+## 2
 
 2 commits and 2 files committed.
 
@@ -4041,7 +4114,7 @@ Current branch is `master`.
              HEAD
              master
 
-##2u
+## 2u
 
 Same as [2] + 1 file uncommitted.
 
@@ -4065,7 +4138,7 @@ Same as [2] + 1 file uncommitted.
              HEAD
              master
 
-##2b
+## 2b
 
 Two branches unmerged, no uncommitted files.
 
@@ -4105,7 +4178,7 @@ Files:
     cat d
         #d1
 
-##3
+## 3
 
 3 commits 2 files.
 
@@ -4129,11 +4202,11 @@ Looks like:
                      |
                      master *
 
-##0bare
+## 0bare
 
 Bare repo.
 
-##multi
+## multi
 
 Contains multiple repos for inter repo tests.
 
@@ -4162,31 +4235,31 @@ Also:
 
 - `a` has a branch `master` and a branch `b`
 
-##multiu
+## multiu
 
 Like [multi], but both master branches have committed unmerged modifications.
 
-#definitions
+# definitions
 
 Some git vocabulary.
 
-##a commit
+## a commit
 
 Is a version.
 
-##to commit
+## to commit
 
 Is to create version.
 
-##to stage a file
+## to stage a file
 
 Is to consider it for next commit.
 
-##tracked file
+## tracked file
 
 Is one that has already been staged once.
 
-##upstream
+## upstream
 
 In general however, upstream is the name for the main repository before you cloned it,
 `origin` being the name of your clone.
@@ -4198,16 +4271,16 @@ In `git`, *upstream* has an specific meaning for the `push` command.
 A better alternative name also used on the man page is *tracking* branch,
 so as not to confuse it with the usual `origin` `upstream` workflow terminology.
 
-#TODO
+# TODO
 
 - `b` clones, `a` commits, `b` commits. How can a check `b`'s work
-(without clone! withou merge into master, but as a branch at first commit)?
+    (without clone! without merge into master, but as a branch at first commit)?
 
 - how to update submodules automatically after a clone (with hooks maybe?)
 
 - how to automatically upload cross platform output files such as PDF (generated from LaTeX).
 
-[GitHub]: https://github.com/
 [bitbucket]: https://www.bitbucket.org/
+[github]:    https://github.com/
 [gitorious]: http://gitorious.org/
-[vcs]: http://en.wikipedia.org/wiki/Revision_control
+[vcs]:       http://en.wikipedia.org/wiki/Revision_control
