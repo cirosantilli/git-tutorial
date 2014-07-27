@@ -26,11 +26,13 @@ layout: default
 
 -   Good tut: <http://cworth.org/hgbook-git/tour/>
 
--   Good tut, straight to the point, ASCII diagrams: <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
+-   Good tut, straight to the point, ASCII diagrams:
+    <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
 
 -   Good tut by GitHub: <http://learn.github.com/p/>
 
--   Description of a production / dev / hotfix branch model: <http://nvie.com/posts/a-successful-git-branching-model/>
+-   Description of a production / dev / hotfix branch model:
+    <http://nvie.com/posts/a-successful-git-branching-model/>
 
 # Motivation
 
@@ -221,17 +223,17 @@ And if nothing changes, it says so.
 
 Check out the `add`, `rm` and `reset` commands to see how it behaves.
 
-# working tree
+# Working tree
 
 Is all the "regular" files that lie outside the `.git` directory.
 
-# index
+# Index
 
 Is where git stores what will be kept for next version.
 
 It can modified with may commands such as `add`, `rm`, `mv`, or `reset`.
 
-# staged
+# Staged
 
 When a file on the working tree is added to the index, its changes are said to be *staged*.
 
@@ -319,6 +321,8 @@ Search in revision only under directory:
 
 # Binary files
 
+## How Git determines if a file is binary
+
 Git has an heuristic for determining if files are binary or text.
 
 This has effects such as not showing diffs in such files, which would be meaningless line-wise.
@@ -338,7 +342,7 @@ Add trailing newlines to all text files that don't have them:
 
     git grep -Ile '' | xargs perl -lapi -e 's/.*/$&/'
 
-## Determine if a file is binary
+## Check if a file is binary
 
 <http://stackoverflow.com/questions/6119956/how-to-determine-if-git-handles-a-file-as-binary-or-as-text>
 
@@ -351,6 +355,14 @@ Add trailing newlines to all text files that don't have them:
 ## Force file to be treated as text
 
 <http://stackoverflow.com/questions/777949/can-i-make-git-recognize-a-utf-16-file-as-text>
+
+## Diff for binary files
+
+It is necessary to first convert the file to a text format if possible.
+
+This can be done automatically through the `textconv` option for specified files.
+
+There exist tools that do the conversion reasonably for documents such as `.doc` or `.odt`.
 
 # blame
 
@@ -672,7 +684,7 @@ By default, `git rm` won't remove dirs.
 
 # Remove file from repo history
 
-[rm] does not remove files from repo history, only from future versions.
+`rm` does not remove files from repo history, only from future versions.
 
 So if you mistakenly committed:
 
@@ -999,13 +1011,13 @@ And the working tree is exactly as it was on `(1)`.
 
 Creates a new version.
 
-You must first which files will be included in it with commands like [add], [rm], [mv] and [reset].
+You must first which files will be included in it with commands like `add`, `rm`, `mv` and `reset`.
 
 After you have decided what will be included or not, you are ready to commit.
 
 This will be important later on to know what a version contains.
 
-So from the [0] do:
+So from the [0](#0) do:
 
     git add a
     git commit -m 'added a'
@@ -1389,8 +1401,8 @@ The key properties of a SHA functions are that:
 In this way, even if SHAs contain much less information than the entire repository itself (only a few bytes),
 it is very unlikely that two different repositories will have the same SHA.
 
-The SHA input includes things like file contents, commit timestamps,
-authors and tags. Therefore, even if the files are the same, SHAs will probably be different.
+The SHA input includes things like file contents, commit timestamps, authors and tags.
+Therefore, even if the files are the same, SHAs will probably be different.
 
 The most complete is giving the entire hash, so:
 
@@ -1838,11 +1850,15 @@ and develop on the `dev` branch.
 
 Not the asterisk indicating which is the current branch.
 
-For more info:
+More info:
 
     git branch -v
 
-Also shows start of hash and commit message.
+Also shows start of SHA and last commit message:
+
+    api-attach   7dc296b Update note attachment from API.
+    api-username 35da7b8 API get user by username.
+    demo         9c1aebe Marked markdown preview as you type.
 
 One very important way is to do is graphically:
 
@@ -1883,7 +1899,7 @@ It becomes:
 
 The *current* branch moves forward and continues being current.
 
-Ex: start at [1ub] now:
+Ex: start at [1ub](#1ub) now:
 
     git add c
     git commit -am 'c'
@@ -2044,15 +2060,35 @@ Before you do this however, take into account its downsides:
 - you cannot view file from both branches simultaneously (unless you copy the repository)
 - its more confusing for new users
 
+# check-ref-format
+
+Plumbing command to check if a `ref` is a valid name.
+
+Git imposes several restrictions on `refs`, such as not containing spaces,
+even is those don't have a specific technical reason like name a conflict,
+e.g. no spaces: <http://stackoverflow.com/questions/6619073/why-cant-a-branch-name-contain-the-space-char>
+
+On the other hand, except for the small restriction list, UTF-8 names are allowed.
+
+TODO why does:
+
+    git check-ref-format 'master'
+
+fail, but:
+
+    git check-ref-format --branch 'master'
+
+pass? What does the first form do?
+
 # checkout
 
 Goes to another version
 
-Before you go to another version, you must see which versions you can go back with [log] or [gitk].
+Before you go to another version, you must see which versions you can go back with `log` or `gitk`.
 
 ## Entire repo
 
-Use the `checkout` command with some version name as explained in [how to refer to a version] for example:
+Use the `checkout` command with some version name as explained in [Revisions](#revisions) for example:
 
     git checkout 494b
     git checkout HEAD~
@@ -2310,8 +2346,7 @@ There are certain merges that are made automagically:
 - file added
 - different lines of a file modified
 
-If all merges can be done automatically, then you are prompted for a commit message
-and the current head advances automatically to a new commit. This process is called fast forward.
+If all merges can be done automatically, then you are prompted for a commit message and the current head advances automatically to a new commit. This process is called fast forward.
 
 However there changes that cannot be merged automatically such as modification of a single line on both versions.
 
@@ -2336,11 +2371,27 @@ To put the file into one of the two versions, you can do either:
 
 This is the most common solution for binary file conflicts.
 
-To go back to the merge conflict version with `<<<<<< HEAD` you can do:
+To go back to the merge conflict version with the `<<<<<< HEAD` markers you can do:
 
     git checkout -m filename
 
-This is what you do when you like the modifications of two branches!
+See both branches and the base in a merge marker style:
+
+    git checkout --conflict=diff3 filename
+
+The file then becomes:
+
+    ++<<<<<<< ours
+     +int a = 1;
+    ++||||||| base
+    ++int a = 0;
+    ++=======
+    + int a = 2;
+    ++>>>>>>> theirs
+
+Stop the merge resolution process and go back to previous state:
+
+    git merge --abort
 
 ## Strategies
 
@@ -2350,16 +2401,93 @@ Some strategies may require user intervention, while others never do.
 
 Some important strategies are:
 
-- ours: keeps local changes
+-   `ours`: keeps local changes
 
         git merge -s ours ref
 
-- theirs: keeps remote changes. Must be used with `-X` instead of `-s`,
-    as discussed [here](http://stackoverflow.com/questions/173919/git-merge-s-ours-what-about-theirs)
+    Can be used on more than 2 branches.
+
+-   `theirs`: keeps remote changes. Must be used with `-X` instead of `-s`, as discussed at:
+    <http://stackoverflow.com/questions/173919/git-merge-s-ours-what-about-theirs>
 
         git merge -X theirs ref
 
-## ignore certain files on merge
+    Can be used on more than 2 branches.
+
+-   `octopus`: able to merge more than 2 branches, but only if there are no conflicts.
+
+    The generated commit will have multiple parents. E.g.:
+
+           +--B
+           |
+        A--+--C
+           |
+           +--D
+
+    Then:
+
+        git checkout B
+        git merge -Xoctopus C D
+
+    Gives:
+
+           +--B--+
+           |     |
+        A--+--C--+--E
+           |     |
+           +--D--+
+
+### recursive
+
+The default strategy.
+
+Uses the `diff3` merge algorithm recursively.
+
+The `diff3` algorithm takes 3 file versions as input: the base, and the two conflict heads.
+
+If there is a single common ancestor for the conflict heads, it is the base.
+
+If there are multiple, it recursively creates a new tree TODO details,
+leading up to a new virtual branch that will be the base.
+`man git` says that this tends to lead to less merge conflicts than directly using either ancestor.
+
+E.g., start with:
+
+    (A)----(B)----(C)-----(F)
+            |      |       |
+            |      |   +---+
+            |      |   |
+            |      +-------+
+            |          |   |
+            |      +---+   |
+            |      |       |
+            +-----(D)-----(E)
+
+Then:
+
+    git checkout E
+    git merge F
+
+There are 2 best common ancestors, `C` and `D`. Git merges them into a new virtual branch `V`,
+and then uses `V` as the base.
+
+    (A)----(B)----(C)--------(F)
+            |      |          |
+            |      |      +---+
+            |      |      |
+            |      +----------+
+            |      |      |   |
+            |      +--(V) |   |
+            |          |  |   |
+            |      +---+  |   |
+            |      |      |   |
+            |      +------+   |
+            |      |          |
+            +-----(D)--------(E)
+
+Example why it is a good choice: <http://codicesoftware.blogspot.com/2011/09/merge-recursive-strategy.html>
+
+## Ignore certain files on merge
 
 Run:
 
@@ -2396,14 +2524,47 @@ We get: TODO
                            |
                            feature
 
+# merge-file
+
+Plumbing command that runs a 3-way merge on the three given input files.
+
+It is therefore a subset of the more complex `merge` recursive operation, which generates
+all the required files by checkout and runs on all required files.
+
+# merge-base
+
+Plumbing command that finds a best common ancestor commit between two candidates,
+thus suitable for a 3-way merge.
+
+A common ancestor is better than another if it is a descendant of the other.
+
+It is possible to have multiple best common ancestors.
+For example, both `C` and `D` are best common ancestors of `E` and `F`:
+
+    (A)----(B)----(C)----------(D)
+            |      |            |
+            |      |            |
+            |      |            |
+            |      +-----(E)    |
+            |             |     |
+            |             |     |
+            |             |     |
+           (F)------------+-----+
+
+Output all merge bases with `-a` instead of just one:
+
+    git merge-base -a E F
+
 # mergetool
 
-Start running a conflict resolution tool, typically a 3-way merge tool to solve all merge conflicts.
+Start running a conflict resolution tool,
+typically a 3-way merge tool to solve all merge conflicts
+for the merge the is currently taking place:
 
     git mergetool -t vimdiff
     git mergetool -t kdiff3
 
-For a single file:
+Resolve conflicts on a single file:
 
     git mergetool -t kdiff3 -- file
 
@@ -2412,15 +2573,46 @@ Git already knows about certain tools, and you must choose amongst them.
 Git checks out all necessary versions in current directory with basename prefixes,
 and calls the merge tool on them.
 
-If the tool is not given, git uses:
+If the tool is not given, Git uses:
 
-- `merge.tool` configuration option tool
+- `git config --global merge.tool kdiff3` configuration option tool
 - a suitable tool found in the path
 
-# email patches
+## prompt
 
-Tools only used in projects that exchange patches via email,
-not in those that use web interfaces like GitHub.
+Before opening the merge tool, by default git prompts you to enter a key to open it.
+
+To avoid that use either:
+
+    git config --global mergetool.prompt false
+
+or for a single invocation:
+
+    git mergetool -y
+
+## keepBackup
+
+Git generates 3 temporary files which it passes to the 3-merge tool for each conflicting file:
+
+- the parent, before conflicting changes were made
+- each conflicting child
+
+You then have to save the output on the merge resolution tool.
+
+After the merge, Git keeps by default the original file with the conflict markers
+with a `.orig` extension.
+
+To prevent that, do:
+
+    git config --global mergetool.keepBackup false
+
+## Programmatically check if mergeable
+
+<http://stackoverflow.com/questions/501407/is-there-a-git-merge-dry-run-option>
+
+# Email patches
+
+Tools only used in projects that exchange patches via email, not in those that use web interfaces like GitHub.
 
 ## format-patch
 
@@ -2463,8 +2655,7 @@ Push even if not fast forward:
 
 ## refspec
 
-The name of a origin destination branch pair,
-including options on how push / pull may happen such as `+` to allow non-fast forwards.
+The name of a origin destination branch pair, including options on how push / pull may happen such as `+` to allow non-fast forwards.
 
 Example:
 
@@ -2486,8 +2677,7 @@ Set the upstream without push:
 
     git branch --set-upstream remote branch
 
-There seems to be no clean way to get the corresponding upstreams of all branches computationally without grepping:
-<http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
+There seems to be no clean way to get the corresponding upstreams of all branches computationally without grepping: <http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
 
 Interactive for a single branch:
 
@@ -2915,11 +3105,11 @@ As of 1.8.4, there seems to be no way to conveniently change the current remote 
 
 # pull
 
-`pull` is exactly the same as [fetch] + [merge] on given branch and merges with current branch.
+`pull` is exactly the same as fetch + merge on given branch and merges with current branch.
 
 `pull --rebase` does `reabase` instead of `merge`. You need that after someone did a `push -f`.
 
-Does not update remote heads like [fetch] does.
+Does not update remote heads like fetch does.
 
 ## Basic usage
 
@@ -3247,7 +3437,8 @@ If you change your mind and think that it is better not to rebase do:
 
     git rebase --abort
 
-If you change your mind only about a single `commit`, but still want to change the others to:
+If you change your mind only about a single `commit`,
+but still want to change the others to:
 
     git rebase --skip
 
@@ -3267,7 +3458,8 @@ Now `git log --pretty=oneline -n3` gives:
 and you want to save progress at several points in case you want to go back.
 
 When you are done, you can expose a single commit for the feature,
-which will be much more concise and useful to others (or at least people will konw that you can use `squash`).
+which will be much more concise and useful to others,
+or at least people will know that you can use `squash`.
 
 You will also look much smarter, since it will seem
 that you did not make lots of trials before getting things right.
@@ -3428,7 +3620,7 @@ Path to `.git` dir:
 
     git rev-parse --git-dir
 
-# Config
+# config
 
 Allows to get and set configuration data.
 
@@ -3663,6 +3855,20 @@ It is simply a Perl script, and you can install it with:
 
 Now when using `git diff --color`, this will work automatically.
 
+# Plumbing
+
+# Porcelain
+
+Plumbing commands are low level, porcelain are high level and more commonly used,
+built upon plumbing commands.
+
+The distinction is made on `man git` itself, which classifies commands as such.
+
+When using Git programmatically, plumbing commands should be used instead of porcelain,
+since their interface is more stable. Quoting `man git`:
+
+> The interface (input, output, set of options and the semantics) to these low-level commands are meant to be a lot more stable than Porcelain level commands, because these commands are primarily for scripted use. The interface to Porcelain commands on the other hand are subject to change in order to improve the end user experience.
+
 # Internals
 
 Learn them as early as possible: they unify many topics.
@@ -3836,6 +4042,24 @@ but when publishing a file to other users, we are only interested in storing rea
 
 The situation is complicated because sometimes we do want the owner to be kept:
 e.g. when a file must be owned by `root`.
+
+## libgit2
+
+<https://github.com/libgit2/libgit2>
+
+Implementation of the Git core methods in C meant to be used programmatically:
+given a `.git` repository it is able to do basically anything `git` can.
+
+Has bindings in many languages.
+
+It is developed by GitHub and open source. Its license is more open than Git's,
+as it can be used by proprietary software if not modified.
+
+`libgit` has reused some of the code in the original Git source from authors that allowed the new license:
+<http://stackoverflow.com/questions/17151597/which-code-is-shared-between-the-original-git-and-libgit2>
+
+TODO why was it created? Because the original Git implementation is not meant to be used programmatically,
+or because of the license?
 
 # GitHub specific
 
@@ -4014,7 +4238,7 @@ They are described here.
 
 ## 0du
 
-Same as [0], but with an untracked subdir d:
+Same as `0`, but with an untracked subdir `d`:
 
     ls
         #a b d
@@ -4030,7 +4254,7 @@ Same as [0], but with an untracked subdir d:
 
 ## 1
 
-Same as [0], but committed.
+Same as `0`, but committed.
 
     ls
         #a b
@@ -4047,11 +4271,11 @@ Same as [0], but committed.
 
 ## 1d
 
-Same as [0d], but with all tracked.
+Same as `0d`, but with all tracked.
 
 ## 1u
 
-Same as [1], but one untracked file `c` added.
+Same as `1`, but one untracked file `c` added.
 
     ls
         #a b c
@@ -4072,7 +4296,7 @@ Same as [1], but one untracked file `c` added.
 
 ## 1ub
 
-Same as 1ub + one branch.
+Same as `1ub` + one branch.
 
 Current branch is `master`.
 
@@ -4116,7 +4340,7 @@ Current branch is `master`.
 
 ## 2u
 
-Same as [2] + 1 file uncommitted.
+Same as `2` + 1 file uncommitted.
 
     ls
         #a b c
@@ -4210,7 +4434,7 @@ Bare repo.
 
 Contains multiple repos for inter repo tests.
 
-It looks just like the GitHub fork model!
+It looks just like the GitHub fork model.
 
 The repos are:
 
@@ -4219,49 +4443,49 @@ The repos are:
 
 Where:
 
-- `ao` is the origin of `a`
-- `ao` is the origin of `bo`
-- `bo` is the origin of `b`
-- `ao` is the upstream of `b`
+-   `a`: original local repository
 
-So that those represent:
+-   `ao`: bare uploaded repository of `a`.
 
-- `a` is the original repo (same as `b2`)
-- `ao` is where the owner put it on GitHub
-- `bo` is the fork made by someone else on GitHub
-- `b`  is the clone of the fork
+    `origin` of `a` and `bo`, `upstream` of `b`.
+
+-   `bo`: remote fork of `ao`.
+
+    Origin of `b`
+
+-   `b`: local clone of fork.
 
 Also:
 
-- `a` has a branch `master` and a branch `b`
+-   `a` has a branch `master` and a branch `b`
 
 ## multiu
 
-Like [multi], but both master branches have committed unmerged modifications.
+Like `multi`, but both master branches have committed unmerged modifications.
 
-# definitions
+# Index of terms
 
 Some git vocabulary.
 
-## a commit
+## A commit
 
-Is a version.
+A version.
 
-## to commit
+## To commit
 
 Is to create version.
 
-## to stage a file
+## To stage a file
 
-Is to consider it for next commit.
+Is to consider it for next commit through `git add`.
 
-## tracked file
+## Tracked file
 
-Is one that has already been staged once.
+Is one that has already been staged once and not removed since.
 
-## upstream
+## Upstream
 
-In general however, upstream is the name for the main repository before you cloned it,
+In general , upstream is the name for the main repository before you cloned it,
 `origin` being the name of your clone.
 
 For example, if you forked `he/project` into `me/project`, and clone `me/project`,
@@ -4270,15 +4494,6 @@ the upstream of the cloned repo should be `he/project`.
 In `git`, *upstream* has an specific meaning for the `push` command.
 A better alternative name also used on the man page is *tracking* branch,
 so as not to confuse it with the usual `origin` `upstream` workflow terminology.
-
-# TODO
-
-- `b` clones, `a` commits, `b` commits. How can a check `b`'s work
-    (without clone! without merge into master, but as a branch at first commit)?
-
-- how to update submodules automatically after a clone (with hooks maybe?)
-
-- how to automatically upload cross platform output files such as PDF (generated from LaTeX).
 
 [bitbucket]: https://www.bitbucket.org/
 [github]:    https://github.com/

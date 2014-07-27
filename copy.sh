@@ -1,24 +1,22 @@
 #!/usr/bin/env bash
 
-#this script is meant to be put on the same dir as the test repos.
+# This script is meant to be put on the same dir as the test repos.
 
-set -u # error on undefined variable
-set -e # stop execution if one command return != 0
-
-#examples:
+set -eu
 
 F="$(basename "$0")"
-usage()
-{
-  echo "copy and remove the standard git test repos
+usage() {
+  echo "Copy and remove the standard git test repos.
 
-EXAMPLES
+Makes it faster to make new tests without modifying existing test templates.
 
-  copy dir 1 as dir t:
+# Examples
+
+Copy dir '1' as dir 't' and 'cd' into it:
 
     ./$F 1
 
-  remove old t/ and copy dir multi as t:
+Remove current dir 't' and copy dir 'multi' as 't':
 
     ./$F multi
 " 1>&2
