@@ -2393,7 +2393,18 @@ Stop the merge resolution process and go back to previous state:
 
     git merge --abort
 
-## Strategies
+## Merge target branch
+
+<http://stackoverflow.com/questions/3216360/merge-update-and-pull-git-branches-without-using-checkouts>
+
+It is not possible to `git merge` into a target branch other than the current
+because if there were merge conflicts there would be no way to solve them.
+
+If it is just a fast forward, you can use `fetch` instead:
+
+    git fetch origin master:target-branch
+
+## Merge strategies
 
 Git attempts to merge automatically using one of different merge strategies.
 
@@ -2953,13 +2964,24 @@ Then you can do git operations as:
     git username@host:/path/to/repo
 
 GitHub git repo directories always end in `.git`, but this is just a convention.
-Also, in GitHub there is a single git user called Git.
+Also, in GitHub there is a single Git user called `git`.
 
 Other methods of connection include:
 
-- HTTP over URLs of type `http://`. Less efficient than the git protocol.
-- a git specific protocol with id `git://`. More efficient than HTTP since git specific,
+-   HTTP over URLs of type `http://`. Less efficient than the Git protocol.
+
+-   a git specific protocol with id `git://`. More efficient than HTTP since git specific,
     but also requires a more specialized server.
+
+TODO: why does:
+
+    cd repository
+    python -m SimpleHTTPServer
+    cd
+    git clone localhost:8000
+    git clone localhost:8000/.git
+
+fail? Related for push: <http://stackoverflow.com/questions/15974286/pushing-to-a-git-repository-hosted-locally-over-http>
 
 # clone
 
@@ -3772,89 +3794,6 @@ and then use `.gitattributes` lines like:
 
     path/to/file merge=ours
 
-# contrib
-
-Under the git source tree there is a directory called contrib
-which includes features that are not yet part of the main distribution,
-but are being considered.
-
-Any information contained on this section is more volatile than the others.
-
-Since these commands are so recent,
-they may not be installed with the Git version that comes from your package manager.
-
-Git subcommands must be available as:
-
-    /usr/lib/git-core/git-SUBCOMMAND_NAME_NO_EXTENSION
-
-for example as:
-
-    /usr/lib/git-core/git-tag
-
-Other commands may simply need to be in the PATH.
-
-## subtree
-
-Split a directory of a repository into another repository.
-
-*Maintains* history in the new repository.
-
-Great tutorial: <http://stackoverflow.com/a/17864475/895245>
-
-Install:
-
-    mkdir -p ~/bin && cd ~/bin && wget -O git-subtree https://raw.githubusercontent.com/git/git/master/contrib/subtree/git-subtree.sh && chmod +x git-subtree
-    sudo ln -s git-subtree /usr/lib/git-core/git-subtree
-
-Create a new branch containing only commits that affected the given directory,
-and put the subdirectory at the root of the repo on that branch:
-
-    git subtree split -P <subdirectory> -b <new-branch>
-
-History of the large repository is untouched.
-
-Check out the new branch:
-
-    git checkout <new-branch>
-
-The `<subdirectory>` directory may still exist because of gitignored files it contains.
-
-To extract it just:
-
-    git clone <big-repo> -b <new-branch> <new-repo>
-    cd <new-repo>
-    git branch -m <new-branch> master
-
-And don't forget to clean up the big directory:
-
-    git branch -d <new-branch>
-    git rm -r <subdirectory>
-    rm -rf <subdirectory>
-
-You also probably want to reuse part of the `.gitignore`
-and other top-level git config files from the larger directory.
-
-## diff-highlight
-
-`git diff --word-diff=color` is probably better than this when you are sure that you want
-a word diff for a file: the advantage of this solution is that it works well for both
-prose and programming languages.
-
-Highlight which parts of a line were modified, similar to by most web interfaces today.
-
-![diff-highlight](diff-highlight.png)
-
-It does a regular line-wise diff, but highlights the words changed between two lines.
-
-It is simply a Perl script, and you can install it with:
-
-    cd ~/bin && curl -O https://raw.github.com/git/git/master/contrib/diff-highlight/diff-highlight && chmod +x diff-highlight
-    git config --global pager.log 'diff-highlight | less'
-    git config --global pager.show 'diff-highlight | less'
-    git config --global pager.diff 'diff-highlight | less'
-
-Now when using `git diff --color`, this will work automatically.
-
 # Plumbing
 
 # Porcelain
@@ -3907,6 +3846,94 @@ The major objects git store are:
 ## commit-tree
 
 TODO
+
+# git options
+
+Options that apply directly to `git` and therefore can be used with any subcommand.
+
+Set path to a custom working tree and bare repository (like a `.git` directory in a working tree):
+
+    git --work-tree='repo.git' --work-tree='repo' status
+
+# contrib
+
+Under the git source tree there is a directory called contrib
+which includes features that are not yet part of the main distribution,
+but are being considered.
+
+Any information contained on this section is more volatile than the others.
+
+Since these commands are so recent,
+they may not be installed with the Git version that comes from your package manager.
+
+Git subcommands must be available as:
+
+    /usr/lib/git-core/git-SUBCOMMAND_NAME_NO_EXTENSION
+
+for example as:
+
+    /usr/lib/git-core/git-tag
+
+Other commands may simply need to be in the PATH.
+
+## subtree
+
+Split a directory of a repository into another repository.
+
+*Maintains* history in the new repository.
+
+Great tutorial: <http://stackoverflow.com/a/17864475/895245>
+
+Install:
+
+    mkdir -p ~/bin && cd ~/bin && wget -O git-subtree https://raw.githubusercontent.com/git/git/master/contrib/subtree/git-subtree.sh && chmod +x git-subtree
+    sudo ln -s git-subtree /usr/lib/git-core/git-subtree
+
+Create a new branch containing only commits that affected the given directory,
+and put the subdirectory at the root of the repo on that branch:
+
+    git subtree split -P <subdirectory> -b <new-branch>
+
+History of the large repository is untouched.
+
+The `<subdirectory>` directory may still exist because of gitignored files it contains.
+
+To extract it just:
+
+    cd ..
+    git clone <big-repo> -b <new-branch> <new-repo>
+    cd <new-repo>
+    git branch -m <new-branch> master
+
+And don't forget to clean up the big directory:
+
+    git branch -D <new-branch>
+    git rm -r <subdirectory>
+    rm -rf <subdirectory>
+
+You also probably want to reuse part of the `.gitignore`
+and other top-level git config files from the larger directory.
+
+## diff-highlight
+
+`git diff --word-diff=color` is probably better than this when you are sure that you want
+a word diff for a file: the advantage of this solution is that it works well for both
+prose and programming languages.
+
+Highlight which parts of a line were modified, similar to by most web interfaces today.
+
+![diff-highlight](diff-highlight.png)
+
+It does a regular line-wise diff, but highlights the words changed between two lines.
+
+It is simply a Perl script, and you can install it with:
+
+    cd ~/bin && curl -O https://raw.github.com/git/git/master/contrib/diff-highlight/diff-highlight && chmod +x diff-highlight
+    git config --global pager.log 'diff-highlight | less'
+    git config --global pager.show 'diff-highlight | less'
+    git config --global pager.diff 'diff-highlight | less'
+
+Now when using `git diff --color`, this will work automatically.
 
 # Third party tools
 
