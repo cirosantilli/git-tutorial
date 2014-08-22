@@ -3006,7 +3006,7 @@ Creates a repo c that is a "copy" of a. now:
         #remote/origin/b2
         #remote/origin/master
 
-So you only have one branch, and the other are [remote head]s.
+So you only have one branch, and the other are remote heads.
 
 But if you do:
 
@@ -3185,13 +3185,28 @@ So you current branch `master` has been merged into the branch `master` from rep
 
 # File permissions
 
-Git only keeps the `x` and symlink bits of file permissions as metadata inside the `.git` dir.
+Git can only store a few UNIX permissions and file types.
 
-Other permissions are lost.
+Internally, Git uses the same data as UNIX numeric permissions to store the subset of permissions it allows:
 
-How to get around it: <http://stackoverflow.com/questions/3207728/retaining-file-permissions-with-git>.
+    0100000000000000 (040000): Directory
+    1000000110100100 (100644): Regular non-executable file
+    1000000110110100 (100664): Regular non-executable group-writeable file
+    1000000111101101 (100755): Regular executable file
+    1010000000000000 (120000): Symbolic link
+    1110000000000000 (160000): Gitlink (submodule)
 
-The best solution seems to be the `git-cache-meta` third party tool.
+It also has one special notation not present in UNIX for the Git specific concept of submodule.
+
+Taken from: <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
+
+Therefore, the only permissions that can be kept are executable and group write.
+
+TODO why is group right here and not most other permissions? Is there an important use case?
+
+How to get around it: <http://stackoverflow.bcom/questions/3207728/retaining-file-permissions-with-git>.
+
+The best solution seems to be the `git-cache-meta` third-party tool.
 
 # Empty dirs
 
@@ -3248,7 +3263,7 @@ e.g. Python / Ruby modules + virtualenv / RVM, use that method instead.
 A submodule is a completely separate repo: the super repository
 only keeps note of its path, URL and current commit.
 
-## Create
+## Create a submodule
 
 Create on directory `.latex`:
 
@@ -3332,7 +3347,7 @@ Print full paths of each submodule:
 
     git submodule foreach pwd
 
-## Delete a submodule
+## Remove a submodule
 
 ## deinit
 
@@ -3340,7 +3355,8 @@ As of git 1.8.3:
 
     git submodule deinit path
 
-Files are kept and the `.submodule` path is not edited.
+Files are kept and the `.gitmodule` file is not edited,
+but internally the module is removed and you can get rid of those.
 
 Before 1.8.3: first remove it from the `.gitmodules` file:
 
