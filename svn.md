@@ -1,6 +1,5 @@
 ---
 title: SVN for Git users.
-layout: default
 ---
 
 Create new SVN controlled folder:

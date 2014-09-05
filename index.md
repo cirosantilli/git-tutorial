@@ -1,6 +1,5 @@
 ---
 title: Git Version Control Tutorial
-layout: default
 ---
 
 <ol data-toc></ol>
@@ -18,15 +17,32 @@ layout: default
 
 -   Help for a command: `git add --help`. Same as `man git-add` or `man git add`.
 
--   Official book: <http://git-scm.com/book>.
+-   Official source code:
+
+        git clone git://git.kernel.org/pub/scm/git/git.git
+
+    Official read only mirror on GitHub:
+
+        git clone https://github.com/git/git
+
+    In particular, the `Documentation` directory contains no only the source for the man pages,
+    but also many tutorials and internals information which are not present in the man pages.
+
+    - `Documentation/technial`: internals
+    - `Documentation/howto`: tutorials
+
+-   Popular book: <http://git-scm.com/book>.
+
+    TODO officially supported by Linux or not? Apparently a GitHub proposed thing:
+    <https://github.com/blog/1125-new-git-homepage>
 
     Good info and graphs.
 
     Leaves out many practical things.
 
--   Good tut: <http://cworth.org/hgbook-git/tour/>
+-   Good tutorial: <http://cworth.org/hgbook-git/tour/>
 
--   Good tut, straight to the point, ASCII diagrams:
+-   Good tutorial, straight to the point, ASCII diagrams:
     <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
 
 -   Good tut by GitHub: <http://learn.github.com/p/>
@@ -34,7 +50,7 @@ layout: default
 -   Description of a production / dev / hotfix branch model:
     <http://nvie.com/posts/a-successful-git-branching-model/>
 
-# Motivation
+# Why learn Git
 
 Git + GitHub allows you to do the following quickly:
 
@@ -190,7 +206,7 @@ Create an empty git repository inside the current directory:
 
 This creates a `.git` dir that contains all the git information.
 
-# create version
+# Create version
 
 Most of git operations are based on versions, so you'd better know how to create them!
 
@@ -233,6 +249,64 @@ Is where git stores what will be kept for next version.
 
 It can modified with may commands such as `add`, `rm`, `mv`, or `reset`.
 
+## Index internals
+
+Internally, <http://stackoverflow.com/questions/4084921/what-does-the-git-index-exactly-contain> the index is stored under `.git/index`, not as a standard `tree` object. TODO rationale.
+
+It's format is binary and documented at: <https://github.com/git/git/blob/master/Documentation/technical/index-format.txt>
+
+Then when we do:
+
+    git init
+    echo a > b
+    tree --charset=ascii
+
+We get:
+
+    .git/objects/
+    |-- 78
+    |   `-- 981922613b2afb6025042ff6bd878ac1994e85
+    |-- info
+    `-- pack
+
+And after:
+
+    git cat-file -p 78981922613b2afb6025042ff6bd878ac1994e85
+
+We get `a`. This indicates that:
+
+- the `index` points to the file contents
+- it stores the metadata in the index file, not as a tree object
+
+Now:
+
+    hd .git/index
+
+gives:
+
+    00000000  44 49 52 43 00 00 00 02  00 00 00 01 54 09 76 e6  |DIRC........T.v.|
+    00000010  1d 81 6f c6 54 09 76 e6  1d 81 6f c6 00 00 08 05  |..o.T.v...o.....|
+    00000020  00 e4 2e 76 00 00 81 a4  00 00 03 e8 00 00 03 e8  |...v............|
+    00000030  00 00 00 02 78 98 19 22  61 3b 2a fb 60 25 04 2f  |....x.."a;*.`%./|
+    00000040  f6 bd 87 8a c1 99 4e 85  00 01 62 00 ee 33 c0 3a  |......N...b..3.:|
+    00000050  be 41 4b 1f d7 1d 33 a9  da d4 93 9a 09 ab 49 94  |.AK...3.......I.|
+    00000060
+
+Breaking it up:
+
+- `44 49 52 43`: `DIRC`
+- `00 00 00 02`: version 2
+- `00 00 00 01`: one file on the index
+
+Next starts the file list, with a bunch of file metadata,
+and finally the SHA-1 of the content `78 98 19 22` at line `30`.
+
+## update-index
+
+Low level index manipulation.
+
+TODO
+
 # Staged
 
 When a file on the working tree is added to the index, its changes are said to be *staged*.
@@ -242,7 +316,7 @@ the changes are said to be *unstaged*.
 
 # ls-files
 
-List tracked files recursively according to several criteria.
+List files in the index and working tree recursively according to several criteria.
 
 List all tracked files under current dir newline separated:
 
@@ -259,29 +333,6 @@ Untracked files only:
     git ls-files --other
 
 TODO only files in current dir?
-
-# ls-tree
-
-List tracked files and directories under current directory:
-
-    git ls-tree
-
-Files are marked as `blob`, while directories as `tree`.
-
-List tracked files recursively starting from the root:
-
-    git ls-tree --full-tree -r HEAD
-
-Sample output:
-
-    100644 blob 867f193a98f573e65a69b336c8205ea392c84c0e    public/404.html
-    100644 blob b6c37ac53866f33aabea2b79ebc365053dbe8e77    public/422.html
-
-Meaning of fields:
-
-1. <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
-2. TODO
-3. <http://stackoverflow.com/questions/18263216/git-ls-tree-head-meaning-of-third-column>
 
 # grep
 
@@ -323,12 +374,18 @@ Search in revision only under directory:
 
 ## How Git determines if a file is binary
 
-Git has an heuristic for determining if files are binary or text.
+Git has an heuristic for determining if files are binary or text:
+it is not possible to do identify file types precisely.
 
-This has effects such as not showing diffs in such files, which would be meaningless line-wise.
+If a file is binary affects such as not showing diffs in such files,
+which would be meaningless line-wise.
 
 In 2014, the heuristic is: look up to 8000 bytes at the beginning of the file.
 Binary iff there is a `NUL` (`\0`).
+
+This heuristic has the interesting property that it works for UTF-8,
+whose only 0 byte represents the NUL character.
+Unfortunately if fails for UTF-16.
 
 <http://stackoverflow.com/questions/7110750/how-do-popular-source-control-systems-differentiate-binary-files-from-text-files>
 
@@ -1337,6 +1394,10 @@ Application: checkout a file with a different name:
 
     git show HEAD^:path/to/file > new/path/to/file
 
+# notes
+
+TODO
+
 # reflog
 
 See all that was done on repo linearly in time:
@@ -1421,15 +1482,23 @@ Get the hash of the latest commit:
 
 ### Refs
 
-Refs are names that point to SHA-1 hashes, and therefor to revisions.
+### pack-refs
+
+Refs are names that point to SHA-1 hashes, and therefore to revisions.
 
 There are many types of references.
 
 Most of them are represented in in files under `.git/refs/` which contain only the SHA they point to. E.g.:
 
 - *branches* like `master`:                 by default at `.git/refs/heads/master`,    modified by `git branch`, `git fetch`, etc.
-- *tags* like `1.0.1`:                      by default at `.git/refs/tags/1.0.1`,      modified by `git tag`
+- *tags* like `1.0.1`:                      by default at `.git/refs/tags/1.0.1`,      modified by `git tag`.
+    Point to the SHA of the tag object, not the commit.
 - *remote* branches like `remotes/feature`: by default at `.git/refs/remotes/feature`, modified by  `git fetch`
+
+If a ref is not found there, it is also searched for on the `.git/packed-refs`:
+this can be more space efficient since each file has metadata associated to it.
+The `git pack-refs` command helps to optimize the repository by putting more refs
+in the files `packed-refs` file.
 
 But there are also some special ones like `HEAD` which live outside of of `refs`, at: `.git/HEAD`.
 
@@ -1480,7 +1549,7 @@ After another commit:
 
 ### show-ref
 
-List all references and their hashes:
+Low-level references listing:
 
     git show-refs
 
@@ -1490,6 +1559,10 @@ Sample output:
     861fa5553de736af945a78b4bf951f6f5d2618e9 refs/remotes/mine/zz/public-user
     9b7dd8b4c04c427de22543fec7f52be26decdb22 refs/remotes/origin/master
     52d771167707552d8e2a50f602c669e2ad135722 refs/tags/v1.0.1
+
+### update-ref
+
+Low-level reference manipulation.
 
 ### Relative to another revision
 
@@ -1627,7 +1700,7 @@ where `gud` is red and `good` is green.
 
 `diff-highlight` is a related contrib script.
 
-## format
+## Diff format
 
 Sample output:
 
@@ -1638,11 +1711,11 @@ Sample output:
 
 Meaning:
 
-- before, line 3 was `before`, line for `after`.
+-   before, line 3 was `before`, line 4 `after`.
 
     There were 2 lines total in what we see.
 
-- after, `error` was added after `before`, becoming line 4
+-   after, `error` was added after `before`, becoming line 4
 
     There will be 3 lines total in what we see.
 
@@ -1650,7 +1723,8 @@ Meaning:
 
     Not surprisingly, if we remove something, a `-` will show instead
 
-After a `git merge`, `git diff` shows a special mode that shows diffs to both parents:
+After a `git merge`, in case of merge conflicts,
+`git diff` shows a special mode that shows diffs to both parents:
 
     +     Added in theirs
     +     Added in theirs2
@@ -1673,7 +1747,8 @@ Add `\n` at end of file that had no ending newline:
     \ No newline at end of file
     +a
 
-This way, every line that starts with `+` is assumed to have a newline at the end, unless stated otherwise.
+This way, every line that starts with `+` is assumed to have a newline at the end,
+unless stated otherwise.
 
 Beware of editors that do magic things with ending newlines: someday it may bite you.
 
@@ -1815,6 +1890,9 @@ Will show who created the tag and the tag message before the rest of the infos.
 
 A tag that is not annotated is called a *lightweight* tag.
 
+TODO: internal representation: it seems that it is pointed to by a tag, and in turn points to a commit:
+<http://teohm.com/blog/2011/05/30/learning-git-internals-by-example/>
+
 ## Signed
 
 GPG signed tags. TODO
@@ -1920,7 +1998,7 @@ Which gives:
      |       |
      b *     master
 
-C disappears because it was not tracked in b:
+C disappears because it was not tracked in `b`:
 
     ls
         #a b
@@ -1942,7 +2020,7 @@ Which makes it obvious why a branch is called a branch.
 
 Is when you checkout to a commit that has no branch associated.
 
-Ex: start with [2]
+E.g.: start with [2]
 
     git checkout HEAD^
 
@@ -2017,7 +2095,7 @@ Therefore you can't both:
 
 since `a` would have to be both a directory and a file at the same time for that to work.
 
-## rename branch
+## Rename branch
 
 Rename a given branch:
 
@@ -2043,7 +2121,6 @@ This command takes the tree:
              master *
 
 and generates:
-
 
     ( )-----( )
              |
@@ -2216,13 +2293,13 @@ Just like checking out the dir, but you also specify the files:
 
     git checkout HEAD~ a b
 
-The head does not move now! this is different from the behaviour of checkout [entire repo]
+The head does not move now! This is different from the behaviour of checking out without a path.
 
 New files that appear are just like untracked ones.
 
 ### Checkout single file
 
-Start from [2]
+Start from [2]:
 
     git checkout HEAD^ a
 
@@ -2688,7 +2765,9 @@ Set the upstream without push:
 
     git branch --set-upstream remote branch
 
-There seems to be no clean way to get the corresponding upstreams of all branches computationally without grepping: <http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
+There seems to be no clean way to get the corresponding upstreams
+of all branches programmatically without grepping:
+<http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
 
 Interactive for a single branch:
 
@@ -2779,7 +2858,8 @@ or:
 
 Can only delete a branch if it is not he current remote branch.
 
-Modify current remote branch: <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
+Modify current remote branch:
+<http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
 After you delete remote branches, you can remove the local tracking branches with:
 
@@ -2945,10 +3025,12 @@ Sample output:
     52d771167707552d8e2a50f602c669e2ad135722    refs/tags/v1.0.1
     7b5799a97998b68416f1b6233ce427135c99165a    refs/tags/v1.0.1^{}
 
-The `^{}` is explained in `man gitrevisions`. Above:
+-   `^{}` is explained in `man gitrevisions`: dereference tags until a non-tag is found
+    (remember that tags can tag anything, including other tags)
 
-- `7b5799a97998b68416f1b6233ce427135c99165a` is the SHA-1 of the tag object
-- `52d771167707552d8e2a50f602c669e2ad135722` is the SHA-1 for the actual commit,
+-   `7b5799a97998b68416f1b6233ce427135c99165a` is the SHA-1 of the tag object
+
+-   `52d771167707552d8e2a50f602c669e2ad135722` is the SHA-1 for the actual commit,
     which is most likely to interest you.
 
 # URLs
@@ -3187,7 +3269,7 @@ So you current branch `master` has been merged into the branch `master` from rep
 
 Git can only store a few UNIX permissions and file types.
 
-Internally, Git uses the same data as UNIX numeric permissions to store the subset of permissions it allows:
+Git uses the same data as UNIX numeric permissions to store the subset of permissions it allows:
 
     0100000000000000 (040000): Directory
     1000000110100100 (100644): Regular non-executable file
@@ -3197,6 +3279,9 @@ Internally, Git uses the same data as UNIX numeric permissions to store the subs
     1110000000000000 (160000): Gitlink (submodule)
 
 It also has one special notation not present in UNIX for the Git specific concept of submodule.
+
+Those permissions are visible on the output of certain porcelain commands like `diff`,
+so knowing them is not just internals.
 
 Taken from: <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
 
@@ -3579,18 +3664,18 @@ Correct the name of one of the authors:
             git commit-tree "$@";
         fi' HEAD
 
-## Commiter vs author
+## Committer vs author
 
 The author is who actually wrote the commit.
 
-The commiter is who committed it on behalf of the author.
+The committer is who committed it on behalf of the author.
 
 It is usually the same person in most cases, but they might differ when:
 
-One important case where commiter and author differ is in projects
+One important case where committer and author differ is in projects
 where patches are generated by `git format-patch`, sent by email,
 and applied by another person with `git am`. In that case,
-the commiter is taken from the local configuration,
+the committer is taken from the local configuration,
 while the authors comes from the patch, so nothing special needs to be done about it.
 
 With web interfaces like GitHub, which hold all the repositories on a single machine
@@ -3784,7 +3869,13 @@ So should be `false` for UTF-8 usage.
 
 # gc
 
-Clean repository.
+Tries to optimize the way git stores files internally.
+
+Can considerably reduce the size of the repository:
+
+    git gc
+
+Some commands automatically run `git gc`. When this is done depends on the value of the `gc.auto` configuration.
 
 TODO what does that do exactly? Possible use case:
 <http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
@@ -3836,32 +3927,296 @@ Holds all the Git information.
 
 - `logs`: information for `reflog`.
 
-## objects
+## Objects
 
+Very good source:
 <http://git-scm.com/book/en/Git-Internals-Git-Objects>
 
-Git has a general key value storage system built-in, where the key is the SHA-1 of something.
+Git implements a generic content addressable filesystem on top of your filesystem:
+given the content you can find the address, which is it's SHA-1.
 
-The major objects git store are:
+The main advantage of this method is that given a content like a commit you can easily determine where it will be stored
+in a way that will not conflict with other objects, which are potentially create by other users.
 
-- blobs: represent files. Contain the contents.
-- trees: represent directories and subdirectories. Contains a list of blobs and trees.
-- commits: contains:
-    - one tree object, the root of the commit
-    - one commit message
-- tags: TODO check. I read some where they are also objects.
+Another advantage is that identical objects like files are all represented by a single data.
 
-## hash-object
+Objects are stored under `.git/objects`. There are two possible formats:
 
-## cat-file
+- with a filename corresponding to it's SHA-1, 40 hexadecimal characters, called a loose object.
+- inside a packfile for greater efficiency.
 
-## update-index
+TODO confirm: objects are stored with zlib DEFLATE algorithm,
+but only the payload is stored, so they are not in the `gz` format as specified by
+<http://www.gzip.org/zlib/rfc-gzip.html#file-format> which contains many extra metadata,
+and therefore cannot be decompressed with `gunzip`.
+<http://stackoverflow.com/questions/1532405/how-to-view-git-objects-and-index-without-using-git>
 
-## write-tree
+What would happen if collision happened: the old object is kept
+<http://stackoverflow.com/questions/9392365/how-would-git-handle-a-sha-1-collision-on-a-blob>
 
-## commit-tree
+Malicious collisions wouldn't have much of an effect since you have to commit them first.
 
-TODO
+Every object has three properties:
+
+- type
+- length of the content
+- content
+
+TODO what is the size for the type and length?
+
+Git uses 4 types of object on the same content addressable filesystem.
+
+- commit
+- tree
+- blob
+- tag
+
+In practice, only commit SHA-1 are used in everyday Git usage,
+while the others objects are referred to by more intuitive aliases.
+
+### Commit object
+
+Represents a version. Contains:
+
+- the SHA-1 of the parents if any.
+- one tree object, the root of the commit
+- author information and creation timestamp
+- committer information and commit timestamp
+- the commit message
+
+Note how the timestamp and parent are part of the content and thus influences the SHA-1:
+therefore, you cannot change the timestamp of a past commit without changing the timestamp
+of all commits that follow.
+
+In `cat-file`:
+
+    git cat-file -p HEAD
+
+    tree e4c4fa4f49a16c8e4c5edfc7274e5cd2a7cd58d2
+    parent add0caccfd13a063d5adff972b3e5a673cee1e40
+    author Ciro Santilli <ciro.santilli@gmail.com> 1409654129 +0200
+    committer Ciro Santilli <ciro.santilli@gmail.com> 1409654129 +0200
+
+    assert_select, ERB tests.
+
+If there was no parent it would print just:
+
+    tree 496d6428b9cf92981dc9495211e6e1120fb6f2ba
+    author Ciro Santilli <ciro.santilli@gmail.com> 1409841443 +0200
+    committer Ciro Santilli <ciro.santilli@gmail.com> 1409841443 +0200
+
+#### commit-tree
+
+Low level commit creation.
+
+Can take custom inputs from the following environment variables:
+
+    GIT_AUTHOR_NAME
+    GIT_AUTHOR_EMAIL
+    GIT_AUTHOR_DATE
+    GIT_COMMITTER_NAME
+    GIT_COMMITTER_EMAIL
+    GIT_COMMITTER_DATE
+    EMAIL
+
+Once you have created a tree object with this command,
+you can update a branch reference to point to it with `git update-ref`.
+
+### Tree object
+
+Represents a directory and subdirectories.
+
+Contains a list of blobs and trees and their metadata.
+
+To get the SHA-1 of a tree you can:
+
+- look at the root of a commit `cat-file`
+- `ls-tree`
+
+Let's cat it:
+
+    git cat-file -p e4c4fa4f49a16c8e4c5edfc7274e5cd2a7cd58d2
+
+Sample output:
+
+    100644 blob 1944fd61e7c53bcc19e6f3eb94cc800508944a25	.gitignore
+    100644 blob a0061019ab73e09ead85b90a8041e71108148bcb	.vimrc
+    100644 blob a3db99ea9cda27e10e5a8091618491946bf4bb10	README.md
+    040000 tree b110e36127f6578433bd68633c68dc8aa96c4f5e	app
+
+As we can see, it contains other trees and blobs, just like the output of `ls-tree`.
+
+#### ls-tree
+
+List tree for current directory at given commit:
+
+    git ls-tree HEAD
+
+List tracked files recursively starting from the root:
+
+    git ls-tree --full-tree -r HEAD
+
+Sample output:
+
+    100644 blob 867f193a98f573e65a69b336c8205ea392c84c0e    public/404.html
+    100644 blob b6c37ac53866f33aabea2b79ebc365053dbe8e77    public/422.html
+
+Meaning of fields:
+
+1.  Git file permission notation: <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
+
+2.  type: tree, blob
+
+3.  SHA of each object: <http://stackoverflow.com/questions/10150541/how-to-suppress-the-output-of-return-value-in-irb-rails-console>
+    You have to know that there are other objects besides commits, in particular blobs and trees,
+    and they are indexed by SHA-1.
+
+TODO: what does `--full-tree` do exactly?
+
+TODO: how to `ls-tree` a given path?
+
+#### mktree
+
+Create a tree from ls-tree output.
+
+#### read-tree
+
+#### write-tree
+
+Create custom trees interactively.
+
+### Blob object
+
+Represents a file. Contain the file content, no metadata (filename and permissions).
+
+Blobs are represented as the entire file, not as diffs.
+
+This way makes things faster since you don't have to resolve tons of diffs to get a version of a file,
+and is not too memory inefficient since identical files will have the same SHA and only get stored once.
+
+Git can also pack similar files into single objects for greater efficiency
+this functionality is implemented using a structure called a packfile.
+
+### Tag object
+
+Points to another object to give it a nicer name. Contents;
+
+- `object`: the SHA-1 of the object it points to
+- `type`: the type of the object it points to
+- `tag`: the tag name
+- the tag message, possibly containing a GPG key
+
+Example:
+
+    git cat-file tag v7.2.1
+
+Output:
+
+    object ff1633f418c29bd613d571107df43396e27b522e
+    type commit
+    tag v7.2.1
+    tagger Jacob Vosmaer <contact@jacobvosmaer.nl> 1409231481 +0200
+
+    Version 7.2.1
+
+Although it does not have many side effects for git,
+you can tag whatever object you want. E.g., if you have the SHA of a blob, you can do:
+
+    git tag blobtag <SHA>
+
+And then:
+
+    git show blobtag
+
+will `cat` the contents of that file.
+
+For git to be able to find tags from their names, it stores them under `.git/refs`.
+
+There are however some side effects even for tags on non-commits:
+
+- `^{}ref` recursively resolves tags until a commit is found
+
+### cat-file
+
+Get information about objects.
+
+The output for each object will be documented with it's description.
+
+Pretty print an object:
+
+    git cat-file -p HEAD
+
+    tree e4c4fa4f49a16c8e4c5edfc7274e5cd2a7cd58d2
+    parent add0caccfd13a063d5adff972b3e5a673cee1e40
+    author Ciro Santilli <ciro.santilli@gmail.com> 1409654129 +0200
+    committer Ciro Santilli <ciro.santilli@gmail.com> 1409654129 +0200
+
+    assert_select, ERB tests.
+
+`1409654129` are the seconds since epoch.
+
+Get object type and size:
+
+    git cat-file -t HEAD
+    git cat-file -s HEAD
+
+Outputs:
+
+    commit
+    252
+
+We can also confirm the size with:
+
+    git cat-file -p | wc -c
+
+### hash-object
+
+Compute hash of a given file:
+
+    echo a > a
+    git hash-object a
+
+Output:
+
+    78981922613b2afb6025042ff6bd878ac1994e85
+
+Create a blob object from a file:
+
+    echo a > a
+    git hash-object -w a
+
+### Loose object
+
+An object that is not stored inside a packfile.
+
+### Packfiles
+
+<https://github.com/gitster/git/blob/master/Documentation/technical/pack-format.txt>
+
+<http://git-scm.com/book/en/Git-Internals-Packfiles>
+
+Stores multiple files under:
+
+- `.git/objects/packs/patck-<SHA>.pack`
+- `.git/objects/packs/patck-<SHA>.idx`
+
+pairs.
+
+### repack
+
+The `git repack` command tells Git to try and package more objects where it can.
+
+### unpack-objects
+
+The `git repack` command tells Git to unpack objects from pack files.
+
+## description file
+
+Created by default at `.git/description`.
+
+Only used by the GitWeb program, never internally, and not used by GitHub either.
+
+<http://stackoverflow.com/questions/6866838/what-should-be-in-the-git-description-file>
 
 # git options
 
@@ -3993,7 +4348,7 @@ General mappings:
 - `b`: one screen up
 - `H`: see a list of branches.
 
-### Refs
+### Refs tig
 
 These bindings are available on views that shows revisions such as the log view or the branches view.
 

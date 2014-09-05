@@ -1,6 +1,5 @@
 ---
 title: Bazaar and Launchpad for Git users.
-layout: default
 ---
 
 #Why it exists?
