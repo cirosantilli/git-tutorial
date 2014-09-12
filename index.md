@@ -10,10 +10,11 @@ title: Git Version Control Tutorial
 
 -   List all commands: `git help -a`
 
--   Some guides:`git help -g`. Interesting ones:
+-   Some guides:`git help -g`. General useful ones:
 
     - `man gitrevisions`: how to name revisions
     - `man gitrepository-layout`: what is inside `.git`
+    - `man gitglossary`: index of Git terms
 
 -   Help for a command: `git add --help`. Same as `man git-add` or `man git add`.
 
@@ -30,6 +31,22 @@ title: Git Version Control Tutorial
 
     - `Documentation/technial`: internals
     - `Documentation/howto`: tutorials
+
+-   <https://git.wiki.kernel.org/index.php/Main_Page>
+
+    Official wiki.
+
+-   Issues, questions and patches are sent by email at: <git@vger.kernel.org>
+
+    You subscribe by sending an email to <majordomo@vger.kernel.org >,
+    but it is around 100 posts / day!
+
+    There are web interfaces subscribed that store old threads.
+    The most popular seems to be: <http://dir.gmane.org/gmane.comp.version-control.git>
+
+    TODO: what is `vger`? Is it a Star Trek reference: <http://en.memory-alpha.org/wiki/V%27ger>?
+    Would make some sense as in the Star Trek canon it is the name
+    of an entity which aims to absorb as much knowledge as possible.
 
 -   Popular book: <http://git-scm.com/book>.
 
@@ -54,11 +71,13 @@ title: Git Version Control Tutorial
 
 Git + GitHub allows you to do the following quickly:
 
--   create multiple versions (*commits* or *revisions* in Git jargon) of your work, and travel between them.
+-   create multiple versions (*commits* or *revisions* in Git jargon)
+    of your work, and travel between them.
 
     This is useful for:
 
-    -   backup. If you delete a file by mistake, and the file was present in some past version, you can recover it.
+    -   backup. If you delete a file by mistake, and the file was present
+        in some past version, you can recover it.
 
     -   if a recent modification made a change that made things worse,
         you can just go back to a previous correct state and see what happened.
@@ -79,13 +98,15 @@ Git + GitHub allows you to do the following quickly:
 
         The current state may not be stable, and may interfere with the more urgent state.
 
-        No problem, make a version of your current work to save it, and switch to the more urgent matter.
+        No problem, make a version of your current work to save it,
+        and switch to the more urgent matter.
 
         When you are done, just switch back.
 
     -   View differences between versions.
 
-        It is easy to [view *differences* between versions](#differences) to find out what was different on a different version
+        It is easy to [view *differences* between versions](#differences)
+        to find out what was different on a different version
 
         This is useful when:
 
@@ -155,9 +176,9 @@ The only thing that makes a directory in to a repository is the presence of a `.
 with the correct files in it, which contains most of the `.git` data.
 Some more may be contained in config files outside `.git` like `.gititnore`.
 
-To create a new repo, use [init].
+To create a new repo, use `init`.
 
-To copy an existing repo, use [clone]. No need to `git init` it after you clone it.
+To copy an existing repo, use `clone`. No need to `git init` it after you clone it.
 
 To transform a repo into a non repo, simply remove the `.git` dir (and maybe other files like `.gitignore`).
 
@@ -166,18 +187,23 @@ To transform a repo into a non repo, simply remove the `.git` dir (and maybe oth
 This is a confusing point for beginners, but it is a good design choice by Git,
 so understand it now and save lots of trouble later.
 
+The three trees are:
+
 - working tree: regular files outside `.git`. Those files may not be tracked by Git.
-- staging area: things that have been selected to be added to the next revision
-- HEAD: the last version
+- index: things that have been selected to be added to the next revision. Internally, not represented as a tree object.
+- `HEAD`: the last version. Internally, a tree object.
 
 Transitions:
 
-    +--------------+  +--------------+  +---------------+
-    | working tree |  | staging area |  | next revision |
-    |--------------+  |--------------+  |---------------+
+    +--------------+  +--------------+  +------+
+    | working tree |  | staging area |  | HEAD |
+    |--------------+  |--------------+  |------+
     |                 |                 |
     |                 |                 |
-    |- add ---------> |- commit ------> |
+    | -- add -------> | -- commit ----> |
+    |                 |                 |
+    |                 |                 |
+    | <- reset ------ | <- reset ------ |
 
 # Setup
 
@@ -219,7 +245,12 @@ You can see what would be included in the next version with `status`
 
 # status
 
-See all differences between staged files and the tree and `HEAD`:
+Lists:
+
+- differences between working tree and index, including files not present in the index
+- differences between index and `HEAD`
+
+Entire repository:
 
     git status
 
@@ -229,11 +260,16 @@ Only in a given directory:
 
 You can change what would be added with commands like `add`, `rm` or `reset`
 
-There are 3 possible sections:
+There are 3 most common possible sections:
 
 - `Untracked files`: files which have never been added in any version.
 - `Changes not staged for commit`: files which have changed but will not be considered.
 - `Changes to be committed`: files which which have changed and will be considered
+
+Other sections also exist:
+
+- `Unmerged paths`: while on a merge conflict resolution.
+    You must first add those files and then `git rebase --continue`.
 
 And if nothing changes, it says so.
 
@@ -245,20 +281,40 @@ Is all the "regular" files that lie outside the `.git` directory.
 
 # Index
 
-Is where git stores what will be kept for next version.
+A temporary place where you can build the next commit little by little.
 
-It can modified with may commands such as `add`, `rm`, `mv`, or `reset`.
+Its existence allows you for example to do several `git add` separately,
+edit some more, and only later create a new version. For this to work,
+operations like `git add` must store the files somewhere: this place is the index.
+
+Usually modified with the following commands:
+
+- `add`:          add file so index. Don't touch working tree.
+- `rm`, `mv`:     remove and rename from both index and working tree.
+- `reset`:        set the index to the same as last commit, therefore undoing operations like `git add`.
+- `checkout ref`: sets the index to the tree of the ref, therefore radically modifying it.
+
+The index is stored internally by Git in the `.git` directory. Therefore,
+after you `git add` a file for example, you can remove it from the working tree
+but you won't lose any data.
 
 ## Index internals
 
-Internally, <http://stackoverflow.com/questions/4084921/what-does-the-git-index-exactly-contain> the index is stored under `.git/index`, not as a standard `tree` object. TODO rationale.
+Internally, the index is stored under `.git/index`, not as a standard tree object.
+<http://stackoverflow.com/questions/4084921/what-does-the-git-index-exactly-contain>
+This is probably because it contains filesystem metadata like timestamps to do it's job.
 
-It's format is binary and documented at: <https://github.com/git/git/blob/master/Documentation/technical/index-format.txt>
+Its format is binary and documented at:
+<https://github.com/git/git/blob/master/Documentation/technical/index-format.txt>
 
-Then when we do:
+The index format has evolved with time. Currently there exists version up to 4.
+2 is common. The format version is stored in the index.
+
+When we do:
 
     git init
     echo a > b
+    git add b
     tree --charset=ascii
 
 We get:
@@ -275,7 +331,7 @@ And after:
 
 We get `a`. This indicates that:
 
-- the `index` points to the file contents
+- the `index` points to the file contents, since `git add b` created a blob object
 - it stores the metadata in the index file, not as a tree object
 
 Now:
@@ -284,28 +340,106 @@ Now:
 
 gives:
 
-    00000000  44 49 52 43 00 00 00 02  00 00 00 01 54 09 76 e6  |DIRC........T.v.|
-    00000010  1d 81 6f c6 54 09 76 e6  1d 81 6f c6 00 00 08 05  |..o.T.v...o.....|
-    00000020  00 e4 2e 76 00 00 81 a4  00 00 03 e8 00 00 03 e8  |...v............|
-    00000030  00 00 00 02 78 98 19 22  61 3b 2a fb 60 25 04 2f  |....x.."a;*.`%./|
-    00000040  f6 bd 87 8a c1 99 4e 85  00 01 62 00 ee 33 c0 3a  |......N...b..3.:|
-    00000050  be 41 4b 1f d7 1d 33 a9  da d4 93 9a 09 ab 49 94  |.AK...3.......I.|
+    00000000  44 49 52 43 00 00 00 02  00 00 00 01 54 09 76 e6  |DIRC.... ....T.v.|
+    00000010  1d 81 6f c6 54 09 76 e6  1d 81 6f c6 00 00 08 05  |..o.T.v. ..o.....|
+    00000020  00 e4 2e 76 00 00 81 a4  00 00 03 e8 00 00 03 e8  |...v.... ........|
+    00000030  00 00 00 02 78 98 19 22  61 3b 2a fb 60 25 04 2f  |....x.." a;*.`%./|
+    00000040  f6 bd 87 8a c1 99 4e 85  00 01 62 00 ee 33 c0 3a  |......N. ..b..3.:|
+    00000050  be 41 4b 1f d7 1d 33 a9  da d4 93 9a 09 ab 49 94  |.AK...3. ......I.|
     00000060
 
 Breaking it up:
 
 - `44 49 52 43`: `DIRC`
-- `00 00 00 02`: version 2
-- `00 00 00 01`: one file on the index
+- `00 00 00 02`: format version: 2
+- `00 00 00 01`: count of files on the index: just one
 
-Next starts the file list, with a bunch of file metadata,
-and finally the SHA-1 of the content `78 98 19 22` at line `30`.
+Next starts a list of index entries. Here we have just one. It contains:
+
+-   a bunch of file metadata: 8 byte `ctime`, 8 byte `mtime`,
+    then 4 byte: device, inode, mode, UID and GID.
+
+    Note how:
+
+    -   `ctime` and `mtime` are the same (`54 09 76 e6 1d 81 6f c6`)
+        as expected since we haven't modified the file
+
+        The first bytes are seconds since EPOCH in hex:
+
+            date --date="@$(printf "%x" "540976e6")"
+
+        Gives:
+
+            Fri Sep  5 10:40:06 CEST 2014
+
+        Which is when I made this example.
+
+        The second 4 bytes are nanoseconds.
+
+    -   UID and GID are `00 03 e8`, 1000 in hex: a common value for single user setups.
+
+    All of this metadata allows Git to check
+    if a file has changed without comparing the entire contents.
+
+-   at start line `30`: `00 00 00 02`: 4 byte file size: 2 bytes
+
+-   20 byte SHA-1 of the content: `78 98 19 22 ... c1 99 4e 85`
+
+-   2 byte flags: `00 01`
+
+    -   1 bit: assume valid flag. TODO
+
+    -   1 bit extended flag. Determines if the extended flags are present or not.
+        Must be `0` on version 2 which does not have extended flags.
+
+    -   2 bit stage flag used during merge. Stages are documented in `man git-merge`:
+
+        - 0: regular file, not in a merge conflict
+        - 1: base
+        - 2: ours
+        - 3: theirs
+
+        During a merge conflict, all stages from 1-3 are stored in the index
+        to allow operations like `git checkout --ours`.
+
+        If you `git add`, then a stage 0 is added to the index for the path,
+        and Git will know that the conflict has been marked as solved.
+
+        TODO: check this.
+
+    -   12 bit length of the path that will follow: `0 01`: 1 byte only since the path was `b`
+
+-   2 byte extended flags
+
+-   `62` (ASCII `b`): variable length path. Length determined in the previous flags.
+
+-   `00`: zero padding so that the index will end in a multiple of 8 bytes. Only before version 4.
+
+Finally we have a 20 byte checksum `ee 33 c0 3a .. 09 ab 49 94` over the content of the index.
+
+## checkout-index
+
+Add files from the index to the working tree.
+
+Plumbing.
 
 ## update-index
 
-Low level index manipulation.
+Add files from working tree to index.
 
-TODO
+Plumbing.
+
+## read-tree
+
+Read given tree object into the index.
+
+Plumbing.
+
+## write-tree
+
+Create a tree object form the index.
+
+Plumbing.
 
 # Staged
 
@@ -420,6 +554,93 @@ It is necessary to first convert the file to a text format if possible.
 This can be done automatically through the `textconv` option for specified files.
 
 There exist tools that do the conversion reasonably for documents such as `.doc` or `.odt`.
+
+## U
+
+## inter-hunk-context
+
+## Hunk
+
+The name of each contiguous modified chunk in a file.
+
+Each hunk is delimited by an `@@` line on the default diff output format.
+
+When Git merges two hunks is controlled by both the `-U` and `--inter-hunk-context` options.
+
+`-U` determines the minimum number of context lines to show. It defaults to 3.
+
+`--inter-hunk-context` determines the maximum extra number of lines
+between two contexts before the hunks are merged.
+It defaults to 0: hunks are only merged by default if the contexts touch.
+
+Consider the following edit:
+
+    1 -> a
+    2    2
+    3    3
+    4    4
+    5    5
+    6    6
+    7    7
+    8    a
+
+Then:
+
+    git diff -U
+
+shows:
+
+
+    @@ -1,8 +1,8 @@
+    -1
+    +a
+     2
+     3
+     4
+     5
+     6
+     7
+    -8
+    +a
+
+Hunks touched with 3 lines of context, and were merged.
+
+    git diff -U2
+
+Gives:
+
+    @@ -1,3 +1,3 @@
+    -1
+    +a
+    2
+    3
+    @@ -6,3 +6,3 @@
+    6
+    7
+    -8
+    +a
+
+Hunks did not touch anymore, so split up.
+
+If we want to force them to merge anyways, we need to bridge two lines: 4 and 5. So we can do:
+
+    gdf --inter-hunk-context=2 -U2
+
+And once again that gives:
+
+    @@ -1,8 +1,8 @@
+    -1
+    +a
+     2
+     3
+     4
+     5
+     6
+     7
+    -8
+    +a
+
+It is sometimes possible to operate on separate hunks. E.g., `git add -i` allows that.
 
 # blame
 
@@ -610,7 +831,7 @@ If you add and then modify, only the first addition will be taken into account f
     git status
         #to be committed: modified: a
 
-Add is recursive on dirs:
+Add is recursive on directories:
 
     mkdir d
     echo a > d/a
@@ -642,16 +863,6 @@ which fails if there are gitignored files.
 
 `git add .` also has the advantage of including hidden dot files `.`.
 
-## combos
-
-Add all non-hidden files in current directory:
-
-    git add *
-
-Add all files in current directory, including hidden:
-
-    git add `ls -A`
-
 # rm
 
 If you want to remove a file that is tracked from future versions then use:
@@ -668,7 +879,7 @@ If you committed sensitive data like passwords like this by mistake, you need to
 
 To do that see [remove file from repo history].
 
-## example: rm
+## Example: rm
 
 Start with [1]
 
@@ -783,24 +994,33 @@ Remove from repo:
 Dry run with `-n`:
 
     git clean -n
-        #would remove c
-        #would not remove d/
+
+Output:
+
+    would remove c
+    would not remove d/
 
 Since this is a very dangerous operation, in `Git 1.8` the default is to do dry runs.
 This can be controlled by the `clean.requireForce` configuration option,
 and an `-f` is required to actually clean. Do not rely on the value of this option.
 
-Remove entire dirs with `-d`:
+Remove entire directories with `-d`:
 
     git clean -dn
-        #would remove c
-        #would remove d/
+
+Output:
+
+    would remove c
+    would remove d/
 
 Not dry run with `-f`:
 
     git clean -df
-        #would remove c
-        #would remove d/
+
+Output:
+
+    would remove c
+    would remove d/
 
 By default, to make a non dry run, you have to add `-f`, but this depends on your git configurations.
 
@@ -818,8 +1038,11 @@ Start with [1].
 
     mv b c
     git status
-        #removed: b
-        #untracked: b
+
+Output:
+
+    removed: b
+    untracked: b
 
 If you do `git mv`, git acknowledges it was moved:
 
@@ -947,13 +1170,13 @@ The tree:
              master *
              b
 
-### dangling commit
+### Dangling commit
 
 `(2)` in this example is called a *dangling commit*.
 
 It is a commit with no descendant branch.
 
-### delete last commit from history
+### Delete last commit from history
 
 Start with [2]:
 
@@ -988,26 +1211,77 @@ The tree:
 
 And `(2)` is called a dangling commit.
 
-## undo a reset hard
+## Undo a reset hard
 
-You *can* undo a reset hard if your are fast enough.
+<http://stackoverflow.com/questions/5473/undoing-a-git-reset-hard-head1>
 
-First find out the hash of the deleted commits:
+You can undo a reset hard if your are fast enough:
+a few weeks on default configurations.
 
-    git fsck --lost-found
+First find out the hash of the deleted commit on the reflog:
 
-They should show up as *dangling commits*. This is what they are: commits that have no descendant branch.
+    git reflog
+
+Then reset hard to it:
+
+    git reset --hard HEAD@{1}
+
+And if you just did the `reste --hard` to any commit,
+you might also be able to get away simply with:
+
+    git reset --hard ORIG_HEAD
+
+They should show up as *dangling commits*.
+This is what they are: commits that have no descendant branch.
 
 Now merge away with the have you just found.
 
 But *don't rely on this!*: dangling commits are removed from time to time depending on your configs.
 
-## remove all dangling commits forever
+## Remove all dangling commits permanently
+
+<http://stackoverflow.com/questions/3765234/listing-and-deleting-git-commits-that-are-under-no-branch-dangling>
 
     git reflog expire --expire=now --all
     git gc --prune=now
 
 But be sure this is what you want! There is no turning back.
+
+# reflog
+
+See all that was done on all branches of the repository linearly in time:
+
+    git reflog
+
+Contains events like:
+
+- commits
+- checkouts
+- resets
+
+Sample output:
+
+    7c7afb3 HEAD@{0}: reset: moving to 7c7afb3
+    06887ac HEAD@{1}: commit (amend): Commit message.
+    7c7afb3 HEAD@{2}: checkout: moving from branch1 to branch2
+
+The given SHA is for the `HEAD` after the operation on the line was carried out.
+
+`HEAD@{N}` are valid revisions and can be used for any command.
+
+The `reflog` also stores times, so you can use revision names like:
+
+    master@{yesterday}
+    HEAD@{5 minutes ago}
+
+Internally, the reflog is stored under `.git/logs`.
+
+One major goal of the `reflog` is to prevent accidental data loss:
+for example, you can undo a `reset --hard` by using it to find the dangling commit.
+
+# fsck
+
+Check reachability and validity of objects.
 
 # revert
 
@@ -1066,9 +1340,10 @@ And the working tree is exactly as it was on `(1)`.
 
 # commit
 
-Creates a new version.
+Creates a new version from the content of the index.
 
-You must first which files will be included in it with commands like `add`, `rm`, `mv` and `reset`.
+You must first tell Git which files will be included in the next version
+by adding them to the index with commands like `add`, `rm`, `mv` and `reset`.
 
 After you have decided what will be included or not, you are ready to commit.
 
@@ -1084,11 +1359,11 @@ To give it a message 'added a'.
 
 Now status only says that `b` is untracked and nothing about `a`.
 
-## commit message
+## Commit message
 
 It is recommended that the commit message be like:
 
-- start with a summary line of max 50 characters
+-   start with a summary line of max 50 characters
 
     To achieve the character limit, **don't** use `-m`, and edit the message in Vim.
 
@@ -1098,8 +1373,9 @@ It is recommended that the commit message be like:
     - start with a capital letter.
     - end with a period.
 
-- blank line
-- detailed explanation of the non-trivial changes.
+-   blank line
+
+-   detailed explanation of the non-trivial changes.
 
     In practice, commits rely on the pull request or fixed issue description for the extended information.
 
@@ -1383,12 +1659,19 @@ Very useful to check out to the most recent stable version before building:
 
 # show
 
+Show human readable information on various types of objects.
+
+## View files at specific version
+
 Show specific versions of files and other infos.
 
-View file at an specific version:
+View file at an specific version, path relative to root:
 
     git show HEAD^:path/to/file
-    git show $HASH^:path/to/file
+
+Relative to current directory:
+
+    git show HEAD^:./path/to/file
 
 Application: checkout a file with a different name:
 
@@ -1397,20 +1680,6 @@ Application: checkout a file with a different name:
 # notes
 
 TODO
-
-# reflog
-
-See all that was done on repo linearly in time:
-
-    git reflog
-
-Shows stuff like:
-
-- commits
-- checkouts
-- resets
-
-Information is stored under `.git/logs`.
 
 # gitk
 
@@ -1428,6 +1697,31 @@ All of the above are also possible via curses based tig.
 What you almost always want is to use with `--all` to see all branches marked:
 
     gitk --all
+
+## diff-index
+
+Plumbing.
+
+Compares blobs between index and repository.
+
+## diff-tree
+
+Plumbing.
+
+## diff-files
+
+Plumbing.
+
+Compares files between the working tree and the index.
+
+## raw diff format
+
+A raw diff is a summarized diff output format that only shows file level modifications,
+not changed lines. It also shows the similarity index for renamed files.
+
+It can be viewed with `git diff --raw`, or as the output of the diff plumbing commands.
+
+The format is documented at `man git-diff-index`.
 
 # Revision
 
@@ -1508,7 +1802,8 @@ Although refs live in subdirectories of `refs`, you don't usually need to specif
 just saying `master` is often enough to specify `refs/heads/master`.
 Git uses the following search order, documented at `man gitrevisions`:
 
-- `$GIT_DIR/<name>` Usually useful only for `HEAD`, `FETCH_HEAD`, `ORIG_HEAD`, `MERGE_HEAD` and `CHERRY_PICK_HEAD`.
+- `$GIT_DIR/<name>` Usually useful only for special branches like
+    `HEAD`, `FETCH_HEAD`, `ORIG_HEAD`, `MERGE_HEAD` and `CHERRY_PICK_HEAD`.
 - `refs/<name>`
 - `refs/tags/<refname>`
 - `refs/heads/<name>`
@@ -1546,6 +1841,19 @@ After another commit:
     (1)-----(2)-----(3)
                      |
                      HEAD
+
+#### ORIG_HEAD
+
+`man gitrevisions` says:
+
+> ORIG_HEAD is created by commands that move your HEAD in a drastic way, to record the position of the HEAD before their operation, so that you can easily change the tip of the branch back to the state before you ran them.
+
+`git reset --hard` is a drastic change, and `man git-reset` says that `ORIG_HEAD` is created on that operation.
+
+So you can just redo the last `reset --hard` as:
+
+    git reset --hard something
+    git reset --hard ORIG_HEAD
 
 ### show-ref
 
@@ -1755,6 +2063,16 @@ Beware of editors that do magic things with ending newlines: someday it may bite
 For example, Vim 7.3 hides trailing newlines by default.
 
 `tail file | hd` and `truncate -s -1` will never lie to you.
+
+## Side-by-side diff
+
+Not possible natively: you must use `git difftool`.
+
+With `difftool`, one option seems to be: <https://github.com/ymattw/cdiff>
+
+# difftool
+
+Use configured `diff` tool so see the diff.
 
 # tag
 
@@ -2418,69 +2736,6 @@ Apply change at the top of the stash:
 
 Is when you take two branches and make a new one that is child of both.
 
-There are certain merges that are made automagically:
-
-- file added
-- different lines of a file modified
-
-If all merges can be done automatically, then you are prompted for a commit message and the current head advances automatically to a new commit. This process is called fast forward.
-
-However there changes that cannot be merged automatically such as modification of a single line on both versions.
-
-If that happens, and the file is not a binary file, the file on the tree be modified to contain:
-
-    <<<<<<< HEAD
-        config.password_length = 1..128
-    =======
-        config.password_length = 8..128
-    >>>>>>> other-branch
-
-and if you do `git status` you will see:
-
-    both modified: filename
-
-To finish the merge you should check all of the both modified files, correct them, `git add` and then `git commit`.
-
-To put the file into one of the two versions, you can do either:
-
-    git checkout --ours filename
-    git checkout --theirs filename
-
-This is the most common solution for binary file conflicts.
-
-To go back to the merge conflict version with the `<<<<<< HEAD` markers you can do:
-
-    git checkout -m filename
-
-See both branches and the base in a merge marker style:
-
-    git checkout --conflict=diff3 filename
-
-The file then becomes:
-
-    ++<<<<<<< ours
-     +int a = 1;
-    ++||||||| base
-    ++int a = 0;
-    ++=======
-    + int a = 2;
-    ++>>>>>>> theirs
-
-Stop the merge resolution process and go back to previous state:
-
-    git merge --abort
-
-## Merge target branch
-
-<http://stackoverflow.com/questions/3216360/merge-update-and-pull-git-branches-without-using-checkouts>
-
-It is not possible to `git merge` into a target branch other than the current
-because if there were merge conflicts there would be no way to solve them.
-
-If it is just a fast forward, you can use `fetch` instead:
-
-    git fetch origin master:target-branch
-
 ## Merge strategies
 
 Git attempts to merge automatically using one of different merge strategies.
@@ -2525,7 +2780,7 @@ Some important strategies are:
            |     |
            +--D--+
 
-### recursive
+### Recursive merge strategy
 
 The default strategy.
 
@@ -2575,6 +2830,156 @@ and then uses `V` as the base.
 
 Example why it is a good choice: <http://codicesoftware.blogspot.com/2011/09/merge-recursive-strategy.html>
 
+## Conflicts
+
+## Merge conflicts
+
+Certain modifications can be made automatically,
+provided they are only done on one of the branches to be merged:
+
+- given line of non-binary file modified
+- file added
+- mode changed
+
+If all merges can be done automatically, then you are prompted for a commit message
+and the current HEAD branch advances automatically to a new commit.
+This type of simple merge is called fast-forward.
+
+### Text conflicts
+
+If a conflict happens happens on two regular text files `git merge` outputs either:
+
+    Auto-merging path/to/file.md
+    CONFLICT (content): Merge conflict in path/to/file.txt
+
+if the file existed already, or:
+
+    Auto-merging path/to/file.md
+    CONFLICT (add/add): Merge conflict in path/to/file.txt
+
+if two different files with the same path were created in the different branches.
+
+The file on the working tree is modified to contain:
+
+    <<<<<<< HEAD
+        config.password_length = 1..128
+    =======
+        config.password_length = 8..128
+    >>>>>>> other-branch
+
+and if you do `git status` you will either of:
+
+    both modified: path/to/file.txt
+    both added: path/to/file.txt
+
+To finish the merge you have to look into each file with a conflict,
+correct them, `git add` and then `git commit`.
+
+To put the file into one of the two versions, you can do either:
+
+    git checkout --ours filename
+    git checkout --theirs filename
+
+This is the most common solution for binary file conflicts.
+
+To go back to the merge conflict version with the `<<<<<< HEAD` markers you can do:
+
+    git checkout -m filename
+
+See both branches and the base in a merge marker style:
+
+    git checkout --conflict=diff3 filename
+
+The file then becomes:
+
+    ++<<<<<<< ours
+     +int a = 1;
+    ++||||||| base
+    ++int a = 0;
+    ++=======
+    + int a = 2;
+    ++>>>>>>> theirs
+
+In the case of `add/add`< the base will be empty:
+
+    ++<<<<<<< ours
+     +int a = 1;
+    ++||||||| base
+    ++=======
+    + int a = 2;
+    ++>>>>>>> theirs
+
+TODO: possible to `git checkout --base`?
+
+Stop the merge resolution process and go back to previous state:
+
+    git merge --abort
+
+### Binary conflicts
+
+Git does not do anything smart in the case of binary files:
+it is up to you to use the right tool to view the file and edit it to work.
+
+You can use `checkout --ours` and `checkout --theirs` normally,
+`checkout --conflict=diff3` does not modify the file tree and outputs:
+
+    warning: Cannot merge binary files: conflict/binary-preview.png (ours vs. theirs)
+
+### Permission conflicts
+
+#### Directory file conflict
+
+Appears as `CONFLICT (file/directory)` on `git merge`, and `both added` on `git status`, 
+
+If a file is changed into a directory with the same name, the working is left as:
+
+    dir-path
+    dir-path~other-branch
+
+from the side that contains the directory, or:
+
+    dir-path
+    dir-path~HEAD
+
+from the side that contains the file.
+
+If `dir-path~other-branch` already exists,
+another names is chosen from the first free name amongst:
+
+    dir-path~other-branch_0
+    dir-path~other-branch_1
+    ...
+
+`--ours` and `--theirs` are half broken since you cannot do `git checkout --ours dir-path`
+to the side that contains the directory: you have to reference the files it contains.
+
+`--conflict=diff3 -- path` fails with:
+
+    error: path 'conflict/perms-dir' does not have all necessary versions
+
+#### Symlink file conflict
+
+Appears as `CONFLICT (add/add)` on `git merge`, and `both added` on `git status`,
+i.e., indistinguishable from regular file conflicts.
+
+On the working tree, the file is always a regular file.
+
+`--ours` and `--theirs` work as expected.
+
+Depending from which side you do `--conflict=diff3` it may generate a symlink
+pointing to a file path with conflict markers!
+
+## Merge target branch
+
+<http://stackoverflow.com/questions/3216360/merge-update-and-pull-git-branches-without-using-checkouts>
+
+It is not possible to `git merge` into a target branch other than the current
+because if there were merge conflicts there would be no way to solve them.
+
+If it is just a fast forward, you can use `fetch` instead:
+
+    git fetch origin master:target-branch
+
 ## Ignore certain files on merge
 
 Run:
@@ -2586,6 +2991,9 @@ and use a `.gitattributes` as:
     file_to_ignore merge=ours
 
 ## squash
+
+Create a single commit on top of the current branch,
+such that the new commit contains exactly what would be the contents of the merge.
 
 Given:
 
@@ -2602,7 +3010,8 @@ After:
     git checkout master
     git merge --squash feature
 
-We get: TODO
+We get: TODO does the new commit have multiple parents?
+Is the author of the feature credited in the `log`?
 
     (A)----(B)----(C)-----(F)
             |              |
@@ -3164,9 +3573,21 @@ To use `fetch`, the remote must have a name, either given automatically at `clon
 as `origin` or through explicit `remote add`,
 since the name determines how the local references will be named.
 
+## FETCH_HEAD
+
+A reference that points to the latest fetched branch.
+
+Common use case: get a single commit not on the main repository,
+often on the fork feature branch of a pull request,
+to try it out locally without merging or adding a new remote:
+
+    git fetch origin pull/<pr-number>/head
+    git checkout -b <local-branch-name> FETCH_HEAD
+
 # bare
 
-A repo that only contains the files that are inside `.git`.
+A bare repository is one that only contains files that are inside `.git`:
+in particular, it has no working tree nor index.
 
 This is what GitHub stores for you: no need to store the files also!
 
@@ -3187,7 +3608,7 @@ To create a bare repo that is a clone of another repo:
 
     git clone --bare other
 
-## current branch
+## Current branch
 
 The active or current branch of a bare repository is what its `HEAD` points to.
 
@@ -3265,6 +3686,8 @@ Local repo after a `merge`:
 
 So you current branch `master` has been merged into the branch `master` from repo `origin`.
 
+# Permissions
+
 # File permissions
 
 Git can only store a few UNIX permissions and file types.
@@ -3273,12 +3696,17 @@ Git uses the same data as UNIX numeric permissions to store the subset of permis
 
     0100000000000000 (040000): Directory
     1000000110100100 (100644): Regular non-executable file
-    1000000110110100 (100664): Regular non-executable group-writeable file
     1000000111101101 (100755): Regular executable file
     1010000000000000 (120000): Symbolic link
     1110000000000000 (160000): Gitlink (submodule)
 
 It also has one special notation not present in UNIX for the Git specific concept of submodule.
+
+There is also another permission mentioned [in the source code](https://github.com/gitster/git/blob/9d02150cf4d833935161ef265e4dc03807caa800/fsck.c#L188):
+
+    1000000110110100 (100664): Regular non-executable group-writeable file
+
+but a comment says that it is only for backwards compatibility, and it is only enabled if `strict` is true (TODO how to set that?). That mode is not tracked by default.
 
 Those permissions are visible on the output of certain porcelain commands like `diff`,
 so knowing them is not just internals.
@@ -3293,9 +3721,20 @@ How to get around it: <http://stackoverflow.bcom/questions/3207728/retaining-fil
 
 The best solution seems to be the `git-cache-meta` third-party tool.
 
-# Empty dirs
+## Symlinks
 
-Git ignores empty dirs.
+Git stores represents symlinks on the same `struct` that it stores regular files except that:
+
+- the permission is `120000` instead of `644` and `755` which are used for files.
+- the content is the destination path. Note that this is not in general how symlink destinations are stored in all filesystems. E.g., ext3 stores symlinks directly in the inode, not with file contents.
+
+On clone, git reads it's internal data in the repository,
+recreates the working tree using the type of symlinks supported by the local filesystem,
+just like it does for directories for example.
+
+# Empty directories
+
+Git ignores empty directories.
 
 To force git to keep a dir, add a file to it.
 
@@ -3304,30 +3743,6 @@ Popular possibilities are:
 - `readme` file explaining why the dir is there after all!
 
 - `.gitkeep` file. It has absolutely no special meaning for git, but is somewhat conventional.
-
-# Symlinks
-
-## On push
-
-Git stores symlinks as files containing the link location + some metadata inside `.git`
-that indicates that it is a symlink.
-
-## On pull
-
-Git recreates the symlinks on local system.
-
-Start with [multi].
-
-    cd a
-    ln -s a c
-    git add c
-    git commit -am 'c'
-    git push
-
-    cd ..
-    git clone ao c
-    cd c
-    [ -s c ] && echo ok
 
 # submodule
 
@@ -3366,9 +3781,9 @@ Add to another directory:
 
     git submodule add https://github.com/USERNAME/latex.git another_name
 
-## Symlink technique
+## Submodule symlink combo
 
-If you technology requires files to be in the current directory,
+If your technology requires files to be in the current directory,
 you can use symlinks into the submodule to achieve that effect.
 
 You have a LaTeX `a.sty` file which you want to use.
@@ -3398,13 +3813,14 @@ If you forgot to use recursive when you cloned, you should:
 It seems that making clone recursive by default is neither possible nor a good idea:
 <http://stackoverflow.com/questions/4251940/retrospectively-add-recursive-to-a-git-repo>
 
-## Update the content of a submodule
+## Update content of a submodule
 
     cd share
     git pull
 
-Now we have:
+Now from the main repository;
 
+    cd ..
     git status
         #modified:   shared (new commits)
 
@@ -3419,6 +3835,11 @@ Update the contents of all submodules:
     git submodule foreach git pull
 
 This does not work if the modules are only listed under `.gitmodule` but have not been added to index with `add`.
+
+## Update repository that contains as submodule
+
+    git pull
+    git submodule update
 
 ## foreach
 
@@ -3638,6 +4059,15 @@ It is also possible to reorder and erase any commit on the commit list.
 
 All you need to do is to change the line order or remove lines.
 
+# replace
+
+Magic mechanism to alter a single commit anywhere in the repository without affecting history,
+(if you change a commit in the middle of the repository, it's parent SHA changes, so you have to change
+it's children and so on).
+
+Works because for every `git` command without `--no-replace-objects`
+Git looks at a separate list of replacements kept under `.git/refs/replace`.
+
 # filter-branch
 
 Mass history rewrite using arbitrary Bash function.
@@ -3724,24 +4154,19 @@ Some useful commands to automate Git.
 
 Get full path of repo root:
 
-    ./copy.sh 1d
     git rev-parse --show-toplevel
-        #`pwd`
-    cd d
-        #$(dirname $(pwd))
 
-Get what you need to `cd` to go to top level:
+Get relative path to the top level:
 
-    ./copy.sh 1d
     git rev-parse --show-cdup
-        #
-    cd d
-    git rev-parse --show-cdup
-        #../
 
 Path to `.git` dir:
 
     git rev-parse --git-dir
+
+# rev-list
+
+Commit tree reachability operations.
 
 # config
 
@@ -3866,6 +4291,23 @@ If `false` and the encoding is compatible with your terminal,
 you will see nice characters.
 
 So should be `false` for UTF-8 usage.
+
+# var
+
+Show values of Git configuration variables and all Git- specific environment variables:
+
+    git var
+
+Sample output:
+
+    remote.origin.url=git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+    remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+    branch.master.remote=origin
+    branch.master.merge=refs/heads/master
+    GIT_COMMITTER_IDENT=Your Name <you.@gmail.com> 1410298645 +0200
+    GIT_AUTHOR_IDENT=Your Name <you@gmail.com> 1410298645 +0200
+    GIT_EDITOR=/usr/bin/vim
+    GIT_PAGER=less -r
 
 # gc
 
@@ -4046,6 +4488,10 @@ Sample output:
 
 As we can see, it contains other trees and blobs, just like the output of `ls-tree`.
 
+The index does not stores trees but rather has a specialized file format,
+probably for greater efficiency. There are however commands like `write-tree` and `read-tree`
+that transform between tree objects and the index.
+
 #### ls-tree
 
 List tree for current directory at given commit:
@@ -4077,13 +4523,7 @@ TODO: how to `ls-tree` a given path?
 
 #### mktree
 
-Create a tree from ls-tree output.
-
-#### read-tree
-
-#### write-tree
-
-Create custom trees interactively.
+Create a tree object from `ls-tree` output.
 
 ### Blob object
 
@@ -4445,19 +4885,37 @@ e.g. when a file must be owned by `root`.
 
 <https://github.com/libgit2/libgit2>
 
-Implementation of the Git core methods in C meant to be used programmatically:
-given a `.git` repository it is able to do basically anything `git` can.
+Reimplementation of the Git core methods. Differences from Git:
 
-Has bindings in many languages.
+-   meant to be used from a C directly as a linked library:
+    does not have a native command line interface
 
-It is developed by GitHub and open source. Its license is more open than Git's,
-as it can be used by proprietary software if not modified.
+-   is GPLv2 with linking exception: proprietary projects can link to it unmodified.
 
-`libgit` has reused some of the code in the original Git source from authors that allowed the new license:
+    This is the perfect move for GitHub,
+    since it forces other companies to merge back if they want to modify it,
+    this improving the software.
+
+    Git is pure GPLv2.
+
+It uses the exact same `.git` repository format as Git.
+
+Has bindings in many higher level languages like Rugged for Ruby.
+This is one of the greatest things about libgit2:
+since it implements a C interface, other languages will just have wrappers around it,
+making all those other libraries more uniform, thus easier to learn, and less buggy.
+
+Its development was started and is strongly backed by GitHub which uses it internally.
+Its license is more open than Git's, as it can be used by proprietary software if not modified.
+
+libgit2 has reused a small portion of the code in the original Git source
+from authors that allowed the new license:
 <http://stackoverflow.com/questions/17151597/which-code-is-shared-between-the-original-git-and-libgit2>
+It is worth noting that many major authors have allowed such usage, including Linus and Hamano.
 
-TODO why was it created? Because the original Git implementation is not meant to be used programmatically,
-or because of the license?
+It was designed to replace the Ruby Grit library which initially powered GitHub.
+Grit only parsed Git output from stdin, so it is much slower than the new native C implementation
+of libgit2 which works directly with the repository.
 
 # GitHub specific
 
@@ -4469,7 +4927,8 @@ GitHub stores refs to pull requests on the original repository under `refs/pull/
 
 Therefore, if you want to get a pull request locally to try it out on a local branch you can do:
 
-    git fetch origin pull/<pr-number>/head:<local-branch-name>
+    git fetch origin pull/<pr-number>/head
+    git checkout -b <local-branch-name> FETCH_HEAD
 
 ## GitHub API v3 via cURL
 
