@@ -1373,6 +1373,9 @@ It is recommended that the commit message be like:
     - start with a capital letter.
     - end with a period.
 
+    The first line is treated specially by many tools which makes that line even more preeminent,
+    e.g., Git itself has `git log --oneline`. So make that line count.
+
 -   blank line
 
 -   detailed explanation of the non-trivial changes.
@@ -1619,6 +1622,13 @@ This is a great option to view history on a feature branch onto which upstream w
 Rebase is a better option than merge in this case if you work locally,
 but may not be an option if a group is working on the feature branch.
 
+## Reachability
+
+Commits point to their parents (0, 1 or more), but not to their children.
+
+This is why when the term *reachable* is used,
+it implies commits which are ancestors of a given commit.
+
 # shortlog
 
 Summarizes log information.
@@ -1784,10 +1794,12 @@ There are many types of references.
 
 Most of them are represented in in files under `.git/refs/` which contain only the SHA they point to. E.g.:
 
-- *branches* like `master`:                 by default at `.git/refs/heads/master`,    modified by `git branch`, `git fetch`, etc.
-- *tags* like `1.0.1`:                      by default at `.git/refs/tags/1.0.1`,      modified by `git tag`.
+-   *branches* like `master`:                 by default at `.git/refs/heads/master`,    modified by `git branch`, `git fetch`, etc.
+
+-   *tags* like `1.0.1`:                      by default at `.git/refs/tags/1.0.1`,      modified by `git tag`.
     Point to the SHA of the tag object, not the commit.
-- *remote* branches like `remotes/feature`: by default at `.git/refs/remotes/feature`, modified by  `git fetch`
+
+-   *remote* branches like `remotes/feature`: by default at `.git/refs/remotes/feature`, modified by `git fetch`.
 
 If a ref is not found there, it is also searched for on the `.git/packed-refs`:
 this can be more space efficient since each file has metadata associated to it.
@@ -1802,13 +1814,18 @@ Although refs live in subdirectories of `refs`, you don't usually need to specif
 just saying `master` is often enough to specify `refs/heads/master`.
 Git uses the following search order, documented at `man gitrevisions`:
 
-- `$GIT_DIR/<name>` Usually useful only for special branches like
+-   `$GIT_DIR/<name>` Usually useful only for special branches like
     `HEAD`, `FETCH_HEAD`, `ORIG_HEAD`, `MERGE_HEAD` and `CHERRY_PICK_HEAD`.
-- `refs/<name>`
-- `refs/tags/<refname>`
-- `refs/heads/<name>`
-- `refs/remotes/<name>`
-- `refs/remotes/<name>/HEAD`
+
+-   `refs/<name>`
+
+-   `refs/tags/<refname>`
+
+-   `refs/heads/<name>`
+
+-   `refs/remotes/<name>`
+
+-   `refs/remotes/<name>/HEAD`
 
 #### HEAD
 
@@ -2198,22 +2215,23 @@ Must do it with:
 
 ## Annotated tag
 
-    git tag -a ta -m 'annotated tag message!'
+For internals and when to use see: <http://stackoverflow.com/a/25996877/895245>
 
-And now:
+Annotated tags are tags that point to tag objects that point to commits.
 
-    git show ta
+Because of this, they have more metadata than just the commit they point to,
+including a message (possibly with a GPG signature at the end if you use `-s`)
+and tagger identity and timestamp.
 
-Will show who created the tag and the tag message before the rest of the infos.
+Use annotated tags to all tags you will publish,
+e.g. version numbers as they contain more useful information.
 
-A tag that is not annotated is called a *lightweight* tag.
+Use lightweight tags only for quick and dirty private development tags.
 
-TODO: internal representation: it seems that it is pointed to by a tag, and in turn points to a commit:
-<http://teohm.com/blog/2011/05/30/learning-git-internals-by-example/>
-
-## Signed
-
-GPG signed tags. TODO
+This pattern is enforced by `git describe`, which goes back to the first
+annotated tag ancestor, not lightweight. Therefore, `git describe HEAD`
+will always go the latest stable version if you follow the above convention,
+even if you have private development only tags.
 
 # branch
 
@@ -2892,6 +2910,16 @@ See both branches and the base in a merge marker style:
 
 The file then becomes:
 
+    <<<<<<< ours
+    int a = 1;
+    ||||||| base
+    int a = 0;
+    =======
+    int a = 2;
+    >>>>>>> theirs
+
+and `git diff` automatically shows a special diff mode called *combined diff* as:
+
     ++<<<<<<< ours
      +int a = 1;
     ++||||||| base
@@ -2900,14 +2928,14 @@ The file then becomes:
     + int a = 2;
     ++>>>>>>> theirs
 
-In the case of `add/add`< the base will be empty:
+In the case of `add/add` the base will be empty:
 
-    ++<<<<<<< ours
-     +int a = 1;
-    ++||||||| base
-    ++=======
-    + int a = 2;
-    ++>>>>>>> theirs
+    <<<<<<< ours
+    int a = 1;
+    ||||||| base
+    =======
+    int a = 2;
+    >>>>>>> theirs
 
 TODO: possible to `git checkout --base`?
 
@@ -3021,6 +3049,26 @@ Is the author of the feature credited in the `log`?
                            |
                            feature
 
+## Programmatically check if mergeable
+
+<http://stackoverflow.com/questions/501407/is-there-a-git-merge-dry-run-option>
+
+## Resolve merge conflicts
+
+To resolve merge conflicts, you have to `git add file`.
+
+There are several techniques that help you to find what is the correct resolution.
+
+-   `git diff topic...master`: show only changes that happened on `master` after `topic` branched out,
+    and which are therefore the cause of the conflict. Useful, since usually you know what
+    you have changed, and you need to know what others have changed since.
+
+    This is specified in `man git-diff`. The notation resembles that of commit sets,
+    of `man gitrevisions`, but this is a special since diff operates two commits,
+    not commit sets.
+
+-   `mergetool` open an external conflict resolution tool, possibly GUI
+
 # merge-file
 
 Plumbing command that runs a 3-way merge on the three given input files.
@@ -3103,25 +3151,49 @@ To prevent that, do:
 
     git config --global mergetool.keepBackup false
 
-## Programmatically check if mergeable
-
-<http://stackoverflow.com/questions/501407/is-there-a-git-merge-dry-run-option>
-
 # Email patches
 
 Tools only used in projects that exchange patches via email, not in those that use web interfaces like GitHub.
 
 ## format-patch
 
-Generate a patch.
+Generate a patch to send by email.
+
+Generate a patch from last commit:
+
+    git format-patch HEAD~
+
+## Signed-off by
+
+Extra text added to commit messages or only to patches.
+
+Required by certain projects, notably the Linux kernel, because of legal reasons:
+<http://stackoverflow.com/questions/1962094/what-is-the-sign-off-feature-in-git-for>
+
+Has no relation to GPG signatures.
+
+Add signed-off by line to the commit message:
+
+    git commit -ms 'Message.'
+
+This would generate a commit message like:
+
+    Message.
+
+    Signed-off-by: Super Developer <super.dev@gmail.com>
+
+Normally you don't need to pollute the commit message:
+just add it to the patch sent by email:
+
+    git format-patch -s
 
 ## am
 
-TODO0
+TODO
 
 ## apply
 
-TODO0
+TODO
 
 # push
 
@@ -3134,83 +3206,151 @@ Typical changes possible with push:
 - put branches there
 - remove branches from there
 
-Push current branch to `remote` bare repo over branch `branch`:
+The full form of the command is:
 
-    git push remote branch
+    git push <remote> +<src>:<dst>
 
-where `remote` is anything that identifies the remote such as its URL or name given by `add`.
+As a concrete example:
 
-If the remote branch does not exist it is created.
+    git push origin +master:dev
 
-Push a branch other than the current one to a remote:
+but there are (sensible) defaults for almost every part of the command,
+many of which are controlled by options. Also, there were major configuration
+and documentation updates on 2.0, So brace yourself!
 
-    git push remote local-name:remote-name
+The full form, pushes the local branch `<src>` to remote with the name `<dst>`.
+It `<dst>` does not exist it is created.
 
-Push even if not fast forward:
+`+` is optional the same as `-f`: if given allows non-fast-forward updates,
+thus allowing you to lose commits on the remote.
 
-    git push remote +local-name:remote-name
+## Omit dst
+
+    git push <remote> <src>
+
+is the same as:
+
+    git push <remote> <src>:<src>
+
+## Omit src
+
+    git push <remote> :<dst>
+
+deletes the branch `master` on the remote.
+The mnemonic is `<src>` does not exist, so you replace the remote with nothing.
+
+Later versions of git added the saner `--delete` option which does the same thing:
+
+    git push --delete <remote> <dst>
+
+## Omit src and dst
+
+    git push <remote> :
+
+Does a matching push: pushes all branches which track on `<remote>`
+for which a branch with the same name exists on `<remote>`.
 
 ## refspec
 
-The name of a origin destination branch pair, including options on how push / pull may happen such as `+` to allow non-fast forwards.
+The name of the `+local-name:remote-name` argument to `git push`,
 
-Example:
+Term also used by commands such as `pull` and `fetch`.
 
-    +local-name:remote-name
+## omit refspec
 
-They are used by commands such as `push` and `fetch`.
+What happens on:
+
+    git push <remote>
+
+depends on the `push.default` option, documented under `man git-config`:
+
+-   `matching`: same as `git push <remote> :`. Default before 2.0.
+                Insane because it does a mass update operation by default!
+
+-   `upstream`: push the current branch to its upstream branch.
+
+-   `simple`  : like `upstream`, but don't push if the remote branch name
+                is different from the local one: you need en explicit refspec for that.
+                Default starting on 2.0.
+
+-   `current` : push the current branch to a branch of the same name.
+                Simple, explicit and does not depend on any configuration.
+
+-   `nothing` : do nothing. For those overly concious with safety.
+                Forces you to always use the branch name explicitly.
+
+## Omit the remote
+
+### Before 2.0
+
+    git push
+
+is the same as:
+
+    git push <remote>
+
+where `<remote>` is:
+
+- the tracking remote of the current branch if it has one
+- `origin` otherwise
+
+The sanest configuration for the GitHub workflow:
+
+-   let `origin` be the clone, `up` the upstream.
+-   fetch and pull with `git fetch up`
+-   push with `git push`
+
+### After 2.0
+
+More configuration variables were added. The search order is:
+
+- `branch.<name>.pushremote`
+- `remote.pushdefault` (affects all branches)
+- `branch.<name>.remote`
+- `origin`
+
+The sanest configuration for the GitHub workflow:
+
+-   let `origin` be the upstream
+-   let `remote.pushdefault` be `mine`, and `mine` point to the clone.
+-   now you can fetch and push directly with `git fetch` and `git push`
 
 ## u
 
-## upstream
+## Upstream
 
-Each local branch can have a remote branch which it tracks, which is known as the upstream or tracked branch.
+## Tracking branch
+
+Each local head can have a remote branch to which it pulls and pushes by default,
+which is known as it's upstream.
+
+The upstream is set under the `branch.<name>.remote` configuration.
+
+Note that for `push`, other configurations come into play after Git 2.0,
+in particular `remote.pushdefault` and `branch.<name>.pushremote`, so the
+concept is more strongly related to fetching.
 
 Push and also set the upstream of current branch:
 
     git push -u remote branch
 
-Set the upstream without push:
+Set the upstream without push for current branch:
 
     git branch --set-upstream remote branch
 
-There seems to be no clean way to get the corresponding upstreams
-of all branches programmatically without grepping:
-<http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
-
-Interactive for a single branch:
+Get a list of all upstreams:
 
     git branch -vv
 
-Sample output:
-
-    * master 7840566 [origin/master: ahead 2] Install aliases.
-
 Also shows the very useful ahead behind statistic on the tracked remote.
 
-Interactive for all branches:
-
-    vim .git/config
+There seems to be no clean plumbing way to get the corresponding upstreams
+of all branches programmatically without grepping:
+<http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
 
 For scripts for a single branch:
 
     git rev-parse --abbrev-ref master@{upstream}
-
-Push current branch to its default upstream (remote/branch) pair
-
-    git push -u git@github.com:userid/reponame.git master
-
-What happens when you do just:
-
-    git push
-
-depends on the `push.default` option: <http://stackoverflow.com/questions/948354/git-push-default-behavior>
-
-The default as of 1.8 is `simple`, which pushes to upstream only if the upstream branch name is the same as the current branch.
-
-Push all local branches which track a remote at `remote`:
-
-    git push remote
 
 ## f
 
@@ -3280,6 +3420,14 @@ Manage remote repositories.
 
 When you clone something, it already has a remote called `origin`.
 
+Remotes are short names that point to URLs. They are stored under `.git/config` as:
+
+    [remote "<remote-name>"]
+      url = http://github.com/user/repo
+
+There are also other remote related variables configurations
+that can be stored under `[remote]`, in including `fetch`.
+
 ## View remote
 
 Shows remote repo aliases without their real addresses:
@@ -3343,6 +3491,8 @@ The actual branches will still be there. Delete merged branches,
 i.e. any ancestor of the current branch, with:
 
     git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+
+<http://stackoverflow.com/questions/6127328/how-can-i-delete-all-git-branches-which-have-been-merged>
 
 ## remote head
 
@@ -3480,7 +3630,9 @@ Make a "copy" of another repo.
 
 Fetches all the remote branches.
 
-Creates only a single branch: the branch were the `HEAD` of the remote was.
+Creates only a single branch: the branch were the `HEAD` of the remote was,
+but also fetches all other branches under `.git/refs/origin/`, so that you can just
+`git checkout -b other-branch` to create them.
 
 ## Example: clone and branches
 
@@ -3524,54 +3676,72 @@ This is how you download a project which interests you.
 
 # fetch
 
-Looks for all modifications made on all branches of a remote
-and download everything necessary to recreate those branches locally.
+Looks for changes made on a remote repository and brings them in.
 
-May or not create branches locally depending on invocation.
+The full signature is:
 
-Look at all branches of `origin`, references under `.git/refs/heads`,
-and make local references of type `.git/refs/remotes/origin`:
+    git fetch <remote> <refspec>
 
-    git fetch origin
+where `<refspec>` is the same as for `git push`.
 
-You can now create a local branch and checkout to it with:
+You can do a dry run that only lists remote references with `ls-remote`.
 
-    git checkout -b  local-name origin/remote-branch
+For example, to update you `master` branch from a remote `dev` you can do:
 
-You can also fetch only specific remote branches and create local branches directly as:
+    git fetch origin dev:master
 
-    git fetch origin local-name1:remote-name1 +local-name2:remote-name2
+This will only work for fast-forward changes, because it could be done for
+any branch, not just the current one, and in that case there is no way to resolve
+merge conflicts without a working tree.
 
-What is fetched by `git fetch` can be controlled by `.git/config` on the `remote` entries.
-By default, `remote add` adds entries of type:
+## Omit refspec
 
-    [remote "mine"]
-        url = git@github.com:cirosantilli/gitlabhq.git
-        fetch = +refs/heads/*:refs/remotes/mine/*
+Omitting refspec as in:
 
-If you want fetch to fetch other references, you can add another fetch entry.
-An useful one with GitHub, is:
+    git fetch <remote>
 
-    fetch = +refs/pull/*/head:refs/pull/origin/*
+defaults `<refspec>` to:
 
-which after `git fetch origin` allows you to fetch pull requests locally as:
+-   `remote.<remote>.fetch`, which is set by default on remote creation to
+    `+refs/heads/*:refs/remotes/<remote>/*` configuration, so a matching forced update
+    from remote `heads` into local `remotes/<remote>/`.
 
-    git checkout -b 999 pull/origin/999
+    So after you `git fetch origin`, you can create a local branch with a shorter name
+    and checkout to it with:
 
-because GitHub automatically stores them there.
+        git checkout -b local-name origin/remote-branch
 
-You can view all the references of a remote with:
+    Remember that this works because `.refs/remotes` is in the refs search path,
+    and no sane person would have a local reference called `.git/heads/origin/remote-branch`,
+    or that would have the preference.
 
-    git ls-remote origin
+    Multiple `remote.<remote>.fetch` entries can be added.
+    A possibly useful one with GitHub, is:
 
-which in the case of GitHub shows a bunch of references of type:
+        fetch = +refs/pull/*/head:refs/pull/origin/*
 
-    e743f59a4f2e0ebff3df55d14bae14f1a52b3152    refs/pull/1037/head
-    960703d4ad21d3a1e2077a7a4b1e1c79a4963bde    refs/pull/1037/merge
+    which also fetches all pull requests, which GitHub stores under `refs/pulls`.
+    You can then checkout with:
 
-To use `fetch`, the remote must have a name, either given automatically at `clone`
-as `origin` or through explicit `remote add`,
-since the name determines how the local references will be named.
+        git checkout -b 999 pull/origin/999
+
+    Remember that just `origin/999` won't work because `refs/pulls` is not in the refs search path.
+
+    Also note that this configuration would might pull *a lot* of references,
+    so you might be better off with one off commands like:
+
+        git fetch origin pull/<pr-number>/head:local-name
+
+-   `origin`
+
+This hasn't changed in Git 2.0, and is therefore simpler than the default refspec for `git push`.
+
+## Omit remote
+
+Defaults the remote to the first defined of:
+
+- `branch.<name>.remote`
+- `origin`
 
 ## FETCH_HEAD
 
@@ -3586,19 +3756,27 @@ to try it out locally without merging or adding a new remote:
 
 # bare
 
-A bare repository is one that only contains files that are inside `.git`:
-in particular, it has no working tree nor index.
+A bare repository is one that:
+
+-   only contains files that are inside `.git`: in particular, it has no working tree nor index.
+
+-   has `core.bare` set to `true`. This option is set automatically by commands that create repositories:
+    `init` and `clone` will leave it on `false`, while `clone --bare` will set it to `true`.
+
+    Because of this configuration variable you cannot directly push to the `.git` of a repository
+    created with `git init`.
 
 This is what GitHub stores for you: no need to store the files also!
 
 There are some operations that you can only do/cannot do on a bare repo:
 
--   you can only push to a bare repo.
+-   you can only push to a bare repo
 
     This means that using git to deploy a project requires a bare repository
     on the server + a post commit hook that will update the tree where desired.
 
--   you cannot pull from a bare repo.
+-   you cannot to any operation that involves the working tree from a bare repo,
+    including `pull`
 
 To create a bare repo from scratch:
 
@@ -5319,38 +5497,6 @@ Also:
 ## multiu
 
 Like `multi`, but both master branches have committed unmerged modifications.
-
-# Index of terms
-
-Some git vocabulary.
-
-## A commit
-
-A version.
-
-## To commit
-
-Is to create version.
-
-## To stage a file
-
-Is to consider it for next commit through `git add`.
-
-## Tracked file
-
-Is one that has already been staged once and not removed since.
-
-## Upstream
-
-In general , upstream is the name for the main repository before you cloned it,
-`origin` being the name of your clone.
-
-For example, if you forked `he/project` into `me/project`, and clone `me/project`,
-the upstream of the cloned repo should be `he/project`.
-
-In `git`, *upstream* has an specific meaning for the `push` command.
-A better alternative name also used on the man page is *tracking* branch,
-so as not to confuse it with the usual `origin` `upstream` workflow terminology.
 
 [bitbucket]: https://www.bitbucket.org/
 [github]:    https://github.com/
