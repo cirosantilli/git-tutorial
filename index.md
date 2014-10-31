@@ -42,27 +42,36 @@ title: Git Version Control Tutorial
     but it is around 100 posts / day!
 
     There are web interfaces subscribed that store old threads.
-    The most popular seems to be: <http://dir.gmane.org/gmane.comp.version-control.git>
+
+    -   the most popular and often linked to as the canonical URL seems to be:
+        <http://dir.gmane.org/gmane.comp.version-control.git>
+        but as a millennial I find it really hard to navigate.
+
+    -   <http://git.661346.n2.nabble.com/> is a more usable option
 
     TODO: what is `vger`? Is it a Star Trek reference: <http://en.memory-alpha.org/wiki/V%27ger>?
     Would make some sense as in the Star Trek canon it is the name
     of an entity which aims to absorb as much knowledge as possible.
 
--   Popular book: <http://git-scm.com/book>.
+-   Tutorials from companies who make money from Git:
 
-    TODO officially supported by Linux or not? Apparently a GitHub proposed thing:
-    <https://github.com/blog/1125-new-git-homepage>
+    -   <http://git-scm.com/book>.
 
-    Good info and graphs.
+        Apparently GitHub maintained but officially adopted by Git:
+        <https://github.com/blog/1125-new-git-homepage>
 
-    Leaves out many practical things.
+        Good info and graphs.
+
+        Leaves out many practical things.
+
+    -   <http://learn.github.com>
+
+    -   <https://www.atlassian.com/git/tutorials>
 
 -   Good tutorial: <http://cworth.org/hgbook-git/tour/>
 
 -   Good tutorial, straight to the point, ASCII diagrams:
     <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
-
--   Good tut by GitHub: <http://learn.github.com/p/>
 
 -   Description of a production / dev / hotfix branch model:
     <http://nvie.com/posts/a-successful-git-branching-model/>
@@ -1941,6 +1950,36 @@ Sample output:
 
     git symbolic-ref 'master2' 'refs/heads/master'
 
+## commit-ish
+
+## tree-ish
+
+## rev
+
+The terms:
+
+- `<commit-ish>`
+- `<tree-ish>`
+- `<rev>`
+
+are used on command specifications throughout Git, so it is crucial to grasp their meaning.
+
+`<commmit-ish>` is a name that ultimately resolves to a commit, e.g.:
+
+- directly: the SHA-1 of the commit
+- indirectly: a tag that points to a commit
+
+Most of the naming described a `man gitrevisions` are commit-ishes.
+
+`<tree-ish>` is a name that ultimately resolves to a tree, which `man gitrevisions`
+defines as either a directory or a file (blob). Every commit-ish is also a tree-ish
+that refers to the top-level tree of the commit, but a few tree-ishes are not commit-ishes, e.g.:
+
+- master:path/to/tree
+- SHA-1 of a tree object
+
+TODO `<rev>` vs `<commit>` vs `<commit-ish>`?
+
 # diff
 
 View diff between working tree and index (changes will disappear after `git add`):
@@ -2097,17 +2136,18 @@ Tags are a type of ref: names for commits commits.
 
 They live under `.git/refs/tags`.
 
-The difference from branches is that tags don't move automatically with commits,
-so you can refer to a commit forever by its tag, unless an evil developer changes the tag,
-which should almost never be done.
+Difference from branches
+
+-   tags don't move automatically with commits, so you can refer to a commit forever by its tag,
+    unless an evil developer changes the tag, which should almost never be done.
+
+-   tags occupy a single namespace: there is no `remotes`. As a consequence,
+    you have to be very careful with which tags you push to a remote
+    so as to not overwrite other people's local tags.
 
 Typical usage: give version numbers: `1.0`, `1.1`, `2.0`
 
     ./copy 2
-
-There are two types of tags, annotated and lightweight (unannoted).
-
-Annotated tags have an associated message, author and creation date.
 
 You cannot give a tag twice:
 
@@ -2118,15 +2158,59 @@ So you must delete the old tag before.
 
 A single commit can however have multiple tags.
 
-## Give tags
+## Annotated tag
+
+There are two types of tags, annotated and lightweight (not annotated).
+
+Annotated tags have an associated message, author and creation date.
+
+For internals and when to use see: <http://stackoverflow.com/a/25996877/895245>
+
+Annotated tags are tags that point to tag objects that point to commits.
+
+Because of this, they have more metadata than just the commit they point to,
+including a message (possibly with a GPG signature at the end if you use `-s`)
+and tagger identity and timestamp.
+
+Use annotated tags to all tags you will publish,
+e.g. version numbers as they contain more useful information.
+
+Some commands treat annotated and lightweight tags differently.
+The general semantics of such differentiation suggests the following rule,
+which you should always follow:
+
+> use lightweight tags only for quick and dirty private development tags.
+
+-   `git describe` goes back to the first annotated tag ancestor,
+    not lightweight, by default.
+
+    Therefore, `git describe HEAD` will always go the latest stable version
+    if you follow the above convention, even if you have private development only tags.
+
+-   `git push --follow-tags` only pushes annotated tags.
+
+Create annotated tag to `HEAD`:
+
+    git tag -a 2.0 -m 'message'
+
+The message is mandatory: if not given an editor will open up for you to type it in.
+
+## List tags
+
+Get a newline separated list of all tags for the latest commit, or empty if no tags are available:
+
+    git tag --contains HEAD
+
+Sample output:
+
+    tag1
+    tag2
+
+## Create tags
 
 Give lightweight tag to `HEAD`:
 
     git tag 2.0
-
-Give annotated tag to `HEAD`:
-
-    git tag -a 2.0 -m 'message'
 
 View associated information of annotated tag:
 
@@ -2163,9 +2247,68 @@ List tags with date side by side and on commit tree:
 
     git log --date-order --graph --tags --simplify-by-decoration --pretty=format:'%ai %h %d'
 
-### describe
+## Edit tag
 
-Find out how many commits we are ahead of the latest tag:
+Strictly speaking there is no tag editing,
+only overwriting tags with new ones of the same name:
+
+    git tag -f tagname
+    git tag -af -m tagname
+
+This requires the `-f` flag or else the command fails.
+
+## Delete tags
+
+Delete a tag:
+
+    git tag -d 1.0
+
+## Push tags to remote
+
+By default `git push` does not push tags to the remote.
+
+The sanest way is to push explicit tags:
+
+    git push <remote> <tagname>>
+
+Another sane option introduced around 1.8 is:
+
+    git push --follow-tags
+
+which only pushes annotated tags that can be reached from the newly pushed commits.
+
+Push all tags with:
+
+    git push --tags
+
+but this is bad because it might push unwanted development tags,
+which could conflict with the local tags of other developers.
+
+Delete a remote tag with either of:
+
+    git push --delete tagname
+    git push :tagname
+
+## Get tags from remote
+
+`clone` automatically gets all the tags.
+
+`fetch`:
+
+-   by default gets all tags that point to objects that exist on the local repository.
+    Does not overwrite existing tags.
+
+-   with `--tags` fetches all tags and overwrite if existing locally.
+
+    When overwriting shows a message like:
+
+        - [tag update]      tagname          -> tagname
+
+-   `git fetch tag` fetches only a single tag
+
+## describe
+
+Get the most recent annotated tag reachable from a given commit. Defaults to `HEAD`:
 
     git describe
 
@@ -2177,9 +2320,9 @@ Format:
 
     <tag>-<commits_ahead>-g<hash_start>
 
-Get the latest tag:
+Not necessarily annotated tag:
 
-    git describe --abbrev=0 --tags
+    git describe --tags
 
 If you want to use this programmatically you could:
 
@@ -2187,51 +2330,6 @@ If you want to use this programmatically you could:
 
 Which ignores the error message in case there are no tags,
 so you get an empty result if there are no tags, and the latest tag if there is at least one tag.
-
----
-
-Get a newline separated list of all tags for the latest commit, or empty if no tags are available:
-
-    git tag --contains HEAD
-
-Sample output:
-
-    tag1
-    tag2
-
-## Delete tags
-
-Delete a tag:
-
-    git tag -d 1.0
-
-## Push tags to remote
-
-Is not done be default.
-
-Must do it with:
-
-    git push --tags
-
-## Annotated tag
-
-For internals and when to use see: <http://stackoverflow.com/a/25996877/895245>
-
-Annotated tags are tags that point to tag objects that point to commits.
-
-Because of this, they have more metadata than just the commit they point to,
-including a message (possibly with a GPG signature at the end if you use `-s`)
-and tagger identity and timestamp.
-
-Use annotated tags to all tags you will publish,
-e.g. version numbers as they contain more useful information.
-
-Use lightweight tags only for quick and dirty private development tags.
-
-This pattern is enforced by `git describe`, which goes back to the first
-annotated tag ancestor, not lightweight. Therefore, `git describe HEAD`
-will always go the latest stable version if you follow the above convention,
-even if you have private development only tags.
 
 # branch
 
@@ -2517,6 +2615,14 @@ If you omit the version, defaults to `HEAD` so:
     git checkout HEAD
 
 Are the same.
+
+## To previous branch
+
+    git checkout -
+
+which is the same as:
+
+    git checkout @{-1}
 
 ### Example: checkout entire repo
 
@@ -3269,14 +3375,14 @@ depends on the `push.default` option, documented under `man git-config`:
 
 -   `upstream`: push the current branch to its upstream branch.
 
--   `simple`  : like `upstream`, but don't push if the remote branch name
+-   `simple`:   like `upstream`, but don't push if the remote branch name
                 is different from the local one: you need en explicit refspec for that.
                 Default starting on 2.0.
 
--   `current` : push the current branch to a branch of the same name.
+-   `current`:  push the current branch to a branch of the same name.
                 Simple, explicit and does not depend on any configuration.
 
--   `nothing` : do nothing. For those overly concious with safety.
+-   `nothing`:  do nothing. For those overly concious with safety.
                 Forces you to always use the branch name explicitly.
 
 ## Omit the remote
@@ -3297,8 +3403,14 @@ where `<remote>` is:
 The sanest configuration for the GitHub workflow:
 
 -   let `origin` be the clone, `up` the upstream.
+
+-   push the first time with `git push -u origin`, and further pushes just with `git push`
+
 -   fetch and pull with `git fetch up`
--   push with `git push`
+
+    This longer form (with explicit `up`) seems unavoidable before Git 2.0
+    if we want to be able to do just `git push`, which is a more common operation
+    than `fetch` and thus should be the shorter one.
 
 ### After 2.0
 
@@ -3311,9 +3423,9 @@ More configuration variables were added. The search order is:
 
 The sanest configuration for the GitHub workflow:
 
--   let `origin` be the upstream
--   let `remote.pushdefault` be `mine`, and `mine` point to the clone.
--   now you can fetch and push directly with `git fetch` and `git push`
+-   let `origin` be the upstream, `mine` the clone.
+-   let `remote.pushdefault` be `mine`
+-   now you can both fetch and push directly with `git fetch` and `git push`
 
 ## u
 
@@ -3543,17 +3655,20 @@ Ex: `origin/master`, `origin/feature2`, `upstream/feature2`, etc.
 
 Branch only sees remotes if you give the `remote-name` explicitly.
 
-### checkout
+### checkout to a remote without specifying which remote
 
-If you have a remote `origin/b` and no branch named `b`,
+If you have a tracking branch `origin/b`, no other tracking branch of the form `some-remote/b`,
+and no branch named `b`:
 
     git checkout b
 
-Is the same as (magic!, never do this, it is very confuging!):
+is expanded to:
 
-    git checkout b origin/b
+    git checkout -b <branch> --track <remote>/<branch>
 
-But:
+which will create the local branch for you and make it track the right thing.
+
+Note however that:
 
     git checkout -b b
 
@@ -3562,11 +3677,7 @@ Is the same as:
     git branch b
     git checkout b
 
-If you had a branch named `b`:
-
-    git checkout b
-
-Would simply go to it.
+so it will create the branch `b` from the current commit.
 
 # ls-remote
 
@@ -4293,7 +4404,11 @@ This is the case for most modern projects.
 
 # cherry-pick
 
-Merge only certain commits from another branch.
+Merge change introduced by given commits.
+
+If merge is not clean, may create merge conflicts which you have to resolve similarly to `git merge`.
+
+The existing merge messages and other metadata are kept.
 
 Merge only the last commit from the `other-branch` branch:
 
@@ -4325,6 +4440,16 @@ Now whenever you commit, you will see `abc` on the terminal!
 See: <http://git-scm.com/book/en/Customizing-Git-Git-Hooks> for other hook names.
 
 When hooks are executed on the remote they echo on the local shell as: `remote: <stdout>`.
+
+Hooks are not transmitted on clone.
+
+There are not global hooks. The best one can do is either:
+
+-   set up `init.templatedir` with the desired hooks. But if you ever modify them,
+    you have to modify each existing project...
+
+-   add the `hooks` to the repository itself on a `.git-hooks` directory
+    and require one extra setup action from developers. Probably the least bad option.
 
 # rev-parse
 
@@ -4472,7 +4597,7 @@ So should be `false` for UTF-8 usage.
 
 # var
 
-Show values of Git configuration variables and all Git- specific environment variables:
+Show values of Git configuration variables and all Git-specific environment variables:
 
     git var
 
