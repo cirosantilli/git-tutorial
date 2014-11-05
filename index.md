@@ -1791,6 +1791,18 @@ Get the hash of the latest commit:
 
     git log -n1 --pretty=format:%H
 
+#### Well known SHA-1s
+
+All zeros: `'0' * 40`. Indicates a blank object, used on the output of many commands
+as a placeholder when something is deleted or created.
+
+Empty file:
+
+    printf '' | git hash-object --stdin
+    e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+Empty tree: <http://stackoverflow.com/questions/9765453/gits-semi-secret-empty-tree>
+
 ### Reference
 
 ### Refs
@@ -4029,9 +4041,9 @@ To force git to keep a dir, add a file to it.
 
 Popular possibilities are:
 
-- `readme` file explaining why the dir is there after all!
+- `README` file explaining why the dir is there after all. Best option.
 
-- `.gitkeep` file. It has absolutely no special meaning for git, but is somewhat conventional.
+- `.gitkeep` file. It has absolutely no special meaning for Git, but is a common convention.
 
 # submodule
 
@@ -4451,6 +4463,25 @@ There are not global hooks. The best one can do is either:
 -   add the `hooks` to the repository itself on a `.git-hooks` directory
     and require one extra setup action from developers. Probably the least bad option.
 
+## PATH gotcha
+
+Git automatically changes the `PATH` in hooks, which may lead to unexpected effects,
+in particular if you rely on dependency management systems like RVM or virtualenv:
+<http://permalink.gmane.org/gmane.comp.version-control.git/258454>
+
+## pre-receive
+
+If returns false, commit is aborted. This can be used to enforce push permissions,
+which is exactly what GitLab is doing.
+
+The stdin contains the inputs which are of the form:
+
+    <old-value> SP <new-value> SP <ref-name> LF
+
+e.g.:
+
+    0000000000000000000000000000000000000000 1111111111111111111111111111111111111111 refs/heads/master
+
 # rev-parse
 
 Some useful commands to automate Git.
@@ -4707,7 +4738,7 @@ Every object has three properties:
 - length of the content
 - content
 
-TODO what is the size for the type and length?
+TODO what is the size in bytes for the type and length?
 
 Git uses 4 types of object on the same content addressable filesystem.
 
@@ -4750,9 +4781,75 @@ If there was no parent it would print just:
     author Ciro Santilli <ciro.santilli@gmail.com> 1409841443 +0200
     committer Ciro Santilli <ciro.santilli@gmail.com> 1409841443 +0200
 
+### Low level commit creations example
+
+Create a Git repository without a working tree:
+
+    git init --bare
+
+    empty_blob="$(printf '' | git hash-object --stdin -w)"
+
+    sub_tree="$(printf "\
+    100644 blob $empty_blob\ta
+    " | git mktree)"
+
+    root_tree="$(printf "\
+    040000 tree $sub_tree\td
+    100644 blob $empty_blob\ta
+    100644 blob $empty_blob\tb
+    " | git mktree)"
+
+    commit="$(git commit-tree -m 0 "$root_tree")"
+
+    git branch master "$commit"
+
+The repository will contain a single commit with message `0` pointing to the tree:
+
+    d/a
+    a
+    b
+
+where all files are empty.
+
+This method allows you to overcome some filesystem "limitations":
+
+-   infinite name width:
+
+        100644 blob $empty_blob\t$(printf '%1024s' ' ' | tr ' ' 'a')
+
+    Limited to 255 on ext filesystems, shows on GitHub, but checkout fails.
+
+-   `.` and `..`. Cannot push to GitHub.
+
+-   path containing a slash `/`. Blocked by `mktree` directly.
+
+-   path containing a NUL. `mktree` treats filename as ending at the NUL.
+
+You can also attempt to overcome Git filename restrictions:
+
+-   empty tree:
+
+        sub_tree="$(printf '' | git mktree)"
+
+    Will be present, and shown on GitHub, <https://github.com/cirosantilli/test-empty-subdir> but generated on clone.
+
+    Commits may point to it the empty tree when the repository is empty,
+
+    This can be achieved with the porcelain `git commit -allow-empty` on an empty repository.
+
+-   a or directory named `.git`:
+
+        100644 blob $empty_blob\t.git
+        040000 tree $sub_tree\td
+
+    Prevents push to GitHub.
+
+Manually corrupt the repository by making trees and commits point to non-existent objects: `git mktree --missing`.
+`git push` does not work on those.
+
 #### commit-tree
 
-Low level commit creation.
+Low level commit creation from a given tree object.
 
 Can take custom inputs from the following environment variables:
 
@@ -4788,6 +4885,10 @@ Sample output:
     100644 blob a0061019ab73e09ead85b90a8041e71108148bcb	.vimrc
     100644 blob a3db99ea9cda27e10e5a8091618491946bf4bb10	README.md
     040000 tree b110e36127f6578433bd68633c68dc8aa96c4f5e	app
+
+TODO: what is the exact format of tree objects? It is not this plain text representation,
+since sing it with `git hash-object` fails, and the SHA of the empty tree is different from that
+of the empty blob.
 
 As we can see, it contains other trees and blobs, just like the output of `ls-tree`.
 
@@ -4885,7 +4986,7 @@ Get information about objects.
 
 The output for each object will be documented with it's description.
 
-Pretty print an object:
+Pretty print a commit:
 
     git cat-file -p HEAD
 
@@ -4897,6 +4998,11 @@ Pretty print an object:
     assert_select, ERB tests.
 
 `1409654129` are the seconds since epoch.
+
+Also works for all other object types:
+
+    git cat-file -p HEAD:./
+    git cat-file -p HEAD:./.gitignore
 
 Get object type and size:
 
@@ -4923,10 +5029,18 @@ Output:
 
     78981922613b2afb6025042ff6bd878ac1994e85
 
+From stdin:
+
+    echo 'a' | git hash-object --stdin
+
 Create a blob object from a file:
 
     echo a > a
     git hash-object -w a
+
+Create objects of other types with `-t`.
+You cannot however create other objects directly from human readable formats,
+e.g., `ls-tree` output can only be used to create trees with `mktree`.
 
 ### Loose object
 
