@@ -1,5 +1,5 @@
 ---
-title: SVN for Git users.
+title: SVN for Git users
 ---
 
 Create new SVN controlled folder:
@@ -32,11 +32,11 @@ What is committed, changed and tracked:
 
     svn status
 
-Must use to make dirs, `-m` to commit with message:
+Must use to make directories, `-m` to commit with message:
 
     svn mkdir foo -m 'commit message'
 
-Must use to remove dirs, `-m` to commit with message:
+Must use to remove directories, `-m` to commit with message:
 
     svn rmdir foo -m 'commit message'
 

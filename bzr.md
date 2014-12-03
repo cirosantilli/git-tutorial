@@ -2,7 +2,7 @@
 title: Bazaar and Launchpad for Git users.
 ---
 
-#Why it exists?
+##  Why it exists?
 
 Because Canonical is stuck to its dying solution and is not making an effort to move out.
 
@@ -19,16 +19,16 @@ Perhaps this was not clear in the past, but today I am not the only one to wonde
 
 At least basic commands look exactly like Git.
 
-#help
+##  help
 
     bzr help
     bzr help init
 
-#Setup
+##  Setup
 
 TODO where is this information stored?
 
-##whoami
+###  whoami
 
 Required to commit:
 
@@ -38,7 +38,7 @@ View current `whoami`:
 
     bzr whoami
 
-##launchpad-login
+###  launchpad-login
 
 Required to push to launchpad:
 
@@ -48,23 +48,23 @@ View current login:
 
     bzr launchpad-login
 
-#init
+##  init
 
     bzr init
 
 Creates a `.bzr` directory.
 
-#ignore
+## ignore
 
 Adds lines to `.bzrignore`:
 
     bzr ignore "*.out" "*.exe"
 
-#add
+## add
 
     bzr add README.md
 
-#status
+## status
 
     bzr status
 
@@ -73,18 +73,18 @@ Sample output:
     added:
       README.md
 
-#commit
+## commit
 
     bzr commit
 
-#push
+## push
 
     bzr push lp:~$LAUNCHPAD_LOGIN/test/branch
 
 TODO: what is `lp:`? What are other possible values?
 
-#clone
+## clone
 
-#branch
+## branch
 
     bzr branch lp:~$LAUCHPAD_LOGIN/+junk/branch
