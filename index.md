@@ -2,7 +2,7 @@
 title: Git Version Control Tutorial
 ---
 
-<ol data-toc></ol>
+{{ site.toc }}
 
 ## Sources
 
