@@ -785,9 +785,27 @@ Does not get pushed to remote.
 
 Same syntax as `.gitignore`.
 
-## git file
+## gitfile
 
-The `.git` file, not directory. TODO
+A `.git` file, not the usual `.git` directory.
+
+`Documentation/glossary-content.txt` says that is contains
+the path to the actual git repository, much like a symlink.
+
+`t0002-gitfile` contains the exact behavior.
+
+TODO different than `git --git-dir`?
+
+The format is:
+
+    echo gitdir: <path>/.git
+
+It must point to a valid Git bare repository, or you get:
+
+    fatal: Invalid gitfile format: .git
+
+Now any operation, including changes you make,
+will act on the given `.git` bare repository.
 
 ## mailmap
 
@@ -1414,12 +1432,28 @@ Reuse old message:
 
     git commit --amend --no-text
 
+### author
+
 Change author:
 
-    git commit --amend --author "Ciro Santilli <ciro@mail.com>"
+    git commit --author 'Ciro Santilli <ciro@mail.com>'
+
+This does not change the committer.
 
 To correct the name of an author on an entire repository, see:
 <http://stackoverflow.com/questions/750172/how-do-i-change-the-author-of-a-commit-in-git>
+
+### Committer change
+
+<http://stackoverflow.com/questions/18750808/difference-between-author-and-committer-in-git>
+
+The only way to do this seems to be with the environment variables `GIT_COMMITER_{AUTHOR,EMAIL}`.
+
+### date
+
+Format: <http://stackoverflow.com/questions/19742345/what-is-the-format-for-date-parameter-of-git-commit>
+
+    git commit --date '2000-01-01T00:00:00 +0000'
 
 ### Commit all tracked files
 
@@ -1764,25 +1798,25 @@ There are a two ways to do that:
 
 #### Hash
 
-This is the SHA hash of the entire repo.
+SHA-1 of the commit object.
 
 If you don't know what a SHA hash is learn it now. <http://en.wikipedia.org/wiki/SHA-1>.
 The key properties of a SHA functions are that:
 
-- it is very unlikely that two inputs give the same output.
-- small changes in the input make large unpredictable changes on the output.
+-   it is very unlikely that two inputs give the same output.
+    There are no known conflicts as of 2014.
+
+-   small changes in the input make large unpredictable changes on the output.
 
 In this way, even if SHAs contain much less information than the entire repository itself (only a few bytes),
 it is very unlikely that two different repositories will have the same SHA.
 
-The SHA input includes things like file contents, commit timestamps, authors and tags.
+The SHA input includes file contents, filenames, commit timestamps, authors and tags.
 Therefore, even if the files are the same, SHAs will probably be different.
 
-The most complete is giving the entire hash, so:
+The most precise way of specifying a version is with the full 40 byte SHA:
 
     1ba8fcebbff0eb6140740c8e1cdb4f9ab5fb73b6
-
-Would be version 2.
 
 If this is the only version that starts with `1ba8fc` or `1ba8`,
 you could use those as well. 6 digits is common for manual use.
@@ -1791,25 +1825,9 @@ Get the hash of the latest commit:
 
     git log -n1 --pretty=format:%H
 
-##### Well known SHA-1s
-
-All zeros: `'0' * 40`. Indicates a blank object, used on the output of many commands
-as a placeholder when something is deleted or created.
-
-Empty blob:
-
-    printf '' | git hash-object --stdin
-    e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
-
-Works because SHA can take empty inputs.
-
-Empty tree: <http://stackoverflow.com/questions/9765453/gits-semi-secret-empty-tree>
-
 #### Reference
 
 #### Refs
-
-#### pack-refs
 
 Refs are names that point to SHA-1 hashes, and therefore to revisions.
 
@@ -1826,8 +1844,7 @@ Most of them are represented in in files under `.git/refs/` which contain only t
 
 If a ref is not found there, it is also searched for on the `.git/packed-refs`:
 this can be more space efficient since each file has metadata associated to it.
-The `git pack-refs` command helps to optimize the repository by putting more refs
-in the files `packed-refs` file.
+See Packfile.
 
 But there are also some special ones like `HEAD` which live outside of of `refs`, at: `.git/HEAD`.
 
@@ -3729,12 +3746,6 @@ Sample output:
 
 ## Protocols
 
-## SSH
-
-## Git
-
-## HTTPS
-
 ### Sources
 
 `Documentation/technical`
@@ -3769,27 +3780,20 @@ Also, in GitHub there is a single Git user called `git`.
 
 Other methods of connection include:
 
--   HTTP over URLs of type `http://`. There are two types of HTTP:
+## HTTP
 
-    -   dumb: works directly from a file tree served directly, but inefficient.
+Works over URLs of type `http://` or `https://`.
+There are two types of HTTP: dumb and smart.
 
-        At first enabld by GitHub, but disabled at some point of it's history.
+One advantage of the HTTP protocols is that it is easy
+to control access for them from web applications,
+which have wide support for HTTP authentication methods.
 
-    -   smart: the server needs Git specific knowledge. More efficient.
+### Dumb HTTP
 
-    For HTTP, authentication is done by giving an username password from the command line.
+Works directly from a file tree served directly, but inefficient.
 
-    Git can remember the credentials for a given amount of time so you don't have to re-enter them.
-
-    Credentials can be managed with `git credential` and family.
-
--   a Git specific protocol with id `git://`. More efficient than HTTP since git specific,
-    but also requires a more specialized server.
-
-    Happens over SSH, so you need to add you SSH key on the server. This has a small setup overhead,
-    but is safer and more convenient than HTTPS.
-
-    Credentials are managed by your SSH system.
+At first enabled by GitHub, but disabled at some point of its history.
 
 TODO: why does:
 
@@ -3801,13 +3805,246 @@ TODO: why does:
 
 fail? Related for push: <http://stackoverflow.com/questions/15974286/pushing-to-a-git-repository-hosted-locally-over-http>
 
+### Smart HTTP
+
+The server needs Git specific knowledge. More efficient.
+
+For HTTP, authentication is done by giving an username password from the command line.
+
+Git can remember the credentials for a given amount of time so you don't have to re-enter them.
+
+Credentials can be managed with `git credential` and family.
+
+The first step is to list the available references:
+
+    curl https://github.com/cirosantilli/test.git/info/refs?service=git-upload-pack
+
+The head is something like:
+
+
+    HTTP/1.1 200 OK
+    Content-Type: application/x-git-upload-pack-advertisement
+    ...
+
+And the body is the output of `git-upload-pack`.
+
+Now make the request as:
+
+    printf 'POST /cirosantilli/test.git/git-upload-pack HTTP/1.0\r
+    Host: github.com\r
+    Accept: application/x-git-upload-pack-result\r
+    \r
+    0032want 4883d362e99ed5cdd51dfacfb17152eae29734cd
+    00000009done
+    ' | ncat --ssl github.com 443
+
+TODO get working. This returns 200 with an empty body (contains only `0` with `Transfer-Encoding: chunked`).
+Worked on a local Grack:
+
+    printf 'POST /tests/example/test_repo/git-upload-pack HTTP/1.0\r
+    Content-Type: application/x-git-upload-pack-request\r
+    Host: 127.0.0.1:9292\r
+    \r
+    0032want cb067e06bdf6e34d4abebf6cf2de85d65a52c65e
+    00000009done
+    ' | nc 127.0.0.1 9292
+
+Here is the hexdump of `git clone http://127.0.0.1:9292/tests/example/test_repo/`
+on the Grack test repository https://github.com/schacon/grack/tree/613acd237ab7f522a02953c310aad0d484873bd7/tests/example
+obtained with Wireshark. It only contains the data request and reply:
+the initial advertisement was made before that and was omitted.
+
+Git request sent:
+
+    POST /tests/example/test_repo/git-upload-pack HTTP/1.1
+    User-Agent: git/1.9.1
+    Host: 127.0.0.1:9292
+    Accept-Encoding: gzip
+    Content-Type: application/x-git-upload-pack-request
+    Accept: application/x-git-upload-pack-result
+    Content-Length: 190
+
+    007fwant cb067e06bdf6e34d4abebf6cf2de85d65a52c65e multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/1.9.1
+    0032want cb067e06bdf6e34d4abebf6cf2de85d65a52c65e
+    00000009done
+
+TODO why was the same `want` line requested twice?
+
+Hexdump (heading TCP data removed):
+
+    0040        50 4f 53 54 20 2f 74 65 73 74 73 2f 65 78     POST /tests/ex
+    0050  61 6d 70 6c 65 2f 74 65 73 74 5f 72 65 70 6f 2f   ample/test_repo/
+    0060  67 69 74 2d 75 70 6c 6f 61 64 2d 70 61 63 6b 20   git-upload-pack 
+    0070  48 54 54 50 2f 31 2e 31 0d 0a 55 73 65 72 2d 41   HTTP/1.1..User-A
+    0080  67 65 6e 74 3a 20 67 69 74 2f 31 2e 39 2e 31 0d   gent: git/1.9.1.
+    0090  0a 48 6f 73 74 3a 20 31 32 37 2e 30 2e 30 2e 31   .Host: 127.0.0.1
+    00a0  3a 39 32 39 32 0d 0a 41 63 63 65 70 74 2d 45 6e   :9292..Accept-En
+    00b0  63 6f 64 69 6e 67 3a 20 67 7a 69 70 0d 0a 43 6f   coding: gzip..Co
+    00c0  6e 74 65 6e 74 2d 54 79 70 65 3a 20 61 70 70 6c   ntent-Type: appl
+    00d0  69 63 61 74 69 6f 6e 2f 78 2d 67 69 74 2d 75 70   ication/x-git-up
+    00e0  6c 6f 61 64 2d 70 61 63 6b 2d 72 65 71 75 65 73   load-pack-reques
+    00f0  74 0d 0a 41 63 63 65 70 74 3a 20 61 70 70 6c 69   t..Accept: appli
+    0100  63 61 74 69 6f 6e 2f 78 2d 67 69 74 2d 75 70 6c   cation/x-git-upl
+    0110  6f 61 64 2d 70 61 63 6b 2d 72 65 73 75 6c 74 0d   oad-pack-result.
+    0120  0a 43 6f 6e 74 65 6e 74 2d 4c 65 6e 67 74 68 3a   .Content-Length:
+    0130  20 31 39 30 0d 0a 0d 0a 30 30 37 66 77 61 6e 74    190....007fwant
+    0140  20 63 62 30 36 37 65 30 36 62 64 66 36 65 33 34    cb067e06bdf6e34
+    0150  64 34 61 62 65 62 66 36 63 66 32 64 65 38 35 64   d4abebf6cf2de85d
+    0160  36 35 61 35 32 63 36 35 65 20 6d 75 6c 74 69 5f   65a52c65e multi_
+    0170  61 63 6b 5f 64 65 74 61 69 6c 65 64 20 6e 6f 2d   ack_detailed no-
+    0180  64 6f 6e 65 20 73 69 64 65 2d 62 61 6e 64 2d 36   done side-band-6
+    0190  34 6b 20 74 68 69 6e 2d 70 61 63 6b 20 6f 66 73   4k thin-pack ofs
+    01a0  2d 64 65 6c 74 61 20 61 67 65 6e 74 3d 67 69 74   -delta agent=git
+    01b0  2f 31 2e 39 2e 31 0a 30 30 33 32 77 61 6e 74 20   /1.9.1.0032want 
+    01c0  63 62 30 36 37 65 30 36 62 64 66 36 65 33 34 64   cb067e06bdf6e34d
+    01d0  34 61 62 65 62 66 36 63 66 32 64 65 38 35 64 36   4abebf6cf2de85d6
+    01e0  35 61 35 32 63 36 35 65 0a 30 30 30 30 30 30 30   5a52c65e.0000000
+    01f0  39 64 6f 6e 65 0a                                 9done.
+
+Reply (de-chunked C-style backslash escapes body):
+
+    HTTP/1.1 200 OK
+    Content-Type: application/x-git-upload-pack-result
+    Transfer-Encoding: chunked
+    Connection: close
+    Server: thin 1.6.1 codename Death Proof
+
+    0008NAK
+    0046\2Counting objects: 3, done.
+    Total 3 (delta 0), reused 3 (delta 0)
+    00e0\1PACK
+
+The rest of the body contained binary data given by the following hexdump:
+
+    0050           50 41 43 4b 00 00 00 02 00 00 00 03 99      PACK.........
+    0060  0b 78 9c 9d cb 41 0e c2 20 10 40 d1 3d a7 98 bd   .x...A.. .@.=...
+    0070  09 99 29 08 6d 62 8c 0b 5d bb f1 02 50 a6 69 13   ..).mb..]...P.i.
+    0080  90 a6 0e d1 e3 db 78 04 77 ff 2d be 6c cc 60 28   ......x.w.-.l.`(
+    0090  79 c3 d1 0e 64 43 9f 52 74 63 44 b6 21 4d dd 11   y...dC.RtcD.!M..
+    00a0  bd f7 e4 88 a8 9f 06 54 a1 c9 5c 37 b8 86 77 80   .......T..\7..w.
+    00b0  7b 61 91 0a a7 b4 43 d7 1f 2e eb bc 64 dd 9a 7e   {a....C.....d..~
+    00c0  e6 33 90 f1 d8 a1 f3 48 70 d8 03 d5 58 4b 59 44   .3.....Hp...XKYD
+    00d0  f8 df 5f 3d f8 25 70 fb 84 b2 66 56 5f a0 9f 38   .._=.%p...fV_..8
+    00e0  7e a0 02 78 9c 33 34 30 30 33 31 51 28 49 2d 2e   ~..x.340031Q(I-.
+    00f0  61 38 c7 68 a6 ca cc bd e2 f6 4a b6 ef 61 d3 ea   a8.h......J..a..
+    0100  e7 cd 59 3c c5 cd 0b 00 a3 c4 0b dd 36 78 9c cb   ..Y<........6x..
+    0110  48 cd c9 c9 e7 02 00 08 4b 02 1f 38 34 30 b8 ad   H.......K..840..
+    0120  e1 b0 f1 72 cf 4e a5 79 2c 4e 1a 9e f8 ec 30 30   ...r.N.y,N....00
+    0130  30 36 01 2f 30 30 30 30                           06./0000
+
+which is likely the packfile.
+
+Line 2:
+
+    Counting objects: 3, done.
+    Total 3 (delta 0), reused 3 (delta 0)
+
+is what git outputs on the command line as a server reply.
+
+#### http-backend
+
+CGI script that implements smart HTTP, so you can run it on any server that supports CGI.
+
+It is a wrapper interface for `git-upload-pack` and `git-receive-pack`.
+
+#### Grack
+
+<https://github.com/schacon/grack>
+
+Grack is a Rack based alternate implementation of `git-http-backend` in pure Ruby.
+
+It was / is used by GitHub and GitLab 7.0,
+as it is much easier to integrate in a Rails project, since it can be accessed
+as a library.
+
+To start the test, simply:
+
+    rackup
+
+and then:
+
+    git clone http://localhost:9292/tests/example/test_repo/
+
+## SSH protocol
+
+Git works out of the box if you have SSH.
+
+On the server, just add the user's public keys under `/home/git/.ssh/authorized_keys`.
+
+Not the users can simply to:
+
+    git clone ssh://user@server.com/path/to/project.git
+
+which git allows to simplify to:
+
+    git clone user@server.com/path/to/project.git
+
+Note that every user will be logged in as the `git` user.
+
+The problem with this method is that it allows people to start shells on you server,
+which you might not want, e.g. on a public server like GitHub.
+Solutions include using the `git-shell` login shell and `authorized_keys` `command` option.
+
+### git-shell login shell
+
+If you set the login shell of the Git user to `git-shell`, an executable that comes with Git,
+it runs a restricted shell that only allows the git operation to be done.
+
+### authorized_keys command` option
+
+See `man authorized_keys` for the details.
+
+This only allows the given command to be run when the Git user logs in,
+which allows you to write an arbitrary access control script.
+
+This is how GitLab 7.0 works, the script being inside GitLab Shell.
+
+## Git protocol
+
+Git specific protocol with URLs of form `git://`.
+
+Happens over SSH, so you need to add you SSH key on the server. TODO check.
+
+Does not have built-in authentication, or any simple way to do it.
+
+### git daemon
+
+Standalone server that implements the git protocol.
+
+## Authentication
+
+Git has mechanisms to store you authentication so you don't have to type in username / password pairs every time.
+
+The mechanism to be used is stored under:
+
+    git config --global credential.helper
+
+Git has a few built-in mechanisms, see:
+
+    man gitcredentials
+
+for the documentation. Currently, there is:
+
+-   `cache`, which uses `git credential-cache`,
+    and stores the password only for a given amount of time.
+    The default is 15 minutes.
+
+-   `store`, which uses `git credential-store`,
+    stores the password on disk forever, so it's less safe.
+
 ### credential
 
 TODO
 
+### cache
+
 ### credential-cache
 
-TODO
+Configure the timeout:
+
+    git config --global credential.helper "cache --timeout=0"
+
+### store
 
 ### credential-store
 
@@ -3817,17 +4054,64 @@ TODO
 
 ### send-pack
 
-TODO
+Plumbing for `git push`.
+
+Invokes `git receive-pack` on the remote.
+
+### fetch-pack
+
+Plumbing of `git clone` and other operations that retrieve server data.
+
+Invokes `git upload-pack` on the remote.
 
 ### receive-pack
 
 TODO
 
-### fetch-pack
-
-TODO
-
 ### upload-pack
+
+If you run:
+
+    git upload-pack .
+
+on a Git repository, it returns something like:
+
+    001e# service=git-upload-pack
+    000000e74883d362e99ed5cdd51dfacfb17152eae29734cd HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/2:2.1.3+github-642-g667ea60
+    003f4883d362e99ed5cdd51dfacfb17152eae29734cd refs/heads/master
+    003ba90828ca4b50a7064a650915b2d0bf2bc642aab0 refs/tags/1.0
+    0000
+
+and then hangs, where `\0` is a literal NUL character.
+
+-   Each line, e.g. that for `master` is prefixed by a 4 byte length of the entire line,
+    including the 4 bytes of the length and the trailing newline.
+
+    E.g.:
+
+        printf '4883d362e99ed5cdd51dfacfb17152eae29734cd refs/heads/master' | wc -c
+
+    says `58`, and `003f` is `63` (plus the 4 bytes of the length and the trailing newline).
+
+    The only exception is line 2, whose length has 8 bytes `000000e7`,
+    including the NUL character up to the newline
+
+-   `multi_ack`, `thin-pack`, etc. are the upload pack capabilities
+    as documented at `Documentation/technical/protocol-capabilities.txt`.
+
+-   `0000` at the end says it's the end of the request.
+
+    It can never happen anywhere else, since no line can be smaller than 4 bytes.
+
+TODO:
+
+-   why the `#` on line 1?
+
+-   why the `HEAD` on the first line is separated by a NUL character from the options?
+
+-   what is `symref` ?
+
+-   what is `+github-642-g667ea60` ?
 
 TODO
 
@@ -4119,14 +4403,17 @@ just like it does for directories for example.
 
 ## Empty directories
 
-Git ignores empty directories.
+<http://stackoverflow.com/questions/115983/add-empty-directory-to-git-repository>
+
+Although Git can represent empty directories through the empty tree object,
+the reference implementation ignores such directories for most commands,
+so you should never rely on them.
 
 To force git to keep a dir, add a file to it.
 
 Popular possibilities are:
 
 - `README` file explaining why the dir is there after all. Best option.
-
 - `.gitkeep` file. It has absolutely no special meaning for Git, but is a common convention.
 
 ## submodule
@@ -4584,7 +4871,15 @@ Path to `.git` dir:
 
 ## rev-list
 
-Commit tree reachability operations.
+Lists commit objects.
+
+### List all objects
+
+<http://stackoverflow.com/questions/7348698/git-how-to-list-all-objects-in-the-database>
+
+Good approximation: list all objects reachable from `refs` (including trees and blobs):
+
+    git rev-list --objects --all
 
 ## config
 
@@ -4727,19 +5022,6 @@ Sample output:
     GIT_EDITOR=/usr/bin/vim
     GIT_PAGER=less -r
 
-## gc
-
-Tries to optimize the way git stores files internally.
-
-Can considerably reduce the size of the repository:
-
-    git gc
-
-Some commands automatically run `git gc`. When this is done depends on the value of the `gc.auto` configuration.
-
-TODO what does that do exactly? Possible use case:
-<http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
-
 ## gitattributes
 
 Configs that apply only to specific paths, not the entire repo.
@@ -4760,6 +5042,24 @@ Always ignore remote version of certain files on merge run:
 and then use `.gitattributes` lines like:
 
     path/to/file merge=ours
+
+#### gc
+
+Tries to optimize the way git stores files internally.
+
+Runs several different plumbing commands to do that. TODO which?
+
+Can considerably reduce the size of the repository:
+
+    git gc
+
+Some commands automatically run `git gc`. When this is done depends on the value of the `gc.auto` configuration.
+
+TODO what does that do exactly? Possible use case:
+<http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
+By default it does:
+
+- `repack` + `git prune-packed`
 
 ## Plumbing
 
@@ -4789,42 +5089,35 @@ Holds all the Git information.
 
 ### Objects
 
-Very good source:
+Good source:
 <http://git-scm.com/book/en/Git-Internals-Git-Objects>
 
+#### Object location
+
 Git implements a generic content addressable filesystem on top of your filesystem:
-given the content you can find the address, which is it's SHA-1.
+given the content of an object you can find the address, which is it's SHA-1.
 
-The main advantage of this method is that given a content like a commit you can easily determine where it will be stored
-in a way that will not conflict with other objects, which are potentially create by other users.
+The main advantage of this method is that given a content like a commit
+you can easily determine where it will be stored in a way that will not conflict with other objects,
+which are potentially create by other users.
 
-Another advantage is that identical objects like files are all represented by a single data.
+Another advantage is that identical objects like files
+are only stored once even if present in multiple revisions.
+And this is a very common case, since in large repositories
+only few files change with each new version.
 
-Objects are stored under `.git/objects`. There are two possible formats:
+The content addressable filesystem is implemented under `.git/objects` as either of:
 
-- with a filename corresponding to it's SHA-1, 40 hexadecimal characters, called a loose object.
-- inside a packfile for greater efficiency.
-
-TODO confirm: objects are stored with zlib DEFLATE algorithm,
-but only the payload is stored, so they are not in the `gz` format as specified by
-<http://www.gzip.org/zlib/rfc-gzip.html#file-format> which contains many extra metadata,
-and therefore cannot be decompressed with `gunzip`.
-<http://stackoverflow.com/questions/1532405/how-to-view-git-objects-and-index-without-using-git>
+-   loose objects
+-   packfiles for greater storage efficiency
 
 What would happen if collision happened: the old object is kept
 <http://stackoverflow.com/questions/9392365/how-would-git-handle-a-sha-1-collision-on-a-blob>
-
 Malicious collisions wouldn't have much of an effect since you have to commit them first.
 
-Every object has three properties:
+#### Object types
 
-- type
-- length of the content
-- content
-
-TODO what is the size in bytes for the type and length?
-
-Git uses 4 types of object on the same content addressable filesystem.
+Git stores 4 types of object on the same content addressable filesystem:
 
 - commit
 - tree
@@ -4928,15 +5221,17 @@ This method allows you to overcome some filesystem "limitations":
 
 You can also attempt to overcome Git filename restrictions:
 
--   empty tree:
+##### Empty tree
 
-        sub_tree="$(printf '' | git mktree)"
+    sub_tree="$(printf '' | git mktree)"
 
-    Will be present, and shown on GitHub, <https://github.com/cirosantilli/test-empty-subdir> but generated on clone.
+Will be present, and shown on GitHub, <https://github.com/cirosantilli/test-empty-subdir> but generated on clone.
 
-    Commits may point to it the empty tree when the repository is empty,
+Commits may point to it the empty tree when the repository is empty,
 
-    This can be achieved with the porcelain `git commit -allow-empty` on an empty repository.
+This can be achieved with the porcelain `git commit -allow-empty` on an empty repository.
+
+---
 
 -   a or directory named `.git`:
 
@@ -5143,30 +5438,419 @@ Create objects of other types with `-t`.
 You cannot however create other objects directly from human readable formats,
 e.g., `ls-tree` output can only be used to create trees with `mktree`.
 
+It does not seem possible to calculate bare SHAs from the Git command line:
+the SHA input also includes the type and length.
+
+##### Well known SHA-1s
+
+###### 0000000000000000000000000000000000000000
+
+All zeros: `'0' * 40`. Indicates a blank object, used on the output of many commands
+as a magic placeholder when something is deleted or created.
+
+###### da39a3ee5e6b4b0d3255bfef95601890afd80709
+
+    printf '' | sha1sum
+
+Output:
+
+    da39a3ee5e6b4b0d3255bfef95601890afd80709
+
+This should never appear in Git (unless you've found the collision!)
+since every object is prefixed by the type and length.
+
+###### e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+Empty blob:
+
+    printf '' | git hash-object --stdin
+    printf 'blob 0\0' | sha1sum
+
+Output:
+
+    e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+###### 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+
+Empty tree: <http://stackoverflow.com/questions/9765453/gits-semi-secret-empty-tree>
+
+    printf '' | git hash-object --stdin -t tree
+    printf 'tree 0\0' | sha1sum
+
+Output:
+
+    4b825dc642cb6eb9a060e54bf8d69288fbee4904
+
+Different from the SHA of the empty blob because the type is included in the input.
+
 #### Loose object
 
-An object that is not stored inside a packfile.
+An object that is not stored inside a packfile but rather under:
 
-#### Packfiles
+    .git/objects/<2 first bytes of SHA>/<38 last bytes of SHA>
 
-<https://github.com/gitster/git/blob/master/Documentation/technical/pack-format.txt>
+e.g., the empty blob is always at:
 
-<http://git-scm.com/book/en/Git-Internals-Packfiles>
+    .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+The object format is:
+
+- type string
+- space
+- human readable length of the content
+- NUL
+- content
+
+Objects are stored with zlib DEFLATE algorithm,
+but only the payload is stored, so they are not in the `.gz` format as specified by
+<http://www.gzip.org/zlib/rfc-gzip.html#file-format> which contains many extra metadata,
+and therefore cannot be decompressed with `gunzip`.
+<http://stackoverflow.com/questions/1532405/how-to-view-git-objects-and-index-without-using-git>
+
+Enough talk, let's open some loose objects manually.
+Starting from the `min-sane` test repository:
+
+    python -c 'import zlib,sys;sys.stdout.write(zlib.decompress(sys.stdin.read()))' \
+      < .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391 | hd
+
+Output:
+
+    00000000  62 6c 6f 62 20 30 00    |blob 0.|
+    00000007
+
+#### Packfile
 
 Stores multiple files under:
 
 - `.git/objects/packs/patck-<SHA>.pack`
 - `.git/objects/packs/patck-<SHA>.idx`
 
-pairs.
+##### Packfile sources
 
-#### repack
+The format documentation: <https://github.com/gitster/git/blob/master/Documentation/technical/pack-format.txt>
 
-The `git repack` command tells Git to try and package more objects where it can.
+<http://git-scm.com/book/en/Git-Internals-Packfiles>
+
+Some information can also be found at `man git-pack-objects`.
+
+<http://stackoverflow.com/questions/9478023/is-the-git-binary-diff-algorithm-delta-storage-standardized>
+contains some information about the delta format.
+
+---
+
+Unlike loose objects, packfiles can store diffs (deltas) between blob versions,
+which is specially important since one line changes on large blobs / trees are common.
+
+Each packfile can be independently unpacked from other packfiles:
+it contains therefore all the deltas for each chain.
+
+Optimizing packfiles is probably an NP complete problem. So Git uses some heuristics to do it:
+<https://github.com/gitster/git/blob/master/Documentation/technical/pack-heuristics.txt>
+
+Normally packfiles only contain reachable objects.
+
+The `.idx` file is just an index to speed up lookup:
+it can be generated at any time from a `.pack` file with `index-pack`.
+
+##### Packfile format
+
+TODO
+
+<http://stefan.saasen.me/articles/git-clone-in-haskell-from-the-bottom-up/#pack_file_format>
+
+##### Delta format
+
+This is the data that is stored in the delta entries of the packfile.
+
+#### pack-objects
+
+Low level pack creation.
+
+Starting from the `min-sane` test repository, run:
+
+    printf '07cd7fe596afc90d9a2c9f7ae30b6b9e7a7b3760
+    496d6428b9cf92981dc9495211e6e1120fb6f2ba
+    e69de29bb2d1d6434b8b29ae775ad8c2e48c5391' \
+    | git pack-objects --stdout
+
+This will output the generated `.pack` to stdout.
+
+To also generate the `.idx` and save to a file, run:
+
+    git pack-objects a
+
+This will generate the `.idx` `.pack` pair with names `a-<SHA>.{idx,pack}`.
+
+You can confirm the files generated by this command are the same as `git repack`.
+
+The `SHA` on the filenames is the SHA of TODO what? It is not the SHA of the content:
+
+    git hash-object a-f847933433935e81b3fee26eaa6002fdf05ad6a5.pack
 
 #### unpack-objects
 
-The `git repack` command tells Git to unpack objects from pack files.
+Start from `min-sane`, run
+
+    git repack
+    git prune-packed
+    mv ./git/objects/pack/pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.pack .
+
+Then:
+
+    git unpack-objects pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.pack
+
+And `tree` outputs:
+
+    .git/objects
+    |-- 07
+    |   `-- cd7fe596afc90d9a2c9f7ae30b6b9e7a7b3760
+    |-- 49
+    |   `-- 6d6428b9cf92981dc9495211e6e1120fb6f2ba
+    |-- e6
+    |   `-- 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+    |-- info
+    `-- pack
+
+The unpacking only happens for objects that are not already present in the repository.
+
+#### unpack-file
+
+Generate a file in the local directory with the contents of the given blob,
+and name of the form `.merge_file_XXXXXX`:
+
+    git unpack-file e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+Outputs the name of the file.
+
+#### repack
+
+#### prune-packed
+
+Porcelain.
+
+Pack all possible reachable objects or try to improve the packing efficiency.
+
+Example: start from the `min-sane` test repository:
+
+Then `.git/objects` looks like:
+
+We have the three usual objects: commit, tree and blob:
+
+    .git/objects
+    |-- 07
+    |   `-- cd7fe596afc90d9a2c9f7ae30b6b9e7a7b3760
+    |-- 49
+    |   `-- 6d6428b9cf92981dc9495211e6e1120fb6f2ba
+    |-- e6
+    |   `-- 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+    |-- info
+    `-- pack
+
+Now run:
+
+    git repack
+
+Output:
+
+    Counting objects: 3, done.
+    Writing objects: 100% (3/3), done.
+    Total 3 (delta 0), reused 0 (delta 0)
+
+Ha, this is what we see on `git clone`!
+
+Now the objects look like:
+
+    .git/objects
+    |-- 07
+    |   `-- cd7fe596afc90d9a2c9f7ae30b6b9e7a7b3760
+    |-- 49
+    |   `-- 6d6428b9cf92981dc9495211e6e1120fb6f2ba
+    |-- e6
+    |   `-- 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+    |-- info
+    |   `-- packs
+    `-- pack
+        |-- pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.idx
+        `-- pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.pack
+
+Notice how the loose objects were not removed, only packed.
+
+To do that, we can use `prune-packed`:
+
+    git prune-packed
+
+And now the tree looks like:
+
+    .git/objects
+    |-- info
+    |   `-- packs
+    `-- pack
+        |-- pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.idx
+        `-- pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.pack
+
+since all objects had been packed.
+
+`git gc` by default does both `repack` and `prune-packed`,
+so we could have used it instead.
+
+#### count-objects
+
+Porcelain.
+
+Count unpacked objects and show their sizes.
+
+Major application: decide how much a `repack` or `gc` might benefit you.
+
+Sample output with `-vH`:
+
+    count: 6324
+    size: 25.58 MiB
+    in-pack: 108316
+    packs: 23
+    size-pack: 100.02 MiB
+    prune-packable: 518
+    garbage: 0
+    size-garbage: 0 bytes
+
+TODO understand
+
+#### verify-pack
+
+Check that an `idx` / `pack` pair is not corrupted:
+
+    git verify-pack .git/objects/pack/pack-<SHA>.idx
+
+Returns `0` if OK.
+
+For lots of information on the pack in interactive usage, use `-v`.
+
+Output for the `min-sane` test repository after `git gc`:
+
+    07cd7fe596afc90d9a2c9f7ae30b6b9e7a7b3760 commit 110 90 12
+    496d6428b9cf92981dc9495211e6e1120fb6f2ba tree   29 40 102
+    e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 blob   0 9 142
+    non delta: 3 objects
+    pack-f847933433935e81b3fee26eaa6002fdf05ad6a5.pack: ok
+
+The format is:
+
+- SHA
+- uncompressed payload size
+- compressed size. Can be larger for small files because of Zlib's overhead.
+- offset into the packfile where the object is located
+
+For a more complex repository, the output could look something like:
+
+    2431da676938450a4d72e260db3bf7b0f587bbc1 commit 223 155 12
+    deef2e1b793907545e50a2ea2ddb5ba6c58c4506 tree   136 136 1178
+    d982c7cb2c2a972ee391a85da481fc1f9127a01d tree   6 17 1314 1 deef2e1b793907545e50a2ea2ddb5ba6c58c4506
+    3c4e9cd789d88d8d89c1073707c3585e41b0e614 tree   8 19 1331 1 deef2e1b793907545e50a2ea2ddb5ba6c58c4506
+    b042a60ef7dff760008df33cee372b945b6e884e blob   22054 5799 1463
+    033b4468fa6b2a9547a70d88d1bbe8bf3f9ed0d5 blob   9 20 7262 1 b042a60ef7dff760008df33cee372b945b6e884e
+    1f7a7a472abf3dd9643fd615f6da379c4acb3e3a blob   10 19 7282
+    (many more lines like the above)
+    non delta: 15 objects
+    chain length = 1: 3 objects
+    chain length = 2: 1 object
+    .git/objects/pack/pack-978e03944f5c581011e6998cd0e9e30000905586.pack: ok
+
+Note that some entries have 2 extra columns:
+
+- the depth of the object, i.e., how many deltas you have to resolve to get to it
+- the object to take the delta from
+
+Those are deltified objects: their payload contains only a delta from another object.
+
+On the first part, there are two kinds of line:
+
+-   raw objects, of the form:
+
+        deef2e1b793907545e50a2ea2ddb5ba6c58c4506 tree   136 136 1178
+
+    TODO what are the three numbers at the end?
+
+    - file size
+    - TODO
+    - TODO
+
+-   delta versions of the form:
+
+        d982c7cb2c2a972ee391a85da481fc1f9127a01d tree   6 17 1314 1 deef2e1b793907545e50a2ea2ddb5ba6c58c4506
+
+    TODO what is the `1`?
+
+    The most recent versions of files are kept and deltas are done backwards
+
+    Here, `d982c` is an older version of `deef2`. See how this is very small
+
+    You can cat the version of the object as usual:
+
+        git cat-file -p d982c7cb2c2a972ee391a85da481fc1f9127a01d
+
+    but only a pack was stored.
+
+#### pack-redundant
+
+Start from the `min-sane` test repository packed.
+
+TODO
+
+#### show-index
+
+Plumbing.
+
+Get information about given index file. Subset of `git verify-pack -v`.
+
+Example:
+
+    git show-index < .git/objects/pack/pack-<SHA>.idx
+
+Sample output:
+
+    133 496d6428b9cf92981dc9495211e6e1120fb6f2ba (0f49d649)
+    12 860e5247c071721c8e286c73c3633509c77cf538 (198b73d3)
+    173 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 (6e760029)
+
+TODO understand. `133`, `12`, ... are probably offsets into the pack file,
+then the object SHA, then what?
+
+#### index-pack
+
+Plumbing.
+
+Build `idx` file for a given `.pack`:
+
+    git index-pack .git/objects/pack/pack-<SHA>.pack
+
+Generates the `.idx` on the same directory as the `.pack`.
+
+Useful flags:
+
+- `-o`: write to given output file
+- `--stdin`: take input `.pack` data from stdin
+
+#### unpack-objects
+
+Plumbing.
+
+Unpack objects from pack files.
+
+### packed-refs file
+
+### pack-refs
+
+Porcelain.
+
+Combine multiple references,
+which normally are stored one per file,
+into a single `.git/packed-refs` file.
+
+This can be more efficient for repositories
+that contain large amounts of refs.
+
+This command has no direct relation to the packfile,
+except that both improve efficiency by storing data in a single file
+instead of multiple separated ones.
 
 ### description file
 
@@ -5399,6 +6083,14 @@ but when publishing a file to other users, we are only interested in storing rea
 The situation is complicated because sometimes we do want the owner to be kept:
 e.g. when a file must be owned by `root`.
 
+## Implementations
+
+The git repository data format and transfer protocols have had other implementations
+besides the original Git implementations. As of December 2014, the most preeminent are:
+
+- libgit2
+- JGit
+
 ### libgit2
 
 <https://github.com/libgit2/libgit2>
@@ -5434,6 +6126,14 @@ It is worth noting that many major authors have allowed such usage, including Li
 It was designed to replace the Ruby Grit library which initially powered GitHub.
 Grit only parsed Git output from stdin, so it is much slower than the new native C implementation
 of libgit2 which works directly with the repository.
+
+### JGit
+
+<https://eclipse.org/jgit/>
+
+Pure Java implementation.
+
+Developed in the context of the Eclipse project.
 
 ## GitHub specific
 
@@ -5483,7 +6183,7 @@ Make a POST request with `curl`:
       "context": "github/gollum"
     }' | curl --data @- https://api.github.com/markdown
 
-#### Authentication
+#### GitHub API Authentication
 
 Many methods that take a user can use the authenticated user instead if present.
 
@@ -5495,7 +6195,7 @@ Or:
 
     curl -u 'cirosantilli:password' https://api.github.com/user/orgs
 
-#### OAuth
+#### GitHub API OAuth
 
 OAuth: generate a large random number called the *access token*.
 Which you can only get once.
@@ -5843,6 +6543,24 @@ Also:
 ### multiu
 
 Like `multi`, but both master branches have committed unmerged modifications.
+
+### min-sane
+
+Minimal, sane, deterministic repository.
+
+    git init
+    touch a
+    git add .
+    date='2000-01-01T00:00:00+0000'
+    GIT_COMMITTER_NAME='a' GIT_COMMITTER_EMAIL='a' GIT_COMMITTER_DATE="$date" \
+      git commit -m a --author 'a <a>' --date="$date"
+
+Since this repository is deterministic,
+you will want to have the following object SHAs in mind:
+
+- `07cd7fe596afc90d9a2c9f7ae30b6b9e7a7b3760`: commit
+- `496d6428b9cf92981dc9495211e6e1120fb6f2ba`: tree
+- `e69de29bb2d1d6434b8b29ae775ad8c2e48c5391`: empty blob
 
 [bitbucket]: https://www.bitbucket.org/
 [github]:    https://github.com/
