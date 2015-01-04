@@ -1,5 +1,6 @@
 ---
 title: Git Version Control Tutorial
+social_media: true
 ---
 
 {{ site.toc }}
@@ -38,7 +39,7 @@ title: Git Version Control Tutorial
 
 -   Issues, questions and patches are sent by email at: <git@vger.kernel.org>
 
-    You subscribe by sending an email to <majordomo@vger.kernel.org >,
+    You subscribe by sending an email to <majordomo@vger.kernel.org>,
     but it is around 100 posts / day!
 
     There are web interfaces subscribed that store old threads.
@@ -2210,7 +2211,9 @@ Some commands treat annotated and lightweight tags differently.
 The general semantics of such differentiation suggests the following rule,
 which you should always follow:
 
-> use lightweight tags only for quick and dirty private development tags.
+`man git` says:
+
+> Annotated tags are meant for release while lightweight tags are meant for private or temporary object labels
 
 -   `git describe` goes back to the first annotated tag ancestor,
     not lightweight, by default.
@@ -2220,11 +2223,15 @@ which you should always follow:
 
 -   `git push --follow-tags` only pushes annotated tags.
 
+### Create an annotated tag
+
 Create annotated tag to `HEAD`:
 
-    git tag -a 2.0 -m 'message'
+    git tag -m 'message'
 
 The message is mandatory: if not given an editor will open up for you to type it in.
+
+If `-m` is given, `-a` is implied which generates an annotated tag.
 
 ### List tags
 
@@ -2236,6 +2243,20 @@ Sample output:
 
     tag1
     tag2
+
+### List only annotated tags
+
+### List only lightweight tags
+
+<http://stackoverflow.com/questions/21031201/how-can-i-list-all-lightweight-tags>
+
+Only annotated:
+
+    git for-each-ref refs/tags/ --format '%(objecttype) %(refname:short)' | awk '$1 == "tag" {print $2}'
+
+Only lightweight:
+
+    git for-each-ref refs/tags/ --format '%(objecttype) %(refname:short)' | awk '$1 == "commit" {print $2}'
 
 ### Create tags
 
@@ -2834,6 +2855,20 @@ Start from [2]
     echo a3 >> a
     git checkout
 
+### theirs
+
+### ours
+
+Will be discussed together with merge conflicts.
+
+#### theirs vs ours in rebase vs merge
+
+Confusingly, during `git rebase`, `theirs` means the previous current branch.
+
+See also:
+<http://stackoverflow.com/questions/2959443/why-is-the-meaning-of-ours-and-theirs-reversed-with-git-svn>
+and `man git-rebase`.
+
 ## bisect
 
 Checkout interactively to binary search between two commits for an error.
@@ -2886,6 +2921,24 @@ List stash:
 Apply change at the top of the stash:
 
     git stash apply
+
+## for-each-ref
+
+List all refs:
+
+    git for-each-ref
+
+Sample output:
+
+    54a4e1ccba10229e4ade6501cdaf2da74f68e97e commit refs/heads/master
+    295acc240d15982eba2969026054658164ad2c19 tag    refs/tags/a
+    54a4e1ccba10229e4ade6501cdaf2da74f68e97e commit refs/tags/l
+
+Where:
+
+- `master` is a branch
+- `a` is an annotated tag
+- `l` is an lightweight tag
 
 ## merge
 
@@ -3079,6 +3132,24 @@ TODO: possible to `git checkout --base`?
 Stop the merge resolution process and go back to previous state:
 
     git merge --abort
+
+##### Techniques to solve text conflicts
+
+If the conflict is very simple, just do `git status`,
+and go on the conflicting files one by one on the default `checkout -m` style.
+
+For slightly more complicated issues, the way to go is to decide what changed between the base
+and each conflicting side, and then try to incorporate both of thoes changes.
+
+For simpler conflicts, `git checkout --conflict=diff3` may be enough.
+
+If the conflict is larger however, you will want to do a diff between the base and each side with:
+
+    git diff :1:./foo.txt :2:./foo.txt
+    git diff :1:./foo.txt :3:./foo.txt
+
+See also:
+<http://stackoverflow.com/questions/8488365/git-compare-base-version-with-theirs-version-of-a-conflicted-file>
 
 #### Binary conflicts
 
@@ -3410,19 +3481,19 @@ What happens on:
 depends on the `push.default` option, documented under `man git-config`:
 
 -   `matching`: same as `git push <remote> :`. Default before 2.0.
-                Insane because it does a mass update operation by default!
+    Insane because it does a mass update operation by default!
 
 -   `upstream`: push the current branch to its upstream branch.
 
--   `simple`:   like `upstream`, but don't push if the remote branch name
-                is different from the local one: you need en explicit refspec for that.
-                Default starting on 2.0.
+-   `simple`: like `upstream`, but don't push if the remote branch name
+    is different from the local one: you need en explicit refspec for that.
+    Default starting on 2.0.
 
--   `current`:  push the current branch to a branch of the same name.
-                Simple, explicit and does not depend on any configuration.
+-   `current`: push the current branch to a branch of the same name.
+    Simple, explicit and does not depend on any configuration.
 
--   `nothing`:  do nothing. For those overly concious with safety.
-                Forces you to always use the branch name explicitly.
+-   `nothing`: do nothing. For those overly concious with safety.
+    Forces you to always use the branch name explicitly.
 
 ### Omit the remote
 
@@ -3694,7 +3765,7 @@ Ex: `origin/master`, `origin/feature2`, `upstream/feature2`, etc.
 
 Branch only sees remotes if you give the `remote-name` explicitly.
 
-#### checkout to a remote without specifying which remote
+#### Checkout to a remote without specifying which remote
 
 If you have a tracking branch `origin/b`, no other tracking branch of the form `some-remote/b`,
 and no branch named `b`:
@@ -4904,7 +4975,7 @@ Corresponding command lines of type:
 
 ### Commands
 
-List the currently used value of all non default configs:
+List the currently used value of all non-default configs:
 
     git config -l
 
