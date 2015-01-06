@@ -2,9 +2,13 @@
 title: SVN for Git users
 ---
 
-Create new SVN controlled folder:
+## Create
 
-    svnadmin create project
+Init:
+
+    svnadmin create $path
+
+The path must not exist.
 
 Clone:
 
@@ -16,19 +20,25 @@ Clone version number 3:
 
 Every time you commit increases this number.
 
-Take a non SVN file directory and convert it to SVN controlled one:
+Take a non-SVN file directory, convert it to SVN controlled one and push with the given commit message:
 
-    svn import nonsvn svn
+    svn import "$local_path" "$remote_url" -m "$commit_message"
+
+## Modify
+
+Add:
+
+    svn add $file
 
 Commit. If your SSH is added, this pushes to the original repository. In SVN everything happens over the network.
 
     svn commit -m 'commit message'
 
-History of commits:
+Log:
 
     svn log
 
-What is committed, changed and tracked:
+Status:
 
     svn status
 
@@ -39,10 +49,6 @@ Must use to make directories, `-m` to commit with message:
 Must use to remove directories, `-m` to commit with message:
 
     svn rmdir foo -m 'commit message'
-
-Add to version control:
-
-    svn add
 
 Get single file from repo, modify it, and up again
 

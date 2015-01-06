@@ -5055,11 +5055,11 @@ It is always executed at the repo root.
 
 This allows for the very useful combo:
 
-    git config --global alias.exec '!exec '
+    git config --global alias.sh '!exec '
 
 Allowing you to do any command at top-level:
 
-    git exec make
+    git exec sh
 
 ### UTF8 filenames
 
