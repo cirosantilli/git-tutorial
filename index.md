@@ -3403,6 +3403,18 @@ TODO
 
 TODO
 
+## archive
+
+Generate an archive file from a repository at a given version.
+
+Possible way to generate source code distribution releases at an specific version while omitting history.
+
+Make a source code release for version 1.2.3:
+
+    git archive --format zip -o output-1.2.3.zip 1.2.3
+
+Generates a file called `output-1.2.3.zip` containing the code.
+
 ## push
 
 Makes changes on a bare remote repo.
@@ -5029,9 +5041,25 @@ Non default ones that you should always set:
 -   `color.ui`: when to add color ANSI escapes. `auto` is the best option,
     which only adds the escapes if not piped.
 -   `core.editor`: editor to use for commit and tag messages.
--   `core.autocrlf`: deal well with windows loved CR LF newlines.
 -   `core.excludesfile`: path of a global `.gititnore` file for all projects.
 -   `commit.template`: commit message template file path
+
+#### autocrlf
+
+`core.autocrlf` deals with Windows CRLF line terminator issues.
+
+<http://stackoverflow.com/a/1250133/895245>
+
+Possible values:
+
+- `false`: (default) don't touch your code. This is what you should need if you have a good editor and workflow...
+- `true`: on checkout, convert LF to CRLF. On checkout, convert LF to CRLF.
+- `input`: CRLF to LF on commit. Nothing on checkout.
+
+Conversions are only done if the entire file has a single line termination style: if there is at least
+one single different line ending, nothing ever gets done by Git.
+
+Conversions don't touch the working directory: only the repository contents.
 
 #### alias
 
