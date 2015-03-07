@@ -5009,12 +5009,14 @@ Sample output:
 
 ## gitattributes
 
+Good tutorial: <http://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes>
+
 Configs that apply only to specific paths, not the entire repo.
 
-It can be put:
+It can be put at:
 
-- inside a `.gitattributes` file in the repo.
-- inside the `.git/info/attributes` file.
+- `.gitattributes` file in any directory of the working tree
+- `.git/info/attributes`
 
 Examples:
 
@@ -5028,9 +5030,16 @@ and then use `.gitattributes` lines like:
 
     path/to/file merge=ours
 
-#### gc
+Other interesting stuff:
+
+- index clean and smudge, including the built-in `ident` smudge.
+- `archive` customization, including smudge-like effects
+
+## gc
 
 Tries to optimize the way git stores files internally.
+
+Mnemonic: Garbage Collection. This is classic when talking about garbage collection of programming languages.
 
 Runs several different plumbing commands to do that. TODO which?
 
@@ -5244,6 +5253,19 @@ Can take custom inputs from the following environment variables:
 
 Once you have created a tree object with this command,
 you can update a branch reference to point to it with `git update-ref`.
+
+###### Squash branch to a single commit
+
+<http://stackoverflow.com/questions/1657017/squash-all-git-commits-into-a-single-commit>
+
+Squash repository to a single commit:
+
+    git reset $(git commit-tree HEAD^{tree} -m "commit message")
+
+where:
+
+- `HEAD^{tree}` means the first `tree` type object found from commit `HEAD`.
+- `commit-tree` takes a tree object, and makes a commit out of it
 
 #### Tree object
 
