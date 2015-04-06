@@ -1352,6 +1352,10 @@ It is a very common default commit command.
 
 If you use this all the time, you only add files once.
 
+### allow-empty
+
+Allow "empty" commits that just reuse the last tree.
+
 ## log
 
 List revisions. Highly customizable output format.
@@ -5223,7 +5227,7 @@ Will be present, and shown on GitHub, <https://github.com/cirosantilli/test-empt
 
 Commits may point to it the empty tree when the repository is empty,
 
-This can be achieved with the porcelain `git commit -allow-empty` on an empty repository.
+This can be achieved with the porcelain `git commit --allow-empty` on an empty repository.
 
 ---
 
