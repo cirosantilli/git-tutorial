@@ -404,18 +404,13 @@ Search in revision only under directory:
 
 ### How Git determines if a file is binary
 
-Git has an heuristic for determining if files are binary or text:
-it is not possible to do identify file types precisely.
+Git has an heuristic for determining if files are binary or text: it is not possible to do identify file types precisely.
 
-If a file is binary affects such as not showing diffs in such files,
-which would be meaningless line-wise.
+If a file is binary affects such as not showing diffs in such files, which would be meaningless line-wise.
 
-In 2014, the heuristic is: look up to 8000 bytes at the beginning of the file.
-Binary iff there is a `NUL` (`\0`).
+In 2014, the heuristic is: look up to 8000 bytes at the beginning of the file. Binary iff there is a `NUL` (`\0`).
 
-This heuristic has the interesting property that it works for UTF-8,
-whose only 0 byte represents the NUL character.
-Unfortunately if fails for UTF-16.
+This heuristic has the interesting property that it works for UTF-8, whose only 0 byte represents the NUL character. Unfortunately if fails for UTF-16.
 
 <http://stackoverflow.com/questions/7110750/how-do-popular-source-control-systems-differentiate-binary-files-from-text-files>
 
@@ -465,9 +460,7 @@ When Git merges two hunks is controlled by both the `-U` and `--inter-hunk-conte
 
 `-U` determines the minimum number of context lines to show. It defaults to 3.
 
-`--inter-hunk-context` determines the maximum extra number of lines
-between two contexts before the hunks are merged.
-It defaults to 0: hunks are only merged by default if the contexts touch.
+`--inter-hunk-context` determines the maximum extra number of lines between two contexts before the hunks are merged. It defaults to 0: hunks are only merged by default if the contexts touch.
 
 Consider the following edit:
 
@@ -550,16 +543,14 @@ Sample output:
     a9d1038f (Jeroen van Baarsen     2013-12-16 21:56:45 +0100  74)       '/assets/no_avatar.png'
     65bcc41f (Robert Speicher        2012-08-15 21:06:08 -0400  75)     else
 
-It does not seem possible to count how many lines each user changed in a single Git command as of 1.8.4,
-but the manual itself suggests a command to do so:
+It does not seem possible to count how many lines each user changed in a single Git command as of 1.8.4, but the manual itself suggests a command to do so:
 
     f=
     git blame --line-porcelain "#f" | sed -n 's/^author //p' | sort | uniq -c | sort -rn
 
 For the entire repo: <http://stackoverflow.com/questions/4589731/git-blame-statistics>
 
-See who last modified all files in project:
-<http://serverfault.com/questions/401437/how-to-retrieve-the-last-modification-date-of-all-files-in-a-git-repository>
+See who last modified all files in project: <http://serverfault.com/questions/401437/how-to-retrieve-the-last-modification-date-of-all-files-in-a-git-repository>
 
 Ignore whitespace only changes (e.g. indent):
 
@@ -573,8 +564,7 @@ Attribute moved lines to the original author, not the mover (TODO understand `C`
 
 See `man gitignore`
 
-`.gitignore` are files that tell git to ignore certain files,
-typically output files so they won't for example clutter your `git status`.
+`.gitignore` are files that tell git to ignore certain files, typically output files so they won't for example clutter your `git status`.
 
 A `.gitignore` can be put anywhere in the repo and affects current dir and all descendants.
 
@@ -624,13 +614,11 @@ If a pattern does not contain a slash `/`, it matches any entire basename in any
         #untracked: b
         #new file: d/b
 
-If the pattern contains a slash `/`, only files under the given directory can match.
-E.g.: `d/*.c` matches `d/a.c` but not `d/e/a.c`.
+If the pattern contains a slash `/`, only files under the given directory can match. E.g.: `d/*.c` matches `d/a.c` but not `d/e/a.c`.
 
 If you want to ignore by basename under a given directory only, put a `.gitignore` into that directory.
 
-If the pattern starts in `/`, only files under the same directory as the gitignore file can match.
-E.g.: `/*.c` matches `/a.c` but not `/d/a.c`.
+If the pattern starts in `/`, only files under the same directory as the gitignore file can match. E.g.: `/*.c` matches `/a.c` but not `/d/a.c`.
 
 Trying to add an ignored file gives an error:
 
@@ -676,8 +664,7 @@ Same syntax as `.gitignore`.
 
 A `.git` file, not the usual `.git` directory.
 
-`Documentation/glossary-content.txt` says that is contains
-the path to the actual git repository, much like a symlink.
+`Documentation/glossary-content.txt` says that is contains the path to the actual git repository, much like a symlink.
 
 `t0002-gitfile` contains the exact behavior.
 
@@ -691,8 +678,7 @@ It must point to a valid Git bare repository, or you get:
 
     fatal: Invalid gitfile format: .git
 
-Now any operation, including changes you make,
-will act on the given `.git` bare repository.
+Now any operation, including changes you make, will act on the given `.git` bare repository.
 
 ## mailmap
 
@@ -762,8 +748,7 @@ Add is recursive on directories:
 
 If you add a file that is in `.gitignore` directly, the add fail.
 
-However, if you add a directory that contains gitignored files,
-then those files are ignored and the ignore succeeds.
+However, if you add a directory that contains gitignored files, then those files are ignored and the ignore succeeds.
 
 Therefore, for example to add all files in the current it is better to use:
 
@@ -914,9 +899,7 @@ Output:
     would remove c
     would not remove d/
 
-Since this is a very dangerous operation, in `Git 1.8` the default is to do dry runs.
-This can be controlled by the `clean.requireForce` configuration option,
-and an `-f` is required to actually clean. Do not rely on the value of this option.
+Since this is a very dangerous operation, in `Git 1.8` the default is to do dry runs. This can be controlled by the `clean.requireForce` configuration option, and an `-f` is required to actually clean. Do not rely on the value of this option.
 
 Remove entire directories with `-d`:
 
@@ -988,8 +971,7 @@ Without paths `git reset [option]`:
 
     `git status` will show staged changes.
 
--   neither `--soft` nor `--hard` does what `--soft` does *and* changes the index to that commit.
-    The working directory is unchanged.
+-   neither `--soft` nor `--hard` does what `--soft` does *and* changes the index to that commit. The working directory is unchanged.
 
     `git status` will show unstaged changes.
 
@@ -1054,19 +1036,17 @@ With hard:
     cat c
         #c
 
-- tracked files went back to as they were at last commit.
+-   tracked files went back to as they were at last commit.
 
     Changes you made on the working tree were discarded!!
 
-- untracked files (`c`) are unchanged, but they are unstaged.
+-   untracked files (`c`) are unchanged, but they are unstaged.
 
 ### change what a branch points to
 
-This changes history and as any history changing, if you do this after you [push]
-and someone else [fetche]d, there will be problems!
+This changes history and as any history changing, if you do this after you [push] and someone else [fetche]d, there will be problems!
 
-With reset, you can change the commit a branch points to to any other commit,
-even if the other commit is not an ancestor of the parent!
+With reset, you can change the commit a branch points to to any other commit, even if the other commit is not an ancestor of the parent!
 
     ./copy.sh b2
     git reset --hard b2
@@ -1129,8 +1109,7 @@ And `(2)` is called a dangling commit.
 
 <http://stackoverflow.com/questions/5473/undoing-a-git-reset-hard-head1>
 
-You can undo a reset hard if your are fast enough:
-a few weeks on default configurations.
+You can undo a reset hard if your are fast enough: a few weeks on default configurations.
 
 First find out the hash of the deleted commit on the reflog:
 
@@ -1140,13 +1119,11 @@ Then reset hard to it:
 
     git reset --hard HEAD@{1}
 
-And if you just did the `reste --hard` to any commit,
-you might also be able to get away simply with:
+And if you just did the `reste --hard` to any commit, you might also be able to get away simply with:
 
     git reset --hard ORIG_HEAD
 
-They should show up as *dangling commits*.
-This is what they are: commits that have no descendant branch.
+They should show up as *dangling commits*. This is what they are: commits that have no descendant branch.
 
 Now merge away with the have you just found.
 
@@ -1190,8 +1167,7 @@ The `reflog` also stores times, so you can use revision names like:
 
 Internally, the reflog is stored under `.git/logs`.
 
-One major goal of the `reflog` is to prevent accidental data loss:
-for example, you can undo a `reset --hard` by using it to find the dangling commit.
+One major goal of the `reflog` is to prevent accidental data loss: for example, you can undo a `reset --hard` by using it to find the dangling commit.
 
 ## fsck
 
@@ -1256,8 +1232,7 @@ And the working tree is exactly as it was on `(1)`.
 
 Creates a new version from the content of the index.
 
-You must first tell Git which files will be included in the next version
-by adding them to the index with commands like `add`, `rm`, `mv` and `reset`.
+You must first tell Git which files will be included in the next version by adding them to the index with commands like `add`, `rm`, `mv` and `reset`.
 
 After you have decided what will be included or not, you are ready to commit.
 
@@ -1327,8 +1302,7 @@ Change author:
 
 This does not change the committer.
 
-To correct the name of an author on an entire repository, see:
-<http://stackoverflow.com/questions/750172/how-do-i-change-the-author-of-a-commit-in-git>
+To correct the name of an author on an entire repository, see: <http://stackoverflow.com/questions/750172/how-do-i-change-the-author-of-a-commit-in-git>
 
 ### Committer change
 
@@ -1417,13 +1391,11 @@ View up to a certain number of log messages (most recent):
 
     git log -n 1
 
-`-n 1` is specially useful if you want to get information on the current commit,
-specially when used with `pretty=format`.
+`-n 1` is specially useful if you want to get information on the current commit, specially when used with `pretty=format`.
 
 ### format
 
-The `--pretty` option allows for any output format.
-There are also options which are aliases to useful formats that can be achieved with `--pretty`.
+The `--pretty` option allows for any output format. There are also options which are aliases to useful formats that can be achieved with `--pretty`.
 
 Same as `--abbrev-commit` and `--pretty=oneline`:
 
@@ -1513,8 +1485,7 @@ Sample output:
 
     git log rev1..rev2
 
-If any of them is omitted, it defaults to `HEAD`.
-Major application: see differences between a branch and its remote.
+If any of them is omitted, it defaults to `HEAD`. Major application: see differences between a branch and its remote.
 
 Outdated remote origin:
 
@@ -1543,8 +1514,7 @@ Also cross `git mv`:
 
     git log --follow -p file
 
-If a merge occurs, both branches appear on `git log` and get mixed up chronologically
-and it is impossible to set them apart.
+If a merge occurs, both branches appear on `git log` and get mixed up chronologically and it is impossible to set them apart.
 
 ### first-parent
 
@@ -1552,16 +1522,13 @@ To show only history of the current branch ignoring merges do:
 
     git log --first-parent
 
-This is a great option to view history on a feature branch onto which upstream was merged from time to time.
-Rebase is a better option than merge in this case if you work locally,
-but may not be an option if a group is working on the feature branch.
+This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
 
 ### Reachability
 
 Commits point to their parents (0, 1 or more), but not to their children.
 
-This is why when the term *reachable* is used,
-it implies commits which are ancestors of a given commit.
+This is why when the term *reachable* is used, it implies commits which are ancestors of a given commit.
 
 ## shortlog
 
@@ -1660,8 +1627,7 @@ Compares files between the working tree and the index.
 
 ### raw diff format
 
-A raw diff is a summarized diff output format that only shows file level modifications,
-not changed lines. It also shows the similarity index for renamed files.
+A raw diff is a summarized diff output format that only shows file level modifications, not changed lines. It also shows the similarity index for renamed files.
 
 It can be viewed with `git diff --raw`, or as the output of the diff plumbing commands.
 
@@ -1673,8 +1639,7 @@ A revision is the git name for a version. It is also known informally as a commi
 
 ### How to name revisions
 
-To actually go to another version, you have to be able to tell git which one is it,
-so that git can go back to it.
+To actually go to another version, you have to be able to tell git which one is it, so that git can go back to it.
 
 For the manual see:
 
@@ -1691,26 +1656,22 @@ There are a two ways to do that:
 
 SHA-1 of the commit object.
 
-If you don't know what a SHA hash is learn it now. <http://en.wikipedia.org/wiki/SHA-1>.
-The key properties of a SHA functions are that:
+If you don't know what a SHA hash is learn it now. <http://en.wikipedia.org/wiki/SHA-1>. The key properties of a SHA functions are that:
 
 -   it is very unlikely that two inputs give the same output.
     There are no known conflicts as of 2014.
 
 -   small changes in the input make large unpredictable changes on the output.
 
-In this way, even if SHAs contain much less information than the entire repository itself (only a few bytes),
-it is very unlikely that two different repositories will have the same SHA.
+In this way, even if SHAs contain much less information than the entire repository itself (only a few bytes), it is very unlikely that two different repositories will have the same SHA.
 
-The SHA input includes file contents, filenames, commit timestamps, authors and tags.
-Therefore, even if the files are the same, SHAs will probably be different.
+The SHA input includes file contents, filenames, commit timestamps, authors and tags. Therefore, even if the files are the same, SHAs will probably be different.
 
 The most precise way of specifying a version is with the full 40 byte SHA:
 
     1ba8fcebbff0eb6140740c8e1cdb4f9ab5fb73b6
 
-If this is the only version that starts with `1ba8fc` or `1ba8`,
-you could use those as well. 6 digits is common for manual use.
+If this is the only version that starts with `1ba8fc` or `1ba8`, you could use those as well. 6 digits is common for manual use.
 
 Get the hash of the latest commit:
 
@@ -1726,24 +1687,19 @@ There are many types of references.
 
 Most of them are represented in in files under `.git/refs/` which contain only the SHA they point to. E.g.:
 
--   *branches* like `master`:                 by default at `.git/refs/heads/master`,    modified by `git branch`, `git fetch`, etc.
+-   *branches* like `master`: by default at `.git/refs/heads/master`, modified by `git branch`, `git fetch`, etc.
 
--   *tags* like `1.0.1`:                      by default at `.git/refs/tags/1.0.1`,      modified by `git tag`.
-    Point to the SHA of the tag object, not the commit.
+-   *tags* like `1.0.1`: by default at `.git/refs/tags/1.0.1`, modified by `git tag`. Point to the SHA of the tag object, not the commit.
 
 -   *remote* branches like `remotes/feature`: by default at `.git/refs/remotes/feature`, modified by `git fetch`.
 
-If a ref is not found there, it is also searched for on the `.git/packed-refs`:
-this can be more space efficient since each file has metadata associated to it.
-See Packfile.
+If a ref is not found there, it is also searched for on the `.git/packed-refs`: this can be more space efficient since each file has metadata associated to it. See Packfile.
 
 But there are also some special ones like `HEAD` which live outside of of `refs`, at: `.git/HEAD`.
 
 TODO how to create refs outside those subdirectories? GitHub creates under `.git/refs/pull` for e.g..
 
-Although refs live in subdirectories of `refs`, you don't usually need to specify the subdirectory:
-just saying `master` is often enough to specify `refs/heads/master`.
-Git uses the following search order, documented at `man gitrevisions`:
+Although refs live in subdirectories of `refs`, you don't usually need to specify the subdirectory: just saying `master` is often enough to specify `refs/heads/master`. Git uses the following search order, documented at `man gitrevisions`:
 
 -   `$GIT_DIR/<name>` Usually useful only for special branches like
     `HEAD`, `FETCH_HEAD`, `ORIG_HEAD`, `MERGE_HEAD` and `CHERRY_PICK_HEAD`.
@@ -1764,11 +1720,9 @@ The `HEAD` is the current commit we are on.
 
 Lives at `.git/HEAD`.
 
-It is possible to determine the current `HEAD` by doing `git branch`:
-the head will be the branch with an asterisk in front of it.
+It is possible to determine the current `HEAD` by doing `git branch`: the head will be the branch with an asterisk in front of it.
 
-Internally, the head is determined by the content of the file `$GIT/HEAD`,
-which is the hash of the current head commit.
+Internally, the head is determined by the content of the file `$GIT/HEAD`, which is the hash of the current head commit.
 
 ###### Example: HEAD
 
@@ -5255,8 +5209,7 @@ Can take custom inputs from the following environment variables:
     GIT_COMMITTER_DATE
     EMAIL
 
-Once you have created a tree object with this command,
-you can update a branch reference to point to it with `git update-ref`.
+Once you have created a tree object with this command, you can update a branch reference to point to it with `git update-ref`.
 
 ###### Squash branch to a single commit
 
