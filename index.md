@@ -5,6 +5,9 @@ social_media: true
 
 {{ site.toc }}
 
+1.  Email patches
+    1. [format-patch](format-patch.md)
+
 ## Sources
 
 -   Short help: `git help`
@@ -27,8 +30,7 @@ social_media: true
 
         git clone https://github.com/git/git
 
-    In particular, the `Documentation` directory contains no only the source for the man pages,
-    but also many tutorials and internals information which are not present in the man pages.
+    In particular, the `Documentation` directory contains no only the source for the man pages, but also many tutorials and internals information which are not present in the man pages.
 
     - `Documentation/technial`: internals
     - `Documentation/howto`: tutorials
@@ -39,27 +41,21 @@ social_media: true
 
 -   Issues, questions and patches are sent by email at: <git@vger.kernel.org>
 
-    You subscribe by sending an email to <majordomo@vger.kernel.org>,
-    but it is around 100 posts / day!
+    You subscribe by sending an email to <majordomo@vger.kernel.org>, but it is around 100 posts / day!
 
     There are web interfaces subscribed that store old threads.
 
-    -   the most popular and often linked to as the canonical URL seems to be:
-        <http://dir.gmane.org/gmane.comp.version-control.git>
-        but as a millennial I find it really hard to navigate.
+    -   the most popular and often linked to as the canonical URL seems to be: <http://dir.gmane.org/gmane.comp.version-control.git> but as a millennial I find it really hard to navigate.
 
     -   <http://git.661346.n2.nabble.com/> is a more usable option
 
-    TODO: what is `vger`? Is it a Star Trek reference: <http://en.memory-alpha.org/wiki/V%27ger>?
-    Would make some sense as in the Star Trek canon it is the name
-    of an entity which aims to absorb as much knowledge as possible.
+    TODO: what is `vger`? Is it a Star Trek reference: <http://en.memory-alpha.org/wiki/V%27ger>? Would make some sense as in the Star Trek canon it is the name of an entity which aims to absorb as much knowledge as possible.
 
 -   Tutorials from companies who make money from Git:
 
     -   <http://git-scm.com/book>.
 
-        Apparently GitHub maintained but officially adopted by Git:
-        <https://github.com/blog/1125-new-git-homepage>
+        Apparently GitHub maintained but officially adopted by Git: <https://github.com/blog/1125-new-git-homepage>
 
         Good info and graphs.
 
@@ -71,26 +67,21 @@ social_media: true
 
 -   Good tutorial: <http://cworth.org/hgbook-git/tour/>
 
--   Good tutorial, straight to the point, ASCII diagrams:
-    <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
+-   Good tutorial, straight to the point, ASCII diagrams: <http://www.sbf5.com/~cduan/technical/git/git-1.shtml>
 
--   Description of a production / dev / hotfix branch model:
-    <http://nvie.com/posts/a-successful-git-branching-model/>
+-   Description of a production / dev / hotfix branch model: <http://nvie.com/posts/a-successful-git-branching-model/>
 
 ## Why learn Git
 
 Git + GitHub allows you to do the following quickly:
 
--   create multiple versions (*commits* or *revisions* in Git jargon)
-    of your work, and travel between them.
+-   create multiple versions (*commits* or *revisions* in Git jargon) of your work, and travel between them.
 
     This is useful for:
 
-    -   backup. If you delete a file by mistake, and the file was present
-        in some past version, you can recover it.
+    -   backup. If you delete a file by mistake, and the file was present in some past version, you can recover it.
 
-    -   if a recent modification made a change that made things worse,
-        you can just go back to a previous correct state and see what happened.
+    -   if a recent modification made a change that made things worse, you can just go back to a previous correct state and see what happened.
 
     -   refer to a specific version.
 
@@ -108,15 +99,13 @@ Git + GitHub allows you to do the following quickly:
 
         The current state may not be stable, and may interfere with the more urgent state.
 
-        No problem, make a version of your current work to save it,
-        and switch to the more urgent matter.
+        No problem, make a version of your current work to save it, and switch to the more urgent matter.
 
         When you are done, just switch back.
 
     -   View differences between versions.
 
-        It is easy to [view *differences* between versions](#differences)
-        to find out what was different on a different version
+        It is easy to [view *differences* between versions](#differences) to find out what was different on a different version
 
         This is useful when:
 
@@ -182,9 +171,7 @@ Git works inside the directories you tell it to work.
 
 Those directories are called *repositories*, *repo* for short.
 
-The only thing that makes a directory in to a repository is the presence of a `.git` folder
-with the correct files in it, which contains most of the `.git` data.
-Some more may be contained in config files outside `.git` like `.gititnore`.
+The only thing that makes a directory in to a repository is the presence of a `.git` folder with the correct files in it, which contains most of the `.git` data. Some more may be contained in config files outside `.git` like `.gititnore`.
 
 To create a new repo, use `init`.
 
@@ -194,8 +181,7 @@ To transform a repo into a non repo, simply remove the `.git` dir (and maybe oth
 
 ### Three trees
 
-This is a confusing point for beginners, but it is a good design choice by Git,
-so understand it now and save lots of trouble later.
+This is a confusing point for beginners, but it is a good design choice by Git, so understand it now and save lots of trouble later.
 
 The three trees are:
 
@@ -293,9 +279,7 @@ Is all the "regular" files that lie outside the `.git` directory.
 
 A temporary place where you can build the next commit little by little.
 
-Its existence allows you for example to do several `git add` separately,
-edit some more, and only later create a new version. For this to work,
-operations like `git add` must store the files somewhere: this place is the index.
+Its existence allows you for example to do several `git add` separately, edit some more, and only later create a new version. For this to work, operations like `git add` must store the files somewhere: this place is the index.
 
 Usually modified with the following commands:
 
@@ -304,14 +288,11 @@ Usually modified with the following commands:
 - `reset`:        set the index to the same as last commit, therefore undoing operations like `git add`.
 - `checkout ref`: sets the index to the tree of the ref, therefore radically modifying it.
 
-The index is stored internally by Git in the `.git` directory. Therefore,
-after you `git add` a file for example, you can remove it from the working tree
-but you won't lose any data.
+The index is stored internally by Git in the `.git` directory. Therefore, after you `git add` a file for example, you can remove it from the working tree but you won't lose any data.
 
 ### Index internals
 
-See:
-<http://stackoverflow.com/questions/4084921/what-does-the-git-index-exactly-contain>
+See: <http://stackoverflow.com/questions/4084921/what-does-the-git-index-exactly-contain>
 
 ### checkout-index
 
@@ -368,8 +349,7 @@ TODO only files in current dir?
 
 Search for lines in tracked files.
 
-If you only want to search the entire current tree,
-`ack -a` is probably better as it has better formatted output.
+If you only want to search the entire current tree, `ack -a` is probably better as it has better formatted output.
 
 There are however cases where `git grep` shines:
 
@@ -2012,14 +1992,10 @@ Tags are a type of ref: names for commits commits.
 
 They live under `.git/refs/tags`.
 
-Difference from branches
+Difference from branches:
 
--   tags don't move automatically with commits, so you can refer to a commit forever by its tag,
-    unless an evil developer changes the tag, which should almost never be done.
-
--   tags occupy a single namespace: there is no `remotes`. As a consequence,
-    you have to be very careful with which tags you push to a remote
-    so as to not overwrite other people's local tags.
+- tags don't move automatically with commits, so you can refer to a commit forever by its tag, unless an evil developer changes the tag, which should almost never be done.
+- tags occupy a single namespace: there is no `remotes`. As a consequence, you have to be very careful with which tags you push to a remote so as to not overwrite other people's local tags.
 
 Typical usage: give version numbers: `1.0`, `1.1`, `2.0`
 
@@ -2044,30 +2020,23 @@ For internals and when to use see: <http://stackoverflow.com/a/25996877/895245>
 
 Annotated tags are tags that point to tag objects that point to commits.
 
-Because of this, they have more metadata than just the commit they point to,
-including a message (possibly with a GPG signature at the end if you use `-s`)
-and tagger identity and timestamp.
+Because of this, they have more metadata than just the commit they point to, including a message (possibly with a GPG signature at the end if you use `-s`) and tagger identity and timestamp.
 
-Use annotated tags to all tags you will publish,
-e.g. version numbers as they contain more useful information.
+Use annotated tags to all tags you will publish, e.g. version numbers as they contain more useful information.
 
-Some commands treat annotated and lightweight tags differently.
-The general semantics of such differentiation suggests the following rule,
-which you should always follow:
+Some commands treat annotated and lightweight tags differently. The general semantics of such differentiation suggests the following rule, which you should always follow:
 
 `man git` says:
 
 > Annotated tags are meant for release while lightweight tags are meant for private or temporary object labels
 
--   `git describe` goes back to the first annotated tag ancestor,
-    not lightweight, by default.
+-   `git describe` goes back to the first annotated tag ancestor, not lightweight, by default.
 
-    Therefore, `git describe HEAD` will always go the latest stable version
-    if you follow the above convention, even if you have private development only tags.
+    Therefore, `git describe HEAD` will always go the latest stable version if you follow the above convention, even if you have private development only tags.
 
 -   `git push --follow-tags` only pushes annotated tags.
 
-### Create an annotated tag
+#### Create an annotated tag
 
 Create annotated tag to `HEAD`:
 
@@ -2079,18 +2048,22 @@ If `-m` is given, `-a` is implied which generates an annotated tag.
 
 ### List tags
 
+#### List tags that contain a given commit
+
 Get a newline separated list of all tags for the latest commit, or empty if no tags are available:
 
-    git tag --contains HEAD
+    git tag --contains <commit>
+
+`<commit>` defaults to `HEAD`.
 
 Sample output:
 
     tag1
     tag2
 
-### List only annotated tags
+#### List only annotated tags
 
-### List only lightweight tags
+#### List only lightweight tags
 
 <http://stackoverflow.com/questions/21031201/how-can-i-list-all-lightweight-tags>
 
@@ -2101,6 +2074,16 @@ Only annotated:
 Only lightweight:
 
     git for-each-ref refs/tags/ --format '%(objecttype) %(refname:short)' | awk '$1 == "commit" {print $2}'
+
+#### Sort the tag listing
+
+By default, lexicographical order is used.
+
+There many more sensible ways of doing that to reflect "time":
+
+- date of annotated tag creation. Only works for annotated tags, as lightweight don't have an object with metadata. <http://stackoverflow.com/questions/6269927/how-can-i-list-all-tags-in-my-git-repository-by-the-date-they-were-created>
+- topological order or the object pointed to <http://stackoverflow.com/questions/6900328/git-command-to-show-all-lightweight-tags-creation-dates>
+- simple version string parsing order. Does not use any Git information, and could be done with `| sort -V`. Git 2 added `--sort=version:refname "foo*"` <http://stackoverflow.com/questions/14273531/how-to-sort-git-tags-by-version-string-order-of-form-rc-x-y-z-w>
 
 ### Create tags
 
@@ -2136,8 +2119,7 @@ List tags and corresponding hashes side by side:
 
     git show-ref --tags
 
-List with tags with corresponding commit messages side by side: not possible without a for loop:
-<http://stackoverflow.com/questions/5358336/have-git-list-all-tags-along-with-the-full-message>
+List with tags with corresponding commit messages side by side: not possible without a for loop: <http://stackoverflow.com/questions/5358336/have-git-list-all-tags-along-with-the-full-message>
 
 List tags with date side by side and on commit tree:
 
@@ -2145,8 +2127,7 @@ List tags with date side by side and on commit tree:
 
 ### Edit tag
 
-Strictly speaking there is no tag editing,
-only overwriting tags with new ones of the same name:
+Strictly speaking there is no tag editing, only overwriting tags with new ones of the same name:
 
     git tag -f tagname
     git tag -af -m tagname
@@ -2191,8 +2172,7 @@ Delete a remote tag with either of:
 
 `fetch`:
 
--   by default gets all tags that point to objects that exist on the local repository.
-    Does not overwrite existing tags.
+-   by default gets all tags that point to objects that exist on the local repository. Does not overwrite existing tags.
 
 -   with `--tags` fetches all tags and overwrite if existing locally.
 
@@ -2224,8 +2204,7 @@ If you want to use this programmatically you could:
 
     git describe --abbrev=0 --tags 2>/dev/null
 
-Which ignores the error message in case there are no tags,
-so you get an empty result if there are no tags, and the latest tag if there is at least one tag.
+Which ignores the error message in case there are no tags, so you get an empty result if there are no tags, and the latest tag if there is at least one tag.
 
 ## branch
 
@@ -3196,8 +3175,7 @@ Git generates 3 temporary files which it passes to the 3-merge tool for each con
 
 You then have to save the output on the merge resolution tool.
 
-After the merge, Git keeps by default the original file with the conflict markers
-with a `.orig` extension.
+After the merge, Git keeps by default the original file with the conflict markers with a `.orig` extension.
 
 To prevent that, do:
 
@@ -3206,38 +3184,6 @@ To prevent that, do:
 ## Email patches
 
 Tools only used in projects that exchange patches via email, not in those that use web interfaces like GitHub.
-
-### format-patch
-
-Generate a patch to send by email.
-
-Generate a patch from last commit:
-
-    git format-patch HEAD~
-
-### Signed-off by
-
-Extra text added to commit messages or only to patches.
-
-Required by certain projects, notably the Linux kernel, because of legal reasons:
-<http://stackoverflow.com/questions/1962094/what-is-the-sign-off-feature-in-git-for>
-
-Has no relation to GPG signatures.
-
-Add signed-off by line to the commit message:
-
-    git commit -ms 'Message.'
-
-This would generate a commit message like:
-
-    Message.
-
-    Signed-off-by: Super Developer <super.dev@gmail.com>
-
-Normally you don't need to pollute the commit message:
-just add it to the patch sent by email:
-
-    git format-patch -s
 
 ### am
 
@@ -3278,15 +3224,11 @@ As a concrete example:
 
     git push origin +master:dev
 
-but there are (sensible) defaults for almost every part of the command,
-many of which are controlled by options. Also, there were major configuration
-and documentation updates on 2.0, So brace yourself!
+but there are (sensible) defaults for almost every part of the command, many of which are controlled by options. Also, there were major configuration and documentation updates on 2.0, So brace yourself!
 
-The full form, pushes the local branch `<src>` to remote with the name `<dst>`.
-If `<dst>` does not exist it is created.
+The full form, pushes the local branch `<src>` to remote with the name `<dst>`. If `<dst>` does not exist it is created.
 
-`+` is optional the same as `-f`: if given allows non-fast-forward updates,
-thus allowing you to lose commits on the remote.
+`+` is optional the same as `-f`: if given allows non-fast-forward updates, thus allowing you to lose commits on the remote.
 
 ### dst
 
@@ -3308,8 +3250,7 @@ is the same as:
 
     git push <remote> :<dst>
 
-deletes the branch `master` on the remote.
-The mnemonic is `<src>` does not exist, so you replace the remote with nothing.
+deletes the branch `master` on the remote. The mnemonic is `<src>` does not exist, so you replace the remote with nothing.
 
 Later versions of git added the saner `--delete` option which does the same thing:
 
@@ -3319,8 +3260,7 @@ Later versions of git added the saner `--delete` option which does the same thin
 
     git push <remote> :
 
-Does a matching push: pushes all branches which track on `<remote>`
-for which a branch with the same name exists on `<remote>`.
+Does a matching push: pushes all branches which track on `<remote>` for which a branch with the same name exists on `<remote>`.
 
 ### refspec
 
@@ -3336,20 +3276,15 @@ What happens on:
 
 depends on the `push.default` option, documented under `man git-config`:
 
--   `matching`: same as `git push <remote> :`. Default before 2.0.
-    Insane because it does a mass update operation by default!
+-   `matching`: same as `git push <remote> :`. Default before 2.0. Insane because it does a mass update operation by default!
 
 -   `upstream`: push the current branch to its upstream branch.
 
--   `simple`: like `upstream`, but don't push if the remote branch name
-    is different from the local one: you need en explicit refspec for that.
-    Default starting on 2.0.
+-   `simple`: like `upstream`, but don't push if the remote branch name is different from the local one: you need en explicit refspec for that. Default starting on 2.0.
 
--   `current`: push the current branch to a branch of the same name.
-    Simple, explicit and does not depend on any configuration.
+-   `current`: push the current branch to a branch of the same name. Simple, explicit and does not depend on any configuration.
 
--   `nothing`: do nothing. For those overly concious with safety.
-    Forces you to always use the branch name explicitly.
+-   `nothing`: do nothing. For those overly concious with safety. Forces you to always use the branch name explicitly.
 
 ### Omit the remote
 
@@ -3374,9 +3309,7 @@ The sanest configuration for the GitHub workflow:
 
 -   fetch and pull with `git fetch up`
 
-    This longer form (with explicit `up`) seems unavoidable before Git 2.0
-    if we want to be able to do just `git push`, which is a more common operation
-    than `fetch` and thus should be the shorter one.
+    This longer form (with explicit `up`) seems unavoidable before Git 2.0 if we want to be able to do just `git push`, which is a more common operation than `fetch` and thus should be the shorter one.
 
 #### After 2.0
 
@@ -3399,14 +3332,11 @@ The sanest configuration for the GitHub workflow:
 
 ### Tracking branch
 
-Each local head can have a remote branch to which it pulls and pushes by default,
-which is known as it's upstream.
+Each local head can have a remote branch to which it pulls and pushes by default, which is known as it's upstream.
 
 The upstream is set under the `branch.<name>.remote` configuration.
 
-Note that for `push`, other configurations come into play after Git 2.0,
-in particular `remote.pushdefault` and `branch.<name>.pushremote`, so the
-concept is more strongly related to fetching.
+Note that for `push`, other configurations come into play after Git 2.0, in particular `remote.pushdefault` and `branch.<name>.pushremote`, so the concept is more strongly related to fetching.
 
 Push and also set the upstream of current branch:
 
@@ -3422,9 +3352,7 @@ Get a list of all upstreams:
 
 Also shows the very useful ahead behind statistic on the tracked remote.
 
-There seems to be no clean plumbing way to get the corresponding upstreams
-of all branches programmatically without grepping:
-<http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
+There seems to be no clean plumbing way to get the corresponding upstreams of all branches programmatically without grepping: <http://stackoverflow.com/questions/4950725/how-do-i-get-git-to-show-me-which-branches-are-tracking-what>
 
 For scripts for a single branch:
 
@@ -3485,8 +3413,7 @@ or:
 
 Can only delete a branch if it is not he current remote branch.
 
-Modify current remote branch:
-<http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
+Modify current remote branch: <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
 After you delete remote branches, you can remove the local tracking branches with:
 
@@ -3553,20 +3480,17 @@ Change the address of a remote:
 
 ### prune
 
-Remove all remote refs under under `remotes/origin`
-such that their remote it tracks has been deleted:
+Remove all remote refs under under `remotes/origin` such that their remote it tracks has been deleted:
 
     git remote prune origin
 
-Useful after `push --delete` or when the remote was deleted via the web interface,
-e.g. after the pull request was merged.
+Useful after `push --delete` or when the remote was deleted via the web interface, e.g. after the pull request was merged.
 
 Also possible with:
 
     git fetch -p
 
-The actual branches will still be there. Delete merged branches,
-i.e. any ancestor of the current branch, with:
+The actual branches will still be there. Delete merged branches, i.e. any ancestor of the current branch, with:
 
     git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
 
@@ -3611,9 +3535,7 @@ Documentation at:
 
 Depends on the command.
 
-The best way is explicitly `<remote-name>/<branch-name>`
-but some commands do explicit stuff if you enter just `<branch-name>`
-and there is no other branch in your repo with that name.
+The best way is explicitly `<remote-name>/<branch-name>` but some commands do explicit stuff if you enter just `<branch-name>` and there is no other branch in your repo with that name.
 
 Ex: `origin/master`, `origin/feature2`, `upstream/feature2`, etc.
 
@@ -3623,8 +3545,7 @@ Branch only sees remotes if you give the `remote-name` explicitly.
 
 #### Checkout to a remote without specifying which remote
 
-If you have a tracking branch `origin/b`, no other tracking branch of the form `some-remote/b`,
-and no branch named `b`:
+If you have a tracking branch `origin/b`, no other tracking branch of the form `some-remote/b`, and no branch named `b`:
 
     git checkout b
 
@@ -3663,13 +3584,11 @@ Sample output:
     52d771167707552d8e2a50f602c669e2ad135722    refs/tags/v1.0.1
     7b5799a97998b68416f1b6233ce427135c99165a    refs/tags/v1.0.1^{}
 
--   `^{}` is explained in `man gitrevisions`: dereference tags until a non-tag is found
-    (remember that tags can tag anything, including other tags)
+-   `^{}` is explained in `man gitrevisions`: dereference tags until a non-tag is found (remember that tags can tag anything, including other tags)
 
 -   `7b5799a97998b68416f1b6233ce427135c99165a` is the SHA-1 of the tag object
 
--   `52d771167707552d8e2a50f602c669e2ad135722` is the SHA-1 for the actual commit,
-    which is most likely to interest you.
+-   `52d771167707552d8e2a50f602c669e2ad135722` is the SHA-1 for the actual commit, which is most likely to interest you.
 
 ## Protocols
 
@@ -3702,19 +3621,15 @@ Then you can do git operations as:
 
     git username@host:/path/to/repo
 
-GitHub git repo directories always end in `.git`, but this is just a convention.
-Also, in GitHub there is a single Git user called `git`.
+GitHub git repo directories always end in `.git`, but this is just a convention. Also, in GitHub there is a single Git user called `git`.
 
 Other methods of connection include:
 
 ## HTTP
 
-Works over URLs of type `http://` or `https://`.
-There are two types of HTTP: dumb and smart.
+Works over URLs of type `http://` or `https://`. There are two types of HTTP: dumb and smart.
 
-One advantage of the HTTP protocols is that it is easy
-to control access for them from web applications,
-which have wide support for HTTP authentication methods.
+One advantage of the HTTP protocols is that it is easy to control access for them from web applications, which have wide support for HTTP authentication methods.
 
 ### Dumb HTTP
 
@@ -3765,8 +3680,7 @@ Now make the request as:
     00000009done
     ' | ncat --ssl github.com 443
 
-TODO get working. This returns 200 with an empty body (contains only `0` with `Transfer-Encoding: chunked`).
-Worked on a local Grack:
+TODO get working. This returns 200 with an empty body (contains only `0` with `Transfer-Encoding: chunked`). Worked on a local Grack:
 
     printf 'POST /tests/example/test_repo/git-upload-pack HTTP/1.0\r
     Content-Type: application/x-git-upload-pack-request\r
@@ -3776,10 +3690,7 @@ Worked on a local Grack:
     00000009done
     ' | nc 127.0.0.1 9292
 
-Here is the hexdump of `git clone http://127.0.0.1:9292/tests/example/test_repo/`
-on the Grack test repository https://github.com/schacon/grack/tree/613acd237ab7f522a02953c310aad0d484873bd7/tests/example
-obtained with Wireshark. It only contains the data request and reply:
-the initial advertisement was made before that and was omitted.
+Here is the hexdump of `git clone http://127.0.0.1:9292/tests/example/test_repo/` on the Grack test repository https://github.com/schacon/grack/tree/613acd237ab7f522a02953c310aad0d484873bd7/tests/example obtained with Wireshark. It only contains the data request and reply: the initial advertisement was made before that and was omitted.
 
 Git request sent:
 
@@ -3908,21 +3819,17 @@ which git allows to simplify to:
 
 Note that every user will be logged in as the `git` user.
 
-The problem with this method is that it allows people to start shells on you server,
-which you might not want, e.g. on a public server like GitHub.
-Solutions include using the `git-shell` login shell and `authorized_keys` `command` option.
+The problem with this method is that it allows people to start shells on you server, which you might not want, e.g. on a public server like GitHub. Solutions include using the `git-shell` login shell and `authorized_keys` `command` option.
 
 ### git-shell login shell
 
-If you set the login shell of the Git user to `git-shell`, an executable that comes with Git,
-it runs a restricted shell that only allows the git operation to be done.
+If you set the login shell of the Git user to `git-shell`, an executable that comes with Git, it runs a restricted shell that only allows the git operation to be done.
 
 ### authorized_keys command` option
 
 See `man authorized_keys` for the details.
 
-This only allows the given command to be run when the Git user logs in,
-which allows you to write an arbitrary access control script.
+This only allows the given command to be run when the Git user logs in, which allows you to write an arbitrary access control script.
 
 This is how GitLab 7.0 works, the script being inside GitLab Shell.
 
@@ -3952,12 +3859,9 @@ Git has a few built-in mechanisms, see:
 
 for the documentation. Currently, there is:
 
--   `cache`, which uses `git credential-cache`,
-    and stores the password only for a given amount of time.
-    The default is 15 minutes.
+-   `cache`, which uses `git credential-cache`, and stores the password only for a given amount of time. The default is 15 minutes.
 
--   `store`, which uses `git credential-store`,
-    stores the password on disk forever, so it's less safe.
+-   `store`, which uses `git credential-store`, stores the password on disk forever, so it's less safe.
 
 ### credential
 
@@ -4011,8 +3915,7 @@ on a Git repository, it returns something like:
 
 and then hangs, where `\0` is a literal NUL character.
 
--   Each line, e.g. that for `master` is prefixed by a 4 byte length of the entire line,
-    including the 4 bytes of the length and the trailing newline.
+-   Each line, e.g. that for `master` is prefixed by a 4 byte length of the entire line, including the 4 bytes of the length and the trailing newline.
 
     E.g.:
 
@@ -4020,11 +3923,9 @@ and then hangs, where `\0` is a literal NUL character.
 
     says `58`, and `003f` is `63` (plus the 4 bytes of the length and the trailing newline).
 
-    The only exception is line 2, whose length has 8 bytes `000000e7`,
-    including the NUL character up to the newline
+    The only exception is line 2, whose length has 8 bytes `000000e7`, including the NUL character up to the newline
 
--   `multi_ack`, `thin-pack`, etc. are the upload pack capabilities
-    as documented at `Documentation/technical/protocol-capabilities.txt`.
+-   `multi_ack`, `thin-pack`, etc. are the upload pack capabilities as documented at `Documentation/technical/protocol-capabilities.txt`.
 
 -   `0000` at the end says it's the end of the request.
 
@@ -4048,9 +3949,7 @@ Make a "copy" of another repo.
 
 Fetches all the remote branches.
 
-Creates only a single branch: the branch were the `HEAD` of the remote was,
-but also fetches all other branches under `.git/refs/origin/`, so that you can just
-`git checkout -b other-branch` to create them.
+Creates only a single branch: the branch were the `HEAD` of the remote was, but also fetches all other branches under `.git/refs/origin/`, so that you can just `git checkout -b other-branch` to create them.
 
 ### Example: clone and branches
 
@@ -4058,7 +3957,7 @@ Start with `multi`.
 
     git clone a c
 
-Creates a repo c that is a "copy" of a. now:
+Creates a repo `c` that is a "copy" of a. Now:
 
     cd c
     branch -a
@@ -4108,9 +4007,7 @@ For example, to update you `master` branch from a remote `dev` you can do:
 
     git fetch origin dev:master
 
-This will only work for fast-forward changes, because it could be done for
-any branch, not just the current one, and in that case there is no way to resolve
-merge conflicts without a working tree.
+This will only work for fast-forward changes, because it could be done for any branch, not just the current one, and in that case there is no way to resolve merge conflicts without a working tree.
 
 ### Omit refspec
 
@@ -4120,33 +4017,25 @@ Omitting refspec as in:
 
 defaults `<refspec>` to:
 
--   `remote.<remote>.fetch`, which is set by default on remote creation to
-    `+refs/heads/*:refs/remotes/<remote>/*` configuration, so a matching forced update
-    from remote `heads` into local `remotes/<remote>/`.
+-   `remote.<remote>.fetch`, which is set by default on remote creation to `+refs/heads/*:refs/remotes/<remote>/*` configuration, so a matching forced update from remote `heads` into local `remotes/<remote>/`.
 
-    So after you `git fetch origin`, you can create a local branch with a shorter name
-    and checkout to it with:
+    So after you `git fetch origin`, you can create a local branch with a shorter name and checkout to it with:
 
         git checkout -b local-name origin/remote-branch
 
-    Remember that this works because `.refs/remotes` is in the refs search path,
-    and no sane person would have a local reference called `.git/heads/origin/remote-branch`,
-    or that would have the preference.
+    Remember that this works because `.refs/remotes` is in the refs search path, and no sane person would have a local reference called `.git/heads/origin/remote-branch`, or that would have the preference.
 
-    Multiple `remote.<remote>.fetch` entries can be added.
-    A possibly useful one with GitHub, is:
+    Multiple `remote.<remote>.fetch` entries can be added. A possibly useful one with GitHub, is:
 
         fetch = +refs/pull/*/head:refs/pull/origin/*
 
-    which also fetches all pull requests, which GitHub stores under `refs/pulls`.
-    You can then checkout with:
+    which also fetches all pull requests, which GitHub stores under `refs/pulls`. You can then checkout with:
 
         git checkout -b 999 pull/origin/999
 
     Remember that just `origin/999` won't work because `refs/pulls` is not in the refs search path.
 
-    Also note that this configuration would might pull *a lot* of references,
-    so you might be better off with one off commands like:
+    Also note that this configuration would might pull *a lot* of references, so you might be better off with one off commands like:
 
         git fetch origin pull/<pr-number>/head:local-name
 
@@ -4165,9 +4054,7 @@ Defaults the remote to the first defined of:
 
 A reference that points to the latest fetched branch.
 
-Common use case: get a single commit not on the main repository,
-often on the fork feature branch of a pull request,
-to try it out locally without merging or adding a new remote:
+Common use case: get a single commit not on the main repository, often on the fork feature branch of a pull request, to try it out locally without merging or adding a new remote:
 
     git fetch origin pull/<pr-number>/head
     git checkout -b <local-branch-name> FETCH_HEAD
@@ -4178,11 +4065,9 @@ A bare repository is one that:
 
 -   only contains files that are inside `.git`: in particular, it has no working tree nor index.
 
--   has `core.bare` set to `true`. This option is set automatically by commands that create repositories:
-    `init` and `clone` will leave it on `false`, while `clone --bare` will set it to `true`.
+-   has `core.bare` set to `true`. This option is set automatically by commands that create repositories: `init` and `clone` will leave it on `false`, while `clone --bare` will set it to `true`.
 
-    Because of this configuration variable you cannot directly push to the `.git` of a repository
-    created with `git init`.
+    Because of this configuration variable you cannot directly push to the `.git` of a repository created with `git init`.
 
 This is what GitHub stores for you: no need to store the files also!
 
@@ -4190,11 +4075,9 @@ There are some operations that you can only do/cannot do on a bare repo:
 
 -   you can only push to a bare repo if pushing to the checked out branch.
 
-    This means that using git to deploy a project requires a bare repository
-    on the server + a post commit hook that will update the tree where desired.
+    This means that using git to deploy a project requires a bare repository on the server + a post commit hook that will update the tree where desired.
 
--   you cannot to any operation that involves the working tree from a bare repo,
-    including `pull`
+-   you cannot to any operation that involves the working tree from a bare repo, including `pull`
 
 To create a bare repo from scratch:
 
@@ -4211,18 +4094,15 @@ The active or current branch of a bare repository is what its `HEAD` points to.
 This has the following effects:
 
 - `clone` automatically checks out one of the branches which are on the same ref as the `HEAD`
-- when deleting remotes with `git push remote --delete branch`,
-    it is not possible to delete the current remote.
+- when deleting remotes with `git push remote --delete branch`, it is not possible to delete the current remote.
 - it is the branch that GitHub shows by default.
 
-It is not possible to use `checkout` on a remote branch since checkout
-also acts on the working tree. You must use `update-ref` or better `symbolic-ref`:
+It is not possible to use `checkout` on a remote branch since checkout also acts on the working tree. You must use `update-ref` or better `symbolic-ref`:
 
     git update-ref   HEAD <hash>
     git symbolic-ref HEAD refs/heads/something
 
-As of 1.8.4, there seems to be no way to conveniently change the current remote branch:
-<http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
+As of 1.8.4, there seems to be no way to conveniently change the current remote branch: <http://stackoverflow.com/questions/1485578/how-do-i-change-a-git-remote-head-to-point-to-something-besides-master>
 
 ## pull
 
@@ -4324,17 +4204,13 @@ Git stores represents symlinks on the same `struct` that it stores regular files
 - the permission is `120000` instead of `644` and `755` which are used for files.
 - the content is the destination path. Note that this is not in general how symlink destinations are stored in all filesystems. E.g., ext3 stores symlinks directly in the inode, not with file contents.
 
-On clone, git reads it's internal data in the repository,
-recreates the working tree using the type of symlinks supported by the local filesystem,
-just like it does for directories for example.
+On clone, git reads it's internal data in the repository, recreates the working tree using the type of symlinks supported by the local filesystem, just like it does for directories for example.
 
 ## Empty directories
 
 <http://stackoverflow.com/questions/115983/add-empty-directory-to-git-repository>
 
-Although Git can represent empty directories through the empty tree object,
-the reference implementation ignores such directories for most commands,
-so you should never rely on them.
+Although Git can represent empty directories through the empty tree object, the reference implementation ignores such directories for most commands, so you should never rely on them.
 
 To force git to keep a dir, add a file to it.
 
@@ -4356,11 +4232,9 @@ This approach is useful when there is no way to:
 
 for a given technology.
 
-If a better system does exist for you repository however,
-e.g. Python / Ruby modules + virtualenv / RVM, use that method instead.
+If a better system does exist for you repository however, e.g. Python / Ruby modules + virtualenv / RVM, use that method instead.
 
-A submodule is a completely separate repo: the super repository
-only keeps note of its path, URL and current commit.
+A submodule is a completely separate repo: the super repository only keeps note of its path, URL and current commit.
 
 ### Create a submodule
 
@@ -4382,8 +4256,7 @@ Add to another directory:
 
 ### Submodule symlink combo
 
-If your technology requires files to be in the current directory,
-you can use symlinks into the submodule to achieve that effect.
+If your technology requires files to be in the current directory, you can use symlinks into the submodule to achieve that effect.
 
 You have a LaTeX `a.sty` file which you want to use.
 
@@ -4409,8 +4282,7 @@ If you forgot to use recursive when you cloned, you should:
 
     git submodule update --init
 
-It seems that making clone recursive by default is neither possible nor a good idea:
-<http://stackoverflow.com/questions/4251940/retrospectively-add-recursive-to-a-git-repo>
+It seems that making clone recursive by default is neither possible nor a good idea: <http://stackoverflow.com/questions/4251940/retrospectively-add-recursive-to-a-git-repo>
 
 ### Update content of a submodule
 
@@ -4423,9 +4295,7 @@ Now from the main repository;
     git status
         #modified:   shared (new commits)
 
-For your repo to incorporate this update,
-you have to add the submodule path (`share/`) and commit,
-or simply do a `commit -a` next time.
+For your repo to incorporate this update, you have to add the submodule path (`share/`) and commit, or simply do a `commit -a` next time.
 
 From the outside, the submodule looks much like a regular git controlled file.
 
@@ -4460,8 +4330,7 @@ As of git 1.8.3:
 
     git submodule deinit path
 
-Files are kept and the `.gitmodule` file is not edited,
-but internally the module is removed and you can get rid of those.
+Files are kept and the `.gitmodule` file is not edited, but internally the module is removed and you can get rid of those.
 
 Before 1.8.3: first remove it from the `.gitmodules` file:
 
@@ -4518,18 +4387,15 @@ you get:
                    |         |
                    master    feature *
 
-Therefore the rebase changes the history,
-making it look linear and therefore easier to understand.
+Therefore the rebase changes the history, making it look linear and therefore easier to understand.
 
-This is how you should incorporate upstreams changes on your feature branch
-before you make a pull request, followed often by a squash interactive rebase.
+This is how you should incorporate upstreams changes on your feature branch before you make a pull request, followed often by a squash interactive rebase.
 
 ### Interactive rebase
 
     git rebase -i HEAD~3
 
-Opens up a Vim buffer where you can modify
-all commits between `HEAD` and `HEAD~2` (total 3 commits).
+Opens up a Vim buffer where you can modify all commits between `HEAD` and `HEAD~2` (total 3 commits).
 
 The buffer should contain something like this:
 
@@ -4557,8 +4423,7 @@ The buffer should contain something like this:
 
 #### Edit
 
-`edit` can be used for example if we want to change
-the commit message for `HEAD~` we edit that to:
+`edit` can be used for example if we want to change the commit message for `HEAD~` we edit that to:
 
     pick fc95d59 last - 2 commit message
     edit 81961e9 last - 1 commit message
@@ -4580,8 +4445,7 @@ If you change your mind and think that it is better not to rebase do:
 
     git rebase --abort
 
-If you change your mind only about a single `commit`,
-but still want to change the others to:
+If you change your mind only about a single `commit`, but still want to change the others to:
 
     git rebase --skip
 
@@ -4597,15 +4461,11 @@ Now `git log --pretty=oneline -n3` gives:
 
 `squash` can be used if you want to remove all trace of a commit.
 
-`squash` is useful when you are developing a feature locally
-and you want to save progress at several points in case you want to go back.
+`squash` is useful when you are developing a feature locally and you want to save progress at several points in case you want to go back.
 
-When you are done, you can expose a single commit for the feature,
-which will be much more concise and useful to others,
-or at least people will know that you can use `squash`.
+When you are done, you can expose a single commit for the feature, which will be much more concise and useful to others, or at least people will know that you can use `squash`.
 
-You will also look much smarter, since it will seem
-that you did not make lots of trials before getting things right.
+You will also look much smarter, since it will seem that you did not make lots of trials before getting things right.
 
 If we want to remove only the `HEAD~` from history we edit as:
 
@@ -4626,8 +4486,7 @@ This will open up another Vim buffer like:
 
     #[more comments]
 
-Because commits `HEAD~` and `HEAD~2` will be turned into one,
-it is likely that the new message will be neither of the two.
+Because commits `HEAD~` and `HEAD~2` will be turned into one, it is likely that the new message will be neither of the two.
 
 So, erase all non comment lines and do something like:
 
@@ -4660,12 +4519,9 @@ All you need to do is to change the line order or remove lines.
 
 ## replace
 
-Magic mechanism to alter a single commit anywhere in the repository without affecting history,
-(if you change a commit in the middle of the repository, it's parent SHA changes, so you have to change
-it's children and so on).
+Magic mechanism to alter a single commit anywhere in the repository without affecting history, (if you change a commit in the middle of the repository, it's parent SHA changes, so you have to change it's children and so on).
 
-Works because for every `git` command without `--no-replace-objects`
-Git looks at a separate list of replacements kept under `.git/refs/replace`.
+Works because for every `git` command without `--no-replace-objects` Git looks at a separate list of replacements kept under `.git/refs/replace`.
 
 ## filter-branch
 
@@ -4701,16 +4557,9 @@ The committer is who committed it on behalf of the author.
 
 It is usually the same person in most cases, but they might differ when:
 
-One important case where committer and author differ is in projects
-where patches are generated by `git format-patch`, sent by email,
-and applied by another person with `git am`. In that case,
-the committer is taken from the local configuration,
-while the authors comes from the patch, so nothing special needs to be done about it.
+One important case where committer and author differ is in projects where patches are generated by `git format-patch`, sent by email, and applied by another person with `git am`. In that case, the committer is taken from the local configuration, while the authors comes from the patch, so nothing special needs to be done about it.
 
-With web interfaces like GitHub, which hold all the repositories on a single machine
-and apply patches with `git merge`, this is not necessary:
-the commit appears directly on history, in addition to the merge commit.
-This is the case for most modern projects.
+With web interfaces like GitHub, which hold all the repositories on a single machine and apply patches with `git merge`, this is not necessary: the commit appears directly on history, in addition to the merge commit. This is the case for most modern projects.
 
 ## cherry-pick
 
@@ -4734,8 +4583,7 @@ Take an action whenever something happens (a commit for example).
 
 Create a hook, just add an executable file with a known hook name under `.git/hooks/`.
 
-This executable may receive command line arguments
-which Git uses to pass useful info to the executable.
+This executable may receive command line arguments which Git uses to pass useful info to the executable.
 
 Example:
 
@@ -4755,22 +4603,16 @@ Hooks are not transmitted on clone.
 
 There are not global hooks. The best one can do is either:
 
--   set up `init.templatedir` with the desired hooks. But if you ever modify them,
-    you have to modify each existing project...
-
--   add the `hooks` to the repository itself on a `.git-hooks` directory
-    and require one extra setup action from developers. Probably the least bad option.
+-   set up `init.templatedir` with the desired hooks. But if you ever modify them, you have to modify each existing project...
+-   add the `hooks` to the repository itself on a `.git-hooks` directory and require one extra setup action from developers. Probably the least bad option.
 
 ### PATH gotcha
 
-Git automatically changes the `PATH` in hooks, which may lead to unexpected effects,
-in particular if you rely on dependency management systems like RVM or virtualenv:
-<http://permalink.gmane.org/gmane.comp.version-control.git/258454>
+Git automatically changes the `PATH` in hooks, which may lead to unexpected effects, in particular if you rely on dependency management systems like RVM or virtualenv: <http://permalink.gmane.org/gmane.comp.version-control.git/258454>
 
 ### pre-receive
 
-If returns false, commit is aborted. This can be used to enforce push permissions,
-which is exactly what GitLab is doing.
+If returns false, commit is aborted. This can be used to enforce push permissions, which is exactly what GitLab is doing.
 
 The stdin contains the inputs which are of the form:
 
@@ -4900,8 +4742,7 @@ Possible values:
 - `true`: on checkout, convert LF to CRLF. On checkout, convert LF to CRLF.
 - `input`: CRLF to LF on commit. Nothing on checkout.
 
-Conversions are only done if the entire file has a single line termination style: if there is at least
-one single different line ending, nothing ever gets done by Git.
+Conversions are only done if the entire file has a single line termination style: if there is at least one single different line ending, nothing ever gets done by Git.
 
 Conversions don't touch the working directory: only the repository contents.
 
@@ -4939,12 +4780,9 @@ Allowing you to do any command at top-level:
 
 #### quotepath
 
-If `true`, file paths that contain characters non printable bytes are printed
-as quoted C strings literals in commands, in particular UTF-8 characters
-are encoded.
+If `true`, file paths that contain characters non printable bytes are printed as quoted C strings literals in commands, in particular UTF-8 characters are encoded.
 
-If `false` and the encoding is compatible with your terminal,
-you will see nice characters.
+If `false` and the encoding is compatible with your terminal, you will see nice characters.
 
 So should be `false` for UTF-8 usage.
 
@@ -5007,9 +4845,7 @@ Can considerably reduce the size of the repository:
 
 Some commands automatically run `git gc`. When this is done depends on the value of the `gc.auto` configuration.
 
-TODO what does that do exactly? Possible use case:
-<http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git>
-By default it does:
+TODO what does that do exactly? Possible use case: <http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git> By default it does:
 
 - `repack` + `git prune-packed`
 
@@ -5017,13 +4853,11 @@ By default it does:
 
 ## Porcelain
 
-Plumbing commands are low level, porcelain are high level and more commonly used,
-built upon plumbing commands.
+Plumbing commands are low level, porcelain are high level and more commonly used, built upon plumbing commands.
 
 The distinction is made on `man git` itself, which classifies commands as such.
 
-When using Git programmatically, plumbing commands should be used instead of porcelain,
-since their interface is more stable. Quoting `man git`:
+When using Git programmatically, plumbing commands should be used instead of porcelain, since their interface is more stable. Quoting `man git`:
 
 > The interface (input, output, set of options and the semantics) to these low-level commands are meant to be a lot more stable than Porcelain level commands, because these commands are primarily for scripted use. The interface to Porcelain commands on the other hand are subject to change in order to improve the end user experience.
 
@@ -5046,26 +4880,18 @@ Good source:
 
 #### Object location
 
-Git implements a generic content addressable filesystem on top of your filesystem:
-given the content of an object you can find the address, which is it's SHA-1.
+Git implements a generic content addressable filesystem on top of your filesystem: given the content of an object you can find the address, which is it's SHA-1.
 
-The main advantage of this method is that given a content like a commit
-you can easily determine where it will be stored in a way that will not conflict with other objects,
-which are potentially create by other users.
+The main advantage of this method is that given a content like a commit you can easily determine where it will be stored in a way that will not conflict with other objects, which are potentially create by other users.
 
-Another advantage is that identical objects like files
-are only stored once even if present in multiple revisions.
-And this is a very common case, since in large repositories
-only few files change with each new version.
+Another advantage is that identical objects like files are only stored once even if present in multiple revisions. And this is a very common case, since in large repositories only few files change with each new version.
 
 The content addressable filesystem is implemented under `.git/objects` as either of:
 
 -   loose objects
 -   packfiles for greater storage efficiency
 
-What would happen if collision happened: the old object is kept
-<http://stackoverflow.com/questions/9392365/how-would-git-handle-a-sha-1-collision-on-a-blob>
-Malicious collisions wouldn't have much of an effect since you have to commit them first.
+What would happen if collision happened: the old object is kept <http://stackoverflow.com/questions/9392365/how-would-git-handle-a-sha-1-collision-on-a-blob> Malicious collisions wouldn't have much of an effect since you have to commit them first.
 
 #### Object types
 
@@ -5076,8 +4902,7 @@ Git stores 4 types of object on the same content addressable filesystem:
 - blob
 - tag
 
-In practice, only commit SHA-1 are used in everyday Git usage,
-while the others objects are referred to by more intuitive aliases.
+In practice, only commit SHA-1 are used in everyday Git usage, while the others objects are referred to by more intuitive aliases.
 
 #### Commit object
 
@@ -5089,9 +4914,7 @@ Represents a version. Contains:
 - committer information and commit timestamp
 - the commit message
 
-Note how the timestamp and parent are part of the content and thus influences the SHA-1:
-therefore, you cannot change the timestamp of a past commit without changing the timestamp
-of all commits that follow.
+Note how the timestamp and parent are part of the content and thus influences the SHA-1: therefore, you cannot change the timestamp of a past commit without changing the timestamp of all commits that follow.
 
 In `cat-file`:
 
@@ -5246,15 +5069,11 @@ Sample output:
     100644 blob a3db99ea9cda27e10e5a8091618491946bf4bb10	README.md
     040000 tree b110e36127f6578433bd68633c68dc8aa96c4f5e	app
 
-TODO: what is the exact format of tree objects? It is not this plain text representation,
-since sing it with `git hash-object` fails, and the SHA of the empty tree is different from that
-of the empty blob.
+TODO: what is the exact format of tree objects? It is not this plain text representation, since sing it with `git hash-object` fails, and the SHA of the empty tree is different from that of the empty blob.
 
 As we can see, it contains other trees and blobs, just like the output of `ls-tree`.
 
-The index does not stores trees but rather has a specialized file format,
-probably for greater efficiency. There are however commands like `write-tree` and `read-tree`
-that transform between tree objects and the index.
+The index does not stores trees but rather has a specialized file format, probably for greater efficiency. There are however commands like `write-tree` and `read-tree` that transform between tree objects and the index.
 
 ##### ls-tree
 
@@ -5273,13 +5092,9 @@ Sample output:
 
 Meaning of fields:
 
-1.  Git file permission notation: <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
-
-2.  type: tree, blob
-
-3.  SHA of each object: <http://stackoverflow.com/questions/10150541/how-to-suppress-the-output-of-return-value-in-irb-rails-console>
-    You have to know that there are other objects besides commits, in particular blobs and trees,
-    and they are indexed by SHA-1.
+1. Git file permission notation: <http://stackoverflow.com/questions/737673/how-to-read-the-mode-field-of-git-ls-trees-output>
+2. type: tree, blob
+3. SHA of each object: <http://stackoverflow.com/questions/10150541/how-to-suppress-the-output-of-return-value-in-irb-rails-console> You have to know that there are other objects besides commits, in particular blobs and trees, and they are indexed by SHA-1.
 
 TODO: what does `--full-tree` do exactly?
 
@@ -5295,11 +5110,9 @@ Represents a file. Contain the file content, no metadata (filename and permissio
 
 Blobs are represented as the entire file, not as diffs.
 
-This way makes things faster since you don't have to resolve tons of diffs to get a version of a file,
-and is not too memory inefficient since identical files will have the same SHA and only get stored once.
+This way makes things faster since you don't have to resolve tons of diffs to get a version of a file, and is not too memory inefficient since identical files will have the same SHA and only get stored once.
 
-Git can also pack similar files into single objects for greater efficiency
-this functionality is implemented using a structure called a packfile.
+Git can also pack similar files into single objects for greater efficiency this functionality is implemented using a structure called a packfile.
 
 #### Tag object
 
@@ -5323,8 +5136,7 @@ Output:
 
     Version 7.2.1
 
-Although it does not have many side effects for git,
-you can tag whatever object you want. E.g., if you have the SHA of a blob, you can do:
+Although it does not have many side effects for git, you can tag whatever object you want. E.g., if you have the SHA of a blob, you can do:
 
     git tag blobtag <SHA>
 
@@ -5398,19 +5210,15 @@ Create a blob object from a file:
     echo a > a
     git hash-object -w a
 
-Create objects of other types with `-t`.
-You cannot however create other objects directly from human readable formats,
-e.g., `ls-tree` output can only be used to create trees with `mktree`.
+Create objects of other types with `-t`. You cannot however create other objects directly from human readable formats, e.g., `ls-tree` output can only be used to create trees with `mktree`.
 
-It does not seem possible to calculate bare SHAs from the Git command line:
-the SHA input also includes the type and length.
+It does not seem possible to calculate bare SHAs from the Git command line: the SHA input also includes the type and length.
 
 ##### Well known SHA-1s
 
 ###### 0000000000000000000000000000000000000000
 
-All zeros: `'0' * 40`. Indicates a blank object, used on the output of many commands
-as a magic placeholder when something is deleted or created.
+All zeros: `'0' * 40`. Indicates a blank object, used on the output of many commands as a magic placeholder when something is deleted or created.
 
 ###### da39a3ee5e6b4b0d3255bfef95601890afd80709
 
@@ -5420,8 +5228,7 @@ Output:
 
     da39a3ee5e6b4b0d3255bfef95601890afd80709
 
-This should never appear in Git (unless you've found the collision!)
-since every object is prefixed by the type and length.
+This should never appear in Git (unless you've found the collision!) since every object is prefixed by the type and length.
 
 ###### e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 
@@ -5465,14 +5272,9 @@ The object format is:
 - NUL
 - content
 
-Objects are stored with zlib DEFLATE algorithm,
-but only the payload is stored, so they are not in the `.gz` format as specified by
-<http://www.gzip.org/zlib/rfc-gzip.html#file-format> which contains many extra metadata,
-and therefore cannot be decompressed with `gunzip`.
-<http://stackoverflow.com/questions/1532405/how-to-view-git-objects-and-index-without-using-git>
+Objects are stored with zlib DEFLATE algorithm, but only the payload is stored, so they are not in the `.gz` format as specified by <http://www.gzip.org/zlib/rfc-gzip.html#file-format> which contains many extra metadata, and therefore cannot be decompressed with `gunzip`. <http://stackoverflow.com/questions/1532405/how-to-view-git-objects-and-index-without-using-git>
 
-Enough talk, let's open some loose objects manually.
-Starting from the `min-sane` test repository:
+Enough talk, let's open some loose objects manually. Starting from the `min-sane` test repository:
 
     python -c 'import zlib,sys;sys.stdout.write(zlib.decompress(sys.stdin.read()))' \
       < .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391 | hd
@@ -5497,24 +5299,19 @@ The format documentation: <https://github.com/gitster/git/blob/master/Documentat
 
 Some information can also be found at `man git-pack-objects`.
 
-<http://stackoverflow.com/questions/9478023/is-the-git-binary-diff-algorithm-delta-storage-standardized>
-contains some information about the delta format.
+<http://stackoverflow.com/questions/9478023/is-the-git-binary-diff-algorithm-delta-storage-standardized> contains some information about the delta format.
 
 ---
 
-Unlike loose objects, packfiles can store diffs (deltas) between blob versions,
-which is specially important since one line changes on large blobs / trees are common.
+Unlike loose objects, packfiles can store diffs (deltas) between blob versions, which is specially important since one line changes on large blobs / trees are common.
 
-Each packfile can be independently unpacked from other packfiles:
-it contains therefore all the deltas for each chain.
+Each packfile can be independently unpacked from other packfiles: it contains therefore all the deltas for each chain.
 
-Optimizing packfiles is probably an NP complete problem. So Git uses some heuristics to do it:
-<https://github.com/gitster/git/blob/master/Documentation/technical/pack-heuristics.txt>
+Optimizing packfiles is probably an NP complete problem. So Git uses some heuristics to do it: <https://github.com/gitster/git/blob/master/Documentation/technical/pack-heuristics.txt>
 
 Normally packfiles only contain reachable objects.
 
-The `.idx` file is just an index to speed up lookup:
-it can be generated at any time from a `.pack` file with `index-pack`.
+The `.idx` file is just an index to speed up lookup: it can be generated at any time from a `.pack` file with `index-pack`.
 
 ##### Packfile format
 
@@ -5579,8 +5376,7 @@ The unpacking only happens for objects that are not already present in the repos
 
 #### unpack-file
 
-Generate a file in the local directory with the contents of the given blob,
-and name of the form `.merge_file_XXXXXX`:
+Generate a file in the local directory with the contents of the given blob, and name of the form `.merge_file_XXXXXX`:
 
     git unpack-file e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 
@@ -5654,8 +5450,7 @@ And now the tree looks like:
 
 since all objects had been packed.
 
-`git gc` by default does both `repack` and `prune-packed`,
-so we could have used it instead.
+`git gc` by default does both `repack` and `prune-packed`, so we could have used it instead.
 
 #### count-objects
 
@@ -5775,8 +5570,7 @@ Sample output:
     12 860e5247c071721c8e286c73c3633509c77cf538 (198b73d3)
     173 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 (6e760029)
 
-TODO understand. `133`, `12`, ... are probably offsets into the pack file,
-then the object SHA, then what?
+TODO understand. `133`, `12`, ... are probably offsets into the pack file, then the object SHA, then what?
 
 #### index-pack
 
@@ -5805,16 +5599,11 @@ Unpack objects from pack files.
 
 Porcelain.
 
-Combine multiple references,
-which normally are stored one per file,
-into a single `.git/packed-refs` file.
+Combine multiple references, which normally are stored one per file, into a single `.git/packed-refs` file.
 
-This can be more efficient for repositories
-that contain large amounts of refs.
+This can be more efficient for repositories that contain large amounts of refs.
 
-This command has no direct relation to the packfile,
-except that both improve efficiency by storing data in a single file
-instead of multiple separated ones.
+This command has no direct relation to the packfile, except that both improve efficiency by storing data in a single file instead of multiple separated ones.
 
 ### description file
 
@@ -5834,14 +5623,11 @@ Set path to a custom working tree and bare repository (like a `.git` directory i
 
 ## contrib
 
-Under the git source tree there is a directory called contrib
-which includes features that are not yet part of the main distribution,
-but are being considered.
+Under the git source tree there is a directory called contrib which includes features that are not yet part of the main distribution, but are being considered.
 
 Any information contained on this section is more volatile than the others.
 
-Since these commands are so recent,
-they may not be installed with the Git version that comes from your package manager.
+Since these commands are so recent, they may not be installed with the Git version that comes from your package manager.
 
 Git subcommands must be available as:
 
@@ -5866,8 +5652,7 @@ Install:
     mkdir -p ~/bin && cd ~/bin && wget -O git-subtree https://raw.githubusercontent.com/git/git/master/contrib/subtree/git-subtree.sh && chmod +x git-subtree
     sudo ln -s git-subtree /usr/lib/git-core/git-subtree
 
-Create a new branch containing only commits that affected the given directory,
-and put the subdirectory at the root of the repo on that branch:
+Create a new branch containing only commits that affected the given directory, and put the subdirectory at the root of the repo on that branch:
 
     git subtree split -P <subdirectory> -b <new-branch>
 
@@ -5888,14 +5673,11 @@ And don't forget to clean up the big directory:
     git rm -r <subdirectory>
     rm -rf <subdirectory>
 
-You also probably want to reuse part of the `.gitignore`
-and other top-level git config files from the larger directory.
+You also probably want to reuse part of the `.gitignore` and other top-level git config files from the larger directory.
 
 ### diff-highlight
 
-`git diff --word-diff=color` is probably better than this when you are sure that you want
-a word diff for a file: the advantage of this solution is that it works well for both
-prose and programming languages.
+`git diff --word-diff=color` is probably better than this when you are sure that you want a word diff for a file: the advantage of this solution is that it works well for both prose and programming languages.
 
 Highlight which parts of a line were modified, similar to by most web interfaces today.
 
@@ -6041,16 +5823,13 @@ Not sure who wrote it originally, but there are some Gists containing the script
     wget https://gist.githubusercontent.com/andris9/1978266/raw/git-cache-meta.sh
     chmod +x git-cache-meta.sh
 
-One downside is that this script always stores file owner,
-but when publishing a file to other users, we are only interested in storing read write permissions.
+One downside is that this script always stores file owner, but when publishing a file to other users, we are only interested in storing read write permissions.
 
-The situation is complicated because sometimes we do want the owner to be kept:
-e.g. when a file must be owned by `root`.
+The situation is complicated because sometimes we do want the owner to be kept: e.g. when a file must be owned by `root`.
 
 ## Implementations
 
-The git repository data format and transfer protocols have had other implementations
-besides the original Git implementations. As of December 2014, the most preeminent are:
+The git repository data format and transfer protocols have had other implementations besides the original Git implementations. As of December 2014, the most preeminent are:
 
 - libgit2
 - JGit
@@ -6061,35 +5840,23 @@ besides the original Git implementations. As of December 2014, the most preemine
 
 Reimplementation of the Git core methods. Differences from Git:
 
--   meant to be used from a C directly as a linked library:
-    does not have a native command line interface
+-   meant to be used from a C directly as a linked library: does not have a native command line interface
 
 -   is GPLv2 with linking exception: proprietary projects can link to it unmodified.
 
-    This is the perfect move for GitHub,
-    since it forces other companies to merge back if they want to modify it,
-    this improving the software.
+    This is the perfect move for GitHub, since it forces other companies to merge back if they want to modify it, this improving the software.
 
     Git is pure GPLv2.
 
 It uses the exact same `.git` repository format as Git.
 
-Has bindings in many higher level languages like Rugged for Ruby.
-This is one of the greatest things about libgit2:
-since it implements a C interface, other languages will just have wrappers around it,
-making all those other libraries more uniform, thus easier to learn, and less buggy.
+Has bindings in many higher level languages like Rugged for Ruby. This is one of the greatest things about libgit2: since it implements a C interface, other languages will just have wrappers around it, making all those other libraries more uniform, thus easier to learn, and less buggy.
 
-Its development was started and is strongly backed by GitHub which uses it internally.
-Its license is more open than Git's, as it can be used by proprietary software if not modified.
+Its development was started and is strongly backed by GitHub which uses it internally. Its license is more open than Git's, as it can be used by proprietary software if not modified.
 
-libgit2 has reused a small portion of the code in the original Git source
-from authors that allowed the new license:
-<http://stackoverflow.com/questions/17151597/which-code-is-shared-between-the-original-git-and-libgit2>
-It is worth noting that many major authors have allowed such usage, including Linus and Hamano.
+libgit2 has reused a small portion of the code in the original Git source from authors that allowed the new license: <http://stackoverflow.com/questions/17151597/which-code-is-shared-between-the-original-git-and-libgit2> It is worth noting that many major authors have allowed such usage, including Linus and Hamano.
 
-It was designed to replace the Ruby Grit library which initially powered GitHub.
-Grit only parsed Git output from stdin, so it is much slower than the new native C implementation
-of libgit2 which works directly with the repository.
+It was designed to replace the Ruby Grit library which initially powered GitHub. Grit only parsed Git output from stdin, so it is much slower than the new native C implementation of libgit2 which works directly with the repository.
 
 ### JGit
 
@@ -6122,8 +5889,7 @@ GitHub has an HTTP REST API, which allows you to:
 
 -   overcome certain web interface limitations.
 
-    For example, on the web interface, you can only see up to 30 results
-    for the starred repos of other people.
+    For example, on the web interface, you can only see up to 30 results for the starred repos of other people.
 
     With the API, you can get all of them at once and grep away by playing with `per_page`.
 
@@ -6161,8 +5927,7 @@ Or:
 
 #### GitHub API OAuth
 
-OAuth: generate a large random number called the *access token*.
-Which you can only get once.
+OAuth: generate a large random number called the *access token*. Which you can only get once.
 
 There are two ways to get the token:
 
@@ -6174,19 +5939,15 @@ There are two ways to get the token:
 
     A way for applications to interact with GitHub and obtain a token.
 
-    User is first redirected to GitHub, inputs his password only there,
-    and the token is sent back to the application.
+    User is first redirected to GitHub, inputs his password only there, and the token is sent back to the application.
 
-    Useful if you are building an application that must interact with GitHub,
-    and don't want to store the user's password.
+    Useful if you are building an application that must interact with GitHub, and don't want to store the user's password.
 
     Each user gets a single token per application in case multiple token requests are made.
 
 Tokens are safer than storing the password directly because:
 
--   it is possible to restrict what can be done with each token,
-    thus increasing confidence users have on your application.
-
+-   it is possible to restrict what can be done with each token, thus increasing confidence users have on your application.
 -   users can revoke tokens at any time, without changing their passwords.
 
 Once you get the token, make an authenticated request with:
