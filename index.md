@@ -5,6 +5,8 @@ social_media: true
 
 {{ site.toc }}
 
+1.  [grep](grep.md)
+1.  [log](log.md)
 1.  Email patches
     1. [format-patch](format-patch.md)
 
@@ -283,9 +285,9 @@ Its existence allows you for example to do several `git add` separately, edit so
 
 Usually modified with the following commands:
 
-- `add`:          add file so index. Don't touch working tree.
-- `rm`, `mv`:     remove and rename from both index and working tree.
-- `reset`:        set the index to the same as last commit, therefore undoing operations like `git add`.
+- `add`: add file so index. Don't touch working tree.
+- `rm`, `mv`: remove and rename from both index and working tree.
+- `reset`: set the index to the same as last commit, therefore undoing operations like `git add`.
 - `checkout ref`: sets the index to the tree of the ref, therefore radically modifying it.
 
 The index is stored internally by Git in the `.git` directory. Therefore, after you `git add` a file for example, you can remove it from the working tree but you won't lose any data.
@@ -344,41 +346,6 @@ Untracked files only:
     git ls-files --other
 
 TODO only files in current dir?
-
-## grep
-
-Search for lines in tracked files.
-
-If you only want to search the entire current tree, `ack -a` is probably better as it has better formatted output.
-
-There are however cases where `git grep` shines:
-
-- it is crucial to ignore ignored files
-- search in other revisions
-
-Do a `grep -r 'a.c' .` only on tracked files of working tree:
-
-    git grep 'a.c
-
-It true, `-n` by default:
-
-    git config --global grep.lineNumber
-
-It true, `-E` by default:
-
-    git config --global grep.extendedRegexp
-
-Search in revision:
-
-    git grep a.c 1.0
-
-Search in revision only under directory:
-
-    git grep a.c 1.0 -- dir
-
-`-l`: list files without any other data:
-
-    git grep -f a.c | xargs perl -lane 's/a/b/p'
 
 ## Binary files
 
@@ -458,7 +425,6 @@ Then:
     git diff -U
 
 shows:
-
 
     @@ -1,8 +1,8 @@
     -1
@@ -1242,8 +1208,7 @@ It is recommended that the commit message be like:
     - start with a capital letter.
     - end with a period.
 
-    The first line is treated specially by many tools which makes that line even more preeminent,
-    e.g., Git itself has `git log --oneline`. So make that line count.
+    The first line is treated specially by many tools which makes that line even more preeminent, e.g., Git itself has `git log --oneline`. So make that line count.
 
 -   blank line
 
@@ -1309,206 +1274,6 @@ If you use this all the time, you only add files once.
 ### allow-empty
 
 Allow "empty" commits that just reuse the last tree.
-
-## log
-
-List revisions. Highly customizable output format.
-
-### Basic usage
-
-Start with [2]. List versions in chronological order:
-
-    git log
-
-Sample output:
-
-    commit 1ba8fcebbff0eb6140740c8e1cdb4f9ab5fb73b6
-    Author: Ciro Santillli <ciro@mail.com>
-    Date:   Fri Apr 12 10:22:30 2013 +0200
-
-        2
-
-    commit 494b713f2bf320ffe034adc5515331803e22a8ae
-    Author: Ciro Santillli <ciro@mail.com>
-    Date:   Thu Apr 11 15:50:38 2013 +0200
-
-        1
-
-In this example, there are 2 versions, one with commit message `1` and another with commit message `2`.
-
-On version `1` we see that:
-
-- author name: `Ciro Santilli` (specified in `git config`)
-- author email: `ciro@mail.com` (specified in `git config`)
-- commit hash: `494b713f2bf320ffe034adc5515331803e22a8ae`.
-
-### all
-
-Show all commits:
-
-    git log --all
-
-Includes:
-
-- on other branches besides the current (by default only current branch is shown):
-- future commits when navigating history
-
-### patch
-
-Show every commit and diff (Patch) of a single file:
-
-    git log -p file
-
-## grep
-
-Show only if grepping commit messages match:
-
-    git log --grep 1
-
-## n
-
-View up to a certain number of log messages (most recent):
-
-    git log -n 1
-
-`-n 1` is specially useful if you want to get information on the current commit, specially when used with `pretty=format`.
-
-### format
-
-The `--pretty` option allows for any output format. There are also options which are aliases to useful formats that can be achieved with `--pretty`.
-
-Same as `--abbrev-commit` and `--pretty=oneline`:
-
-    git log --oneline
-
-View hash and commit messages only, one per line:
-
-    git log --pretty=oneline
-
-Show short hashes:
-
-    git log --abbrev-commit
-
-Use a custom format string:
-
-    git log --pretty=format:'%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s' --date=short
-
-See `man git log` and grep for `format:` for a list of all formats.
-
-There seems to be no built-in way to do fixed column widths, but that can be worked around with `column`:
-
-    git log --pretty=format:'%C(yellow)%h|%Cred%ad|%Cblue%an|%Cgreen%d %Creset%s' --date=short | column -ts'|' | less -r
-
-### graph
-
-Show text commit tree:
-
-    git log --oneline --graph
-
-Sample output:
-
-    *   0f055197776275cdf55538469a07cf8d5e13ad24 Merge pull request #6610 from Datacom/feature/parallel_diff_scrollbars_pr2
-    |\
-    | * 83f811fff5f6b2188c82f187f747122d2f7cd936 Refactor Parallel Diff feature and add scrollbars
-    * |   cf7aab9b441f61a0db11f1f20887db1862c8c791 Merge branch 'master' of gitlab.com:gitlab-org/gitlab-ce
-    |\ \
-    | * \   24e9c5e83e1b5b304aa0109e95bbd69a554f5e3f  Merge branch 'bugfix/fix_unicorn-sidekiq_confusion_in_gitlab_init_script' into 'master'
-    | |\ \
-    | | * | 058aae5940762c18b3f099a6c3cb734041641390 Fixed Unicorn-Sidekiq confusion in GitLab init script.
-    * | | |   aabd90a828eeb1b1c2fd82afd674d965aaa2dde3 Merge branch 'master' of github.com:gitlabhq/gitlabhq
-
-The asterisks `*` show which branch the message on the right corresponds to.
-
-### decorate
-
-Also show refs for each commit:
-
-    git log --decorate --pretty=oneline
-
-Sample output:
-
-    abc2f322034989737e0c7654ecbeaa1009011bb6 (HEAD, normalize) Improve output normalization with custom parser.
-    9b397b1d09f126aeba985aed8c41bf86ba0b0e58 Add -l option.
-    9dc5a1a74d65fdb3e1d6aa23365089a0d8d7a6ed Add -n option.
-    d99ce39e4c37c869ba2b98f593f31d00842c8c99 Add -s option.
-    2fba1c4ba0574027fe8845aa5ce63edea677824f (up/master, origin/master, origin/HEAD, only-ext, master) Merging and resolving conflict
-
-### simplify-by-decoration
-
-Only show commits that:
-
-- have a ref
-- are required to understand history of commits with a ref. Basically merge events.
-
-Especially meaningful with `--graph`, where it becomes clear why the extra commits are added:
-
-    git log --decorate --graph --pretty=oneline --simplify-by-decoration
-
-Sample output:
-
-    * b60e1176d0f1be90902e117e6bb45b712024ade0 (HEAD, origin/one-test, one-test) Add -a option.
-    *   2fba1c4ba0574027fe8845aa5ce63edea677824f (up/master, origin/master, origin/HEAD, only-ext, master) Merging and resolving conflict
-    |\
-    | * 7033e24a572fdd1f88d5b0eb67bf08599ca655d9 (origin/document-config-local) Document config_local.py on README.
-    * |   7ab3a61a7a5b95bffb4704e3b2824613099f140e Merge pull request #24 from cirosantilli/factor-out-engines
-    |\ \
-    | * | 4ae853d571046c18705f49520e501c9affbe2812 (origin/factor-out-engines) Factor out engines that are commands on PATH.
-    * | |   e69627cbf9a576ded85fadd7a1e1325499f462cf Merge pull request #25 from cirosantilli/sample-output-readme
-    |\ \ \
-    | * | | 3e4684cd291e54c79028c58c8241254771d9ceca (origin/sample-output-readme) Add sample run-tests.py output to README.
-    | |/ /
-    * | | 1f7b2547d1965f2887146929e55eecc881eabb9f (origin/check-no-engines) Check if are no engines enabled to avoid exception.
-    |/ /
-    * |   710e9adf53d7cdd1f3888a3dbeacb38d07deaf49 Merge pull request #20 from cirosantilli/multimarkdown
-
-### Range
-
-    git log rev1..rev2
-
-If any of them is omitted, it defaults to `HEAD`. Major application: see differences between a branch and its remote.
-
-Outdated remote origin:
-
-    git fetch origin
-    git log origin/master..
-
-Updated upstream:
-
-    git fetch upstream
-    git log ..upstream/master
-
-To simply count the number of different versions, consider `git branch -vv`
-
-### diff-filter
-
-View deleted files only:
-
-    git log --diff-filter=D --summary
-    git log --all --pretty=format: --name-only --diff-filter=D
-
-Useful to find when you deleted a file from a repo if you don't know its exact path!
-
-### follow
-
-Also cross `git mv`:
-
-    git log --follow -p file
-
-If a merge occurs, both branches appear on `git log` and get mixed up chronologically and it is impossible to set them apart.
-
-### first-parent
-
-To show only history of the current branch ignoring merges do:
-
-    git log --first-parent
-
-This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
-
-### Reachability
-
-Commits point to their parents (0, 1 or more), but not to their children.
-
-This is why when the term *reachable* is used, it implies commits which are ancestors of a given commit.
 
 ## shortlog
 
@@ -1778,13 +1543,11 @@ Also work:
 - remote head: `origin/master~3`
 - the previous position of branch `master`: `master@{1}`
 
-Moving forward is not unique since branch can split and have multiple children,
-so it is more complicated.
+Moving forward is not unique since branch can split and have multiple children, so it is more complicated.
 
 ### name-rev
 
-If you have the hash of a commit and you want a symbolic name for it,
-`name-rev` does that for you, probably looking for the closest named reference ahead of the commit.
+If you have the hash of a commit and you want a symbolic name for it, `name-rev` does that for you, probably looking for the closest named reference ahead of the commit.
 
 Example:
 
@@ -1827,9 +1590,7 @@ are used on command specifications throughout Git, so it is crucial to grasp the
 
 Most of the naming described a `man gitrevisions` are commit-ishes.
 
-`<tree-ish>` is a name that ultimately resolves to a tree, which `man gitrevisions`
-defines as either a directory or a file (blob). Every commit-ish is also a tree-ish
-that refers to the top-level tree of the commit, but a few tree-ishes are not commit-ishes, e.g.:
+`<tree-ish>` is a name that ultimately resolves to a tree, which `man gitrevisions` defines as either a directory or a file (blob). Every commit-ish is also a tree-ish that refers to the top-level tree of the commit, but a few tree-ishes are not commit-ishes, e.g.:
 
 - master:path/to/tree
 - SHA-1 of a tree object
@@ -2158,8 +1919,7 @@ Push all tags with:
 
     git push --tags
 
-but this is bad because it might push unwanted development tags,
-which could conflict with the local tags of other developers.
+but this is bad because it might push unwanted development tags, which could conflict with the local tags of other developers.
 
 Delete a remote tag with either of:
 
@@ -2212,11 +1972,9 @@ Branches are a type of ref: a name for a commit.
 
 Branches live under `.git/refs/heads`.
 
-Unlike tags, branches are movable: when you commit on a branch the branch moves.
-Therefore, you cannot refer to a single revision forever with a branch.
+Unlike tags, branches are movable: when you commit on a branch the branch moves. Therefore, you cannot refer to a single revision forever with a branch.
 
-Branches are used to creates alternate realities
-so you can test changes without one affecting the other.
+Branches are used to creates alternate realities so you can test changes without one affecting the other.
 
 ### master
 
@@ -2224,12 +1982,9 @@ so you can test changes without one affecting the other.
 
 There is nothing else special about it.
 
-By convention, In many work flows,
-it represents the most recent unstable version of the software,
-so it is where you will develop the software.
+By convention, In many work flows, it represents the most recent unstable version of the software, so it is where you will develop the software.
 
-There are also some work flows that only leave stable versions at `master`,
-and develop on the `dev` branch.
+There are also some work flows that only leave stable versions at `master`, and develop on the `dev` branch.
 
 ### List branches
 
@@ -2416,8 +2171,7 @@ Rename the current branch:
 
 ### Branch without parent
 
-If two repositories are strictly linked,
-it is possible to use a single repository with unrelated branches for both.
+If two repositories are strictly linked, it is possible to use a single repository with unrelated branches for both.
 
 To achieve this, you must create a branch without a parent, which can be done with:
 
@@ -2450,9 +2204,7 @@ Before you do this however, take into account its downsides:
 
 Plumbing command to check if a `ref` is a valid name.
 
-Git imposes several restrictions on `refs`, such as not containing spaces,
-even is those don't have a specific technical reason like name a conflict,
-e.g. no spaces: <http://stackoverflow.com/questions/6619073/why-cant-a-branch-name-contain-the-space-char>
+Git imposes several restrictions on `refs`, such as not containing spaces, even is those don't have a specific technical reason like name a conflict, e.g. no spaces: <http://stackoverflow.com/questions/6619073/why-cant-a-branch-name-contain-the-space-char>
 
 On the other hand, except for the small restriction list, UTF-8 names are allowed.
 
@@ -2666,8 +2418,7 @@ And it fails, because in `HEAD` a was removed from the repo.
 
 #### Uncommitted changes
 
-Unlike when checking out the entire repo, Git does not prompt you
-in case of non-committed modifications when checking out individual files!
+Unlike when checking out the entire repo, Git does not prompt you in case of non-committed modifications when checking out individual files!
 
 This is a great way to achieve data loss.
 
@@ -2722,15 +2473,13 @@ And the binary search continues!
 
 ## stash
 
-Saves all unstaged modifications of the working tree,
-and returns the working tree to `HEAD` into a modification stack called *stash*.
+Saves all unstaged modifications of the working tree, and returns the working tree to `HEAD` into a modification stack called *stash*.
 
 The changes can be applied to any branch afterwards.
 
 This is a common operation when:
 
-- you are working on a branch, when a more urgent branch needs fixing,
-    but you don't want to create a commit just to save the current state
+- you are working on a branch, when a more urgent branch needs fixing, but you don't want to create a commit just to save the current state
 - you want to apply working tree modifications to another branch
 
 Push changes to the top of the stash:
@@ -2821,9 +2570,7 @@ The `diff3` algorithm takes 3 file versions as input: the base, and the two conf
 
 If there is a single common ancestor for the conflict heads, it is the base.
 
-If there are multiple, it recursively creates a new tree TODO details,
-leading up to a new virtual branch that will be the base.
-`man git` says that this tends to lead to less merge conflicts than directly using either ancestor.
+If there are multiple, it recursively creates a new tree TODO details, leading up to a new virtual branch that will be the base. `man git` says that this tends to lead to less merge conflicts than directly using either ancestor.
 
 E.g., start with:
 
@@ -2842,8 +2589,7 @@ Then:
     git checkout E
     git merge F
 
-There are 2 best common ancestors, `C` and `D`. Git merges them into a new virtual branch `V`,
-and then uses `V` as the base.
+There are 2 best common ancestors, `C` and `D`. Git merges them into a new virtual branch `V`, and then uses `V` as the base.
 
     (A)----(B)----(C)--------(F)
             |      |          |
@@ -2865,16 +2611,13 @@ Example why it is a good choice: <http://codicesoftware.blogspot.com/2011/09/mer
 
 ### Merge conflicts
 
-Certain modifications can be made automatically,
-provided they are only done on one of the branches to be merged:
+Certain modifications can be made automatically, provided they are only done on one of the branches to be merged:
 
 - given line of non-binary file modified
 - file added
 - mode changed
 
-If all merges can be done automatically, then you are prompted for a commit message
-and the current HEAD branch advances automatically to a new commit.
-This type of simple merge is called fast-forward.
+If all merges can be done automatically, then you are prompted for a commit message and the current HEAD branch advances automatically to a new commit. This type of simple merge is called fast-forward.
 
 #### Text conflicts
 
@@ -2903,8 +2646,7 @@ and if you do `git status` you will either of:
     both modified: path/to/file.txt
     both added: path/to/file.txt
 
-To finish the merge you have to look into each file with a conflict,
-correct them, `git add` and then `git commit`.
+To finish the merge you have to look into each file with a conflict, correct them, `git add` and then `git commit`.
 
 To put the file into one of the two versions, you can do either:
 
@@ -2958,11 +2700,9 @@ Stop the merge resolution process and go back to previous state:
 
 ##### Techniques to solve text conflicts
 
-If the conflict is very simple, just do `git status`,
-and go on the conflicting files one by one on the default `checkout -m` style.
+If the conflict is very simple, just do `git status`, and go on the conflicting files one by one on the default `checkout -m` style.
 
-For slightly more complicated issues, the way to go is to decide what changed between the base
-and each conflicting side, and then try to incorporate both of thoes changes.
+For slightly more complicated issues, the way to go is to decide what changed between the base and each conflicting side, and then try to incorporate both of those changes.
 
 For simpler conflicts, `git checkout --conflict=diff3` may be enough.
 
@@ -2976,11 +2716,9 @@ See also:
 
 #### Binary conflicts
 
-Git does not do anything smart in the case of binary files:
-it is up to you to use the right tool to view the file and edit it to work.
+Git does not do anything smart in the case of binary files: it is up to you to use the right tool to view the file and edit it to work.
 
-You can use `checkout --ours` and `checkout --theirs` normally,
-`checkout --conflict=diff3` does not modify the file tree and outputs:
+You can use `checkout --ours` and `checkout --theirs` normally, `checkout --conflict=diff3` does not modify the file tree and outputs:
 
     warning: Cannot merge binary files: conflict/binary-preview.png (ours vs. theirs)
 
@@ -3002,15 +2740,13 @@ from the side that contains the directory, or:
 
 from the side that contains the file.
 
-If `dir-path~other-branch` already exists,
-another names is chosen from the first free name amongst:
+If `dir-path~other-branch` already exists, another names is chosen from the first free name amongst:
 
     dir-path~other-branch_0
     dir-path~other-branch_1
     ...
 
-`--ours` and `--theirs` are half broken since you cannot do `git checkout --ours dir-path`
-to the side that contains the directory: you have to reference the files it contains.
+`--ours` and `--theirs` are half broken since you cannot do `git checkout --ours dir-path` to the side that contains the directory: you have to reference the files it contains.
 
 `--conflict=diff3 -- path` fails with:
 
@@ -3018,22 +2754,19 @@ to the side that contains the directory: you have to reference the files it cont
 
 ##### Symlink file conflict
 
-Appears as `CONFLICT (add/add)` on `git merge`, and `both added` on `git status`,
-i.e., indistinguishable from regular file conflicts.
+Appears as `CONFLICT (add/add)` on `git merge`, and `both added` on `git status`, i.e., indistinguishable from regular file conflicts.
 
 On the working tree, the file is always a regular file.
 
 `--ours` and `--theirs` work as expected.
 
-Depending from which side you do `--conflict=diff3` it may generate a symlink
-pointing to a file path with conflict markers!
+Depending from which side you do `--conflict=diff3` it may generate a symlink pointing to a file path with conflict markers!
 
 ### Merge target branch
 
 <http://stackoverflow.com/questions/3216360/merge-update-and-pull-git-branches-without-using-checkouts>
 
-It is not possible to `git merge` into a target branch other than the current
-because if there were merge conflicts there would be no way to solve them.
+It is not possible to `git merge` into a target branch other than the current because if there were merge conflicts there would be no way to solve them.
 
 If it is just a fast forward, you can use `fetch` instead:
 
@@ -3051,8 +2784,7 @@ and use a `.gitattributes` as:
 
 ### squash
 
-Create a single commit on top of the current branch,
-such that the new commit contains exactly what would be the contents of the merge.
+Create a single commit on top of the current branch, such that the new commit contains exactly what would be the contents of the merge.
 
 Given:
 
@@ -3090,13 +2822,9 @@ To resolve merge conflicts, you have to `git add file`.
 
 There are several techniques that help you to find what is the correct resolution.
 
--   `git diff topic...master`: show only changes that happened on `master` after `topic` branched out,
-    and which are therefore the cause of the conflict. Useful, since usually you know what
-    you have changed, and you need to know what others have changed since.
+-   `git diff topic...master`: show only changes that happened on `master` after `topic` branched out, and which are therefore the cause of the conflict. Useful, since usually you know what you have changed, and you need to know what others have changed since.
 
-    This is specified in `man git-diff`. The notation resembles that of commit sets,
-    of `man gitrevisions`, but this is a special since diff operates two commits,
-    not commit sets.
+    This is specified in `man git-diff`. The notation resembles that of commit sets, of `man gitrevisions`, but this is a special since diff operates two commits, not commit sets.
 
 -   `mergetool` open an external conflict resolution tool, possibly GUI
 
@@ -3104,18 +2832,15 @@ There are several techniques that help you to find what is the correct resolutio
 
 Plumbing command that runs a 3-way merge on the three given input files.
 
-It is therefore a subset of the more complex `merge` recursive operation, which generates
-all the required files by checkout and runs on all required files.
+It is therefore a subset of the more complex `merge` recursive operation, which generates all the required files by checkout and runs on all required files.
 
 ## merge-base
 
-Plumbing command that finds a best common ancestor commit between two candidates,
-thus suitable for a 3-way merge.
+Plumbing command that finds a best common ancestor commit between two candidates, thus suitable for a 3-way merge.
 
 A common ancestor is better than another if it is a descendant of the other.
 
-It is possible to have multiple best common ancestors.
-For example, both `C` and `D` are best common ancestors of `E` and `F`:
+It is possible to have multiple best common ancestors. For example, both `C` and `D` are best common ancestors of `E` and `F`:
 
     (A)----(B)----(C)----------(D)
             |      |            |
@@ -3133,9 +2858,7 @@ Output all merge bases with `-a` instead of just one:
 
 ## mergetool
 
-Start running a conflict resolution tool,
-typically a 3-way merge tool to solve all merge conflicts
-for the merge the is currently taking place:
+Start running a conflict resolution tool, typically a 3-way merge tool to solve all merge conflicts for the merge the is currently taking place:
 
     git mergetool -t vimdiff
     git mergetool -t kdiff3
@@ -3146,8 +2869,7 @@ Resolve conflicts on a single file:
 
 Git already knows about certain tools, and you must choose amongst them.
 
-Git checks out all necessary versions in current directory with basename prefixes,
-and calls the merge tool on them.
+Git checks out all necessary versions in current directory with basename prefixes, and calls the merge tool on them.
 
 If the tool is not given, Git uses:
 
@@ -3186,10 +2908,6 @@ To prevent that, do:
 Tools only used in projects that exchange patches via email, not in those that use web interfaces like GitHub.
 
 ### am
-
-TODO
-
-### apply
 
 TODO
 
