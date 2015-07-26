@@ -32,9 +32,9 @@ On version `1` we see that:
 
 ## Search criteria
 
-## all
+### all
 
-Show all commits:
+Start searching from all refs:
 
     git log --all
 
@@ -69,7 +69,7 @@ Show only if grepping commit messages match:
 
 ### S
 
-Find commits that added or removed a given word:
+Find commits that added or removed a given word (it appears on the diff):
 
     git log -Sword
 
@@ -102,13 +102,25 @@ If a merge occurs, both branches appear on `git log` and get mixed up chronologi
 
 ### first-parent
 
-To show only history of the current branch ignoring merges do:
+Show only history of the current branch ignoring merges:
 
     git log --first-parent
 
 This is a great option to view history on a feature branch onto which upstream was merged from time to time. Rebase is a better option than merge in this case if you work locally, but may not be an option if a group is working on the feature branch.
 
+### max-parents
+
+### min-parents
+
+Filter by the number of parents.
+
+Find all root commits:
+
+    git log --max-parents=0
+
 ## Display mode
+
+### p
 
 ### patch
 
@@ -211,3 +223,17 @@ Sample output:
     * | | 1f7b2547d1965f2887146929e55eecc881eabb9f (origin/check-no-engines) Check if are no engines enabled to avoid exception.
     |/ /
     * |   710e9adf53d7cdd1f3888a3dbeacb38d07deaf49 Merge pull request #20 from cirosantilli/multimarkdown
+
+### source
+
+Show from which refs the commit was reached. Useful with `--all`
+
+Commit lines will be of the type:
+
+    commit 8d8140843501107c92e2f9a5acb60ee136352c1f	refs/tags/v2.3.0-rc0
+
+instead of:
+
+    commit 8d8140843501107c92e2f9a5acb60ee136352c1f	
+
+So we see that this commit was found from `refs/tags/v2.3.0-rc0`.
