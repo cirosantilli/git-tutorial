@@ -1,4 +1,8 @@
-# diff
+---
+title: diff
+social_media: true
+---
+
 
 View diff between working tree and index (changes will disappear after `git add`):
 

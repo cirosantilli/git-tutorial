@@ -1,4 +1,7 @@
-# format-patch
+---
+title: format-patch
+social_media: true
+---
 
 Generate a patch to send by email.
 

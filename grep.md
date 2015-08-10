@@ -1,4 +1,8 @@
-# grep
+---
+title: grep
+social_media: true
+---
+
 
 Search for lines in tracked files.
 
