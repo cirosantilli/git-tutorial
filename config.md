@@ -48,7 +48,10 @@ Get multiple values: TODO
 
     git config --get-all user.name
 
-Set boolean
+Set boolean:
+
+    git config X true
+    git config X false
 
 ## Most important configs with bad defaults
 
