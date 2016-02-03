@@ -1,8 +1,8 @@
 ---
 title: diff
 social_media: true
+permalink: git-tutorial/diff/
 ---
-
 
 View diff between working tree and index (changes will disappear after `git add`):
 

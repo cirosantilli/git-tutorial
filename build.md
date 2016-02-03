@@ -1,6 +1,7 @@
 ---
 title: Build
 social_media: true
+permalink: git-tutorial/build/
 ---
 
 How to build git from source.

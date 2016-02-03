@@ -1,6 +1,7 @@
 ---
 title: clone
 social_media: true
+permalink: git-tutorial/clone/
 ---
 
 Make a "copy" of another repo.

@@ -1,4 +1,8 @@
-# log
+---
+title: log
+social_media: true
+permalink: git-tutorial/log/
+---
 
 List revisions. Highly customizable output format.
 

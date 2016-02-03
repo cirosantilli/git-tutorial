@@ -1,6 +1,7 @@
 ---
 title: push
 social_media: true
+permalink: git-tutorial/push/
 ---
 
 Makes changes on a bare remote repo.
