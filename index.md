@@ -3929,6 +3929,12 @@ The content addressable filesystem is implemented under `.git/objects` as either
 
 What would happen if collision happened: the old object is kept <http://stackoverflow.com/questions/9392365/how-would-git-handle-a-sha-1-collision-on-a-blob> Malicious collisions wouldn't have much of an effect since you have to commit them first.
 
+##### Alternatives
+
+It is also possible to store objects on a custom directory with the `alternatives` system: <http://dustin.sallings.org/2008/12/30/git-alternates.html>
+
+This allows you to reuse all objects across multiple repositories. Used by GitHub: <http://githubengineering.com/counting-objects/>
+
 #### Object types
 
 Git stores 4 types of object on the same content addressable filesystem:
