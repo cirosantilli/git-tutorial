@@ -25,7 +25,7 @@ but there are (sensible) defaults for almost every part of the command, many of 
 
 The full form, pushes the local branch `<src>` to remote with the name `<dst>`. If `<dst>` does not exist it is created.
 
-`+` is optional the same as `-f`: if given allows non-fast-forward updates, thus allowing you to lose commits on the remote.
+The plus sign `+` is optional the same as `-f`: if given allows non-fast-forward updates, thus allowing you to lose commits on the remote.
 
 ## dst
 

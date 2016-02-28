@@ -14,8 +14,10 @@ New multi-file organization being built:
     1.  Working with remotes
         1. [clone](clone)
         1. [push](push)
+        1. [fetch](fetch)
         1. [remote](remote)
     1.  [config](config)
+    1.  [rebase](rebase)
 1.  Email patches
     1. [format-patch](format-patch)
 1.  Other version control systems
@@ -23,6 +25,9 @@ New multi-file organization being built:
     1. [hg](hg)
 1.  Internals
     1. [Build](build)
+1.  Web interfaces
+    1. [GitHub](github)
+    1. [Gerrit](gerrit)
 
 ## Why learn Git
 
@@ -217,8 +222,7 @@ There are 3 most common possible sections:
 
 Other sections also exist:
 
-- `Unmerged paths`: while on a merge conflict resolution.
-    You must first add those files and then `git rebase --continue`.
+- `Unmerged paths`: while on a merge conflict resolution. You must first add those files and then `git rebase --continue`.
 
 And if nothing changes, it says so.
 
@@ -2244,9 +2248,7 @@ Will be discussed together with merge conflicts.
 
 Confusingly, during `git rebase`, `theirs` means the previous current branch.
 
-See also:
-<http://stackoverflow.com/questions/2959443/why-is-the-meaning-of-ours-and-theirs-reversed-with-git-svn>
-and `man git-rebase`.
+See also: <http://stackoverflow.com/questions/2959443/why-is-the-meaning-of-ours-and-theirs-reversed-with-git-svn> and `man git-rebase`.
 
 ## bisect
 
@@ -3103,74 +3105,6 @@ TODO:
 
 TODO
 
-## fetch
-
-Looks for changes made on a remote repository and brings them in.
-
-The full signature is:
-
-    git fetch <remote> <refspec>
-
-where `<refspec>` is the same as for `git push`.
-
-You can do a dry run that only lists remote references with `ls-remote`.
-
-For example, to update you `master` branch from a remote `dev` you can do:
-
-    git fetch origin dev:master
-
-This will only work for fast-forward changes, because it could be done for any branch, not just the current one, and in that case there is no way to resolve merge conflicts without a working tree.
-
-### Omit refspec
-
-Omitting refspec as in:
-
-    git fetch <remote>
-
-defaults `<refspec>` to:
-
--   `remote.<remote>.fetch`, which is set by default on remote creation to `+refs/heads/*:refs/remotes/<remote>/*` configuration, so a matching forced update from remote `heads` into local `remotes/<remote>/`.
-
-    So after you `git fetch origin`, you can create a local branch with a shorter name and checkout to it with:
-
-        git checkout -b local-name origin/remote-branch
-
-    Remember that this works because `.refs/remotes` is in the refs search path, and no sane person would have a local reference called `.git/heads/origin/remote-branch`, or that would have the preference.
-
-    Multiple `remote.<remote>.fetch` entries can be added. A possibly useful one with GitHub, is:
-
-        fetch = +refs/pull/*/head:refs/pull/origin/*
-
-    which also fetches all pull requests, which GitHub stores under `refs/pulls`. You can then checkout with:
-
-        git checkout -b 999 pull/origin/999
-
-    Remember that just `origin/999` won't work because `refs/pulls` is not in the refs search path.
-
-    Also note that this configuration would might pull *a lot* of references, so you might be better off with one off commands like:
-
-        git fetch origin pull/<pr-number>/head:local-name
-
--   `origin`
-
-This hasn't changed in Git 2.0, and is therefore simpler than the default refspec for `git push`.
-
-### Omit remote
-
-Defaults the remote to the first defined of:
-
-- `branch.<name>.remote`
-- `origin`
-
-### FETCH_HEAD
-
-A reference that points to the latest fetched branch.
-
-Common use case: get a single commit not on the main repository, often on the fork feature branch of a pull request, to try it out locally without merging or adding a new remote:
-
-    git fetch origin pull/<pr-number>/head
-    git checkout -b <local-branch-name> FETCH_HEAD
-
 ## bare
 
 A bare repository is one that:
@@ -3220,7 +3154,7 @@ As of 1.8.4, there seems to be no way to conveniently change the current remote 
 
 `pull` is exactly the same as fetch + merge on given branch and merges with current branch.
 
-`pull --rebase` does `reabase` instead of `merge`. You need that after someone did a `push -f`.
+`pull --rebase` does `rebase` instead of `merge`. You need that after someone did a `push -f`.
 
 Does not update remote heads like fetch does.
 
@@ -3470,165 +3404,6 @@ Edit `.gitmodules` and then:
 
 <http://stackoverflow.com/questions/4604486/how-do-i-move-an-existing-git-submodule-within-a-git-repository>
 
-## rebase
-
-Change local history making it appear linear thus clearer.
-
-As any history change, should only be done before pushing to a remote.
-
-### Non-interactive rebase
-
-Given:
-
-    (A)----(B)----(C)
-            |      |
-            |      master *
-            |
-            +-----(D)
-                   |
-                   feature
-
-If you do:
-
-    git checkout feature
-    git rebase master
-
-you get:
-
-    (A)----(B)----(C)-------(D)
-                   |         |
-                   master    feature *
-
-Therefore the rebase changes the history, making it look linear and therefore easier to understand.
-
-This is how you should incorporate upstreams changes on your feature branch before you make a pull request, followed often by a squash interactive rebase.
-
-### Interactive rebase
-
-    git rebase -i HEAD~3
-
-Opens up a Vim buffer where you can modify all commits between `HEAD` and `HEAD~2` (total 3 commits).
-
-The buffer should contain something like this:
-
-    pick fc95d59 last - 2 commit message
-    pick 81961e9 last - 1 commit message
-    pick d13a071 last commit message
-
-    # Rebase d57a363..d13a071 onto d57a363
-    #
-    # Commands:
-    #  p, pick = use commit
-    #  r, reword = use commit, but edit the commit message
-    #  e, edit = use commit, but stop for amending
-    #  s, squash = use commit, but meld into previous commit
-    #  f, fixup = like "squash", but discard this commit's log message
-    #  x, exec = run command (the rest of the line) using shell
-    #
-    # These lines can be re-ordered; they are executed from top to bottom.
-    #
-    # If you remove a line here THAT COMMIT WILL BE LOST.
-    #
-    # However, if you remove everything, the rebase will be aborted.
-    #
-    # Note that empty commits are commented out
-
-#### Edit
-
-`edit` can be used for example if we want to change the commit message for `HEAD~` we edit that to:
-
-    pick fc95d59 last - 2 commit message
-    edit 81961e9 last - 1 commit message
-    pick d13a071 last commit message
-
-Save and quit.
-
-Now git puts us back as `HEAD~1`.
-
-We can then:
-
-    git commit --amend -m 'new last - 1 commit message'
-
-When you are satisfied:
-
-    git rebase --continue
-
-If you change your mind and think that it is better not to rebase do:
-
-    git rebase --abort
-
-If you change your mind only about a single `commit`, but still want to change the others to:
-
-    git rebase --skip
-
-And we are back to `HEAD`.
-
-Now `git log --pretty=oneline -n3` gives:
-
-    fc95d59[...] last - 2 commit message
-    81961e9[...] new last - 1 commit message
-    d13a071[...] last commit message
-
-#### squash
-
-`squash` can be used if you want to remove all trace of a commit.
-
-`squash` is useful when you are developing a feature locally and you want to save progress at several points in case you want to go back.
-
-When you are done, you can expose a single commit for the feature, which will be much more concise and useful to others, or at least people will know that you can use `squash`.
-
-You will also look much smarter, since it will seem that you did not make lots of trials before getting things right.
-
-If we want to remove only the `HEAD~` from history we edit as:
-
-    pick fc95d59 last - 2 commit message
-    s 81961e9 last - 1 commit message
-    pick d13a071 last commit message
-
-This will open up another Vim buffer like:
-
-    # This is a combination of 2 commits.
-    # The first commit's message is:
-
-    last -2 commit message
-
-    # This is the 2nd commit message:
-
-    last -1 commit message
-
-    #[more comments]
-
-Because commits `HEAD~` and `HEAD~2` will be turned into one, it is likely that the new message will be neither of the two.
-
-So, erase all non comment lines and do something like:
-
-    last -1 and last -2 together
-    #[more comments]
-
-Now `git log --pretty=oneline -n2` gives something like:
-
-    fc95d59[...] last -1 and last -2 together
-    d13a071[...] last commit message
-
-It is not possible to squash the last commit of a rebase:
-
-    squash fc95d59 last - 2 commit message
-    pick 81961e9 last - 1 commit message
-    pick d13a071 last commit message
-
-To do that, it would be necessary to do a `git rabase -i HEAD~4`, and `pick` `HEAD~4`:
-
-    pick fc95d59 last - 2 commit message
-    squash fc95d59 last - 2 commit message
-    pick 81961e9 last - 1 commit message
-    pick d13a071 last commit message
-
-#### reorder and delete
-
-It is also possible to reorder and erase any commit on the commit list.
-
-All you need to do is to change the line order or remove lines.
-
 ## replace
 
 Magic mechanism to alter a single commit anywhere in the repository without affecting history, (if you change a commit in the middle of the repository, it's parent SHA changes, so you have to change it's children and so on).
@@ -3672,18 +3447,6 @@ It is usually the same person in most cases, but they might differ when:
 One important case where committer and author differ is in projects where patches are generated by `git format-patch`, sent by email, and applied by another person with `git am`. In that case, the committer is taken from the local configuration, while the authors comes from the patch, so nothing special needs to be done about it.
 
 With web interfaces like GitHub, which hold all the repositories on a single machine and apply patches with `git merge`, this is not necessary: the commit appears directly on history, in addition to the merge commit. This is the case for most modern projects.
-
-## cherry-pick
-
-Merge change introduced by given commits.
-
-If merge is not clean, may create merge conflicts which you have to resolve similarly to `git merge`.
-
-The existing merge messages and other metadata are kept.
-
-Merge only the last commit from the `other-branch` branch:
-
-    git cherry-pick other-branch
 
 ## rerere
 
@@ -4846,161 +4609,6 @@ It was designed to replace the Ruby Grit library which initially powered GitHub.
 Pure Java implementation.
 
 Developed in the context of the Eclipse project.
-
-## GitHub specific
-
-The git URL is then `git@github.com:userid/reponame.git`
-
-### Pull request refs
-
-GitHub stores refs to pull requests on the original repository under `refs/pull/<number>/head`.
-
-Therefore, if you want to get a pull request locally to try it out on a local branch you can do:
-
-    git fetch origin pull/<pr-number>/head
-    git checkout -b <local-branch-name> FETCH_HEAD
-
-GitHub also offers the merge request directly at `refs/pull/<pull-request-id>/merge`.
-
-### GitHub API v3 via cURL
-
-GitHub has an HTTP REST API, which allows you to:
-
--   programmatically access and modify GitHub data
-
--   overcome certain web interface limitations.
-
-    For example, on the web interface, you can only see up to 30 results for the starred repos of other people.
-
-    With the API, you can get all of them at once and grep away by playing with `per_page`.
-
-`curl` is a convenient way to use the API manually.
-
-Vars:
-
-    USER=user
-    REPO=repo
-    PASS=
-
-GET is the default request type:
-
-    curl https://api.github.com/users/$USER/starred?per_page=9999909 | grep -B1 "description" | less
-
-Make a POST request with `curl`:
-
-    echo '{
-      "text": "Hello world github/linguist#1 **cool**, and #1!",
-      "mode": "gfm",
-      "context": "github/gollum"
-    }' | curl --data @- https://api.github.com/markdown
-
-#### GitHub API Authentication
-
-Many methods that take a user can use the authenticated user instead if present.
-
-Basic with user password pair:
-
-    curl -u 'cirosantilli' https://api.github.com/user/orgs
-
-Or:
-
-    curl -u 'cirosantilli:password' https://api.github.com/user/orgs
-
-#### GitHub API OAuth
-
-OAuth: generate a large random number called the *access token*. Which you can only get once.
-
-There are two ways to get the token:
-
--   personal tokens, generated by a logged in user from: <https://github.com/settings/tokens/new>
-
-    Useful if you need to generate only a few tokens for personal use.
-
--   application obtained token.
-
-    A way for applications to interact with GitHub and obtain a token.
-
-    User is first redirected to GitHub, inputs his password only there, and the token is sent back to the application.
-
-    Useful if you are building an application that must interact with GitHub, and don't want to store the user's password.
-
-    Each user gets a single token per application in case multiple token requests are made.
-
-Tokens are safer than storing the password directly because:
-
--   it is possible to restrict what can be done with each token, thus increasing confidence users have on your application.
--   users can revoke tokens at any time, without changing their passwords.
-
-Once you get the token, make an authenticated request with:
-
-    curl https://api.github.com/user?access_token=$TOKEN
-
-or:
-
-    curl -H "Authorization: token $TOKEN" https://api.github.com
-
-#### Rate limiting
-
-- authenticated: 60 requests per hour
-- unauthenticated requests: 5000 requests per hour
-
-<http://developer.github.com/v3/#rate-limiting>
-
-#### per_page
-
-Get given number of results. Default is 30. Allows you to beat web API limitations. List all starred repos of a user:
-
-    curl https://api.github.com/users/$USER/starred?per_page=9999909 | grep -B1 "description" | less
-
-#### Get repo info
-
-Lots of info:
-
-    curl -i https://api.github.com/users/$USER/repos
-
-#### Create repo
-
-    USER=
-    REPO=
-    curl -u "$USER" https://api.github.com/user/repos -d '{"name":"'$REPO'"}'
-
-Repo name is the very minimal you must set, but you could also set other params such as:
-
-    curl -u "$USER" https://api.github.com/user/repos -d '{
-       "name": "'"$REPO"'",
-       "description": "This is your first repo",
-       "homepage": "https://github.com",
-       "private": false,
-       "has_issues": true,
-       "has_wiki": true,
-       "has_downloads": true
-    }'
-
-Its just JSON (remember, last item cannot end in a comma).
-
-#### Delete repo
-
-    curl -u "$USER" -X DELETE https://api.github.com/repos/$USER/$REPO
-
-Careful, it works!
-
-### hub
-
-Powerful CLI interface: <https://github.com/github/hub>
-
-    gem install hub
-
-Open URL of current branch / commit in browser:
-
-    hub browse
-
-Create repository with same name as current dir:
-
-    hub create
-
-Give a name and a description:
-
-    hub create name -d 'Description'
 
 ## Test repos
 
