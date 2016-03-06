@@ -74,16 +74,6 @@ Docs explain well how this (shitty >:-)) software works:
 
         git config --local --add 'remote.origin.fetch +refs/changes/*:refs/remotes/origin/changes/*'
 
--   To back up changes that are not yet ready... use:
-
-        git push origin HEAD:refs/drafts/master
-
-    or:
-
-        git remote add ssh://<username>@gerrit-ring.savoirfairelinux.com:29420/ring-daemon
-        git config --local push.draft.url :refs/drafts/master
-        git push draft
-
 -   `/#/c/2538/6` means patchset 6 of change `2538`. `/#/c/2538` means the latest patch.
 
 -   I think when you rebase and force push multiple commits, it updates the patch-set per commit
@@ -137,3 +127,22 @@ To get the most recent one, change e.g. `Patch Sets (1/4)` to the latest `Patch 
 You can edit changes in the browser! Amazing for a system that has no web-view.
 
 <https://gerrit-review.googlesource.com/Documentation/user-inline-edit.html>
+
+## Drafts
+
+To back up changes that are not yet ready... use:
+
+    git push origin HEAD:refs/drafts/master
+
+or:
+
+    git remote add draft ssh://<username>@gerrit-ring.savoirfairelinux.com:29420/ring-daemon
+    git config --local push.draft.url :refs/drafts/master
+    git push draft
+
+The only thing this does is to hide the draft from everyone else. You can then explicitly allow individual people to see the draft.
+
+## Publish review line comments
+
+Even that is hard.
+
