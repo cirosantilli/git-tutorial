@@ -4,7 +4,6 @@ social_media: true
 permalink: git-tutorial/svn/
 ---
 
-
 ## Create
 
 Init:
@@ -27,7 +26,22 @@ Take a non-SVN file directory, convert it to SVN controlled one and push with th
 
     svn import "$local_path" "$remote_url" -m "$commit_message"
 
-## Modify
+## checkout
+
+    svn switch ^/branches/abranch
+    svn switch ^/tags/1.2.3
+
+## tag
+
+## branch
+
+List <http://stackoverflow.com/users/1305501/nosid> No kidding:
+
+    svn ls -v ^/
+    svn ls -v ^/tags
+    svn ls -v ^/branches
+
+---
 
 Add:
 
