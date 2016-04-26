@@ -1,7 +1,6 @@
 ---
 title: hg
 social_media: true
-permalink: git-tutorial/hg/
 ---
 
 Most commands look like Git, we will focus on differences.

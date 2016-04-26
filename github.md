@@ -1,7 +1,6 @@
 ---
 title: GitHub
 social_media: true
-permalink: git-tutorial/github/
 ---
 
 The git URL is then `git@github.com:userid/reponame.git`

@@ -1,7 +1,6 @@
 ---
 title: remote
 social_media: true
-permalink: git-tutorial/remote/
 ---
 
 Manage remote repositories.

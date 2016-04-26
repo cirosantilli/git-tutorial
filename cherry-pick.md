@@ -1,7 +1,6 @@
 ---
 title: cherry-pick
 social_media: true
-permalink: git-tutorial/cherry-pick/
 ---
 
 Merge change introduced by given commits.

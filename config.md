@@ -1,7 +1,6 @@
 ---
 title: config
 social_media: true
-permalink: git-tutorial/config/
 ---
 
 Allows to get and set configuration data.

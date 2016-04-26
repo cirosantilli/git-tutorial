@@ -1,7 +1,6 @@
 ---
 title: grep
 social_media: true
-permalink: git-tutorial/grep/
 ---
 
 

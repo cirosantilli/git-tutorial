@@ -1,7 +1,6 @@
 ---
 title: Gerrit
 social_media: true
-permalink: git-tutorial/gerrit/
 ---
 
 <https://www.gerritcodereview.com/>

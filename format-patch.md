@@ -1,7 +1,6 @@
 ---
 title: format-patch
 social_media: true
-permalink: git-tutorial/format-patch/
 ---
 
 Generate a patch to send by email.

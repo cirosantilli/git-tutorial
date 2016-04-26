@@ -1,7 +1,6 @@
 ---
 title: fetch
 social_media: true
-permalink: git-tutorial/fetch/
 ---
 
 Looks for changes made on a remote repository and brings them in.

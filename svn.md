@@ -1,7 +1,6 @@
 ---
 title: SVN
 social_media: true
-permalink: git-tutorial/svn/
 ---
 
 ## Create

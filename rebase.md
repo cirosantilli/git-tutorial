@@ -1,7 +1,6 @@
 ---
 title: rebase
 social_media: true
-permalink: git-tutorial/rebase/
 ---
 
 Change local history making it appear linear thus clearer.

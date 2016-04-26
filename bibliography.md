@@ -1,7 +1,6 @@
 ---
 title: Bibliography
 social_media: true
-permalink: git-tutorial/bibliography/
 ---
 
 -   Short help: `git help`
