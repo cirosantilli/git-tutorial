@@ -72,13 +72,13 @@ What happens on:
 
 depends on the `push.default` option, documented under `man git-config`:
 
--   `matching`: same as `git push <remote> :`. Default before 2.0. Insane because it does a mass update operation by default!
-
--   `upstream`: push the current branch to its upstream branch.
+-   `current`: push the current branch to a branch of the same name. Simple, explicit and does not depend on any configuration. I like it.
 
 -   `simple`: like `upstream`, but don't push if the remote branch name is different from the local one: you need en explicit refspec for that. Default starting on 2.0.
 
--   `current`: push the current branch to a branch of the same name. Simple, explicit and does not depend on any configuration.
+-   `matching`: same as `git push <remote> :`. Default before 2.0. Insane because it does a mass update operation by default!
+
+-   `upstream`: push the current branch to its upstream branch, which is defined at: TODO.
 
 -   `nothing`: do nothing. For those overly concious with safety. Forces you to always use the branch name explicitly.
 
