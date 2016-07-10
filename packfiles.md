@@ -300,4 +300,3 @@ Build `idx` file for a given `.pack`:
     git index-pack .git/objects/pack/pack-<SHA>.pack
 
 Generates the `.idx` on the same directory as the `.pack`.
-
