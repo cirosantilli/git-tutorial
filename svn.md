@@ -11,6 +11,10 @@ Init:
 
 The path must not exist.
 
+## checkout
+
+`git clone`
+
 Clone:
 
     svn checkout https://subversion.assembla.com/svn/cirosantillitest/
@@ -25,14 +29,30 @@ Take a non-SVN file directory, convert it to SVN controlled one and push with th
 
     svn import "$local_path" "$remote_url" -m "$commit_message"
 
-## checkout
+Unlike Git, you can pull specific directories:
+
+    svn checkout https://server.com/path/to/repo/dir/inside/repo
+
+`svn info` knows which directory was cloned afterwards.
+
+## info
+
+Get various information about the repo:
+
+    svn info
+
+Sample output: TODO
+
+## switch
+
+`git checkout`:
 
     svn switch ^/branches/abranch
     svn switch ^/tags/1.2.3
 
-## tag
+## ls
 
-## branch
+`git tag` and `git branch`.
 
 List <http://stackoverflow.com/users/1305501/nosid> No kidding:
 
@@ -72,3 +92,10 @@ Get single file from repo, modify it, and up again
     svn checkout readme.textile
     vim readme.textile
     svn ci -m 'modified readme.textile'
+
+## update
+
+`git pull`:
+
+    svn update
+    svn up
