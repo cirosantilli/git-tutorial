@@ -19,6 +19,14 @@ Show remotes:
 
     hg paths
 
+## branches
+
+List all branches.
+
+## tags
+
+List all branches.
+
 ## History
 
 Also developed for the kernel after the BitKeeper incident, but Git won, and mercurial will fall into oblivion.

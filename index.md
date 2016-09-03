@@ -30,8 +30,9 @@ New multi-file organization being built:
     1. [GitHub](github)
     1. [Gerrit](gerrit)
 1.  Other version control systems
-    1. [svn](svn)
-    1. [hg](hg)
+    1.  [svn](svn)
+    1.  [hg](hg)
+    1.  [cvs](cvs)
 
 ## Why learn Git
 
