@@ -60,11 +60,15 @@ List <http://stackoverflow.com/users/1305501/nosid> No kidding:
     svn ls -v ^/tags
     svn ls -v ^/branches
 
----
+# add
 
-Add:
+Only needed before the first commit for a given file.
 
     svn add $file
+
+After it has been added once, `svn commit` will see the file automatically.
+
+---
 
 Commit. If your SSH is added, this pushes to the original repository. In SVN everything happens over the network.
 
@@ -99,3 +103,15 @@ Get single file from repo, modify it, and up again
 
     svn update
     svn up
+
+## revert
+
+`git reset`
+
+<http://stackoverflow.com/questions/6204572/is-there-a-subversion-command-to-reset-the-working-copy>
+
+    svn revert --recursive .
+
+## git clean
+
+<http://stackoverflow.com/questions/239340/automatically-remove-subversion-unversioned-files>
