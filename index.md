@@ -3,6 +3,8 @@ title: Git Version Control Tutorial
 social_media: true
 ---
 
+TODO move to cirodown and migrate to cirosantilli.github.io.
+
 {{ site.toc }}
 
 New multi-file organization being built:
