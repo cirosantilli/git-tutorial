@@ -1027,7 +1027,7 @@ Then reset hard to it:
 
     git reset --hard HEAD@{1}
 
-And if you just did the `reste --hard` to any commit, you might also be able to get away simply with:
+And if you just did the `reset --hard` to any commit, you might also be able to get away simply with:
 
     git reset --hard ORIG_HEAD
 
